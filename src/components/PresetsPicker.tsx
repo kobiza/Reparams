@@ -132,14 +132,14 @@ const PresetsPicker = (props: PresetsPickerProps) => {
         const entriesToAdd = presetsKeys.map(presetKey => presets[presetKey])
         const newEntries = mergeEntries([entries, ...entriesToAdd], props.paramsWithMultipleValues)
 
-        addEntriesAndNavigate(newEntries)
+        setEntries(newEntries)
     }
 
     const addPresetsAndNavigate = (presetsKeys: Array<string>) => {
         const entriesToAdd = presetsKeys.map(presetKey => presets[presetKey])
         const newEntries = mergeEntries([entries, ...entriesToAdd], props.paramsWithMultipleValues)
 
-        setEntries(newEntries)
+        addEntriesAndNavigate(newEntries)
     }
 
     const onAdd: TagsProps['onAdd'] = ({value}) => {
@@ -154,7 +154,7 @@ const PresetsPicker = (props: PresetsPickerProps) => {
     const quickActionButtons = quickActions.map((quickActionData) => {
         const {label, presets} = quickActionData
 
-        const quickActionCb = () => addPresets(presets)
+        const quickActionCb = () => addPresetsAndNavigate(presets)
 
         return (
             <button className="app-button quick-action-button" key={`quick-action-${label}`}
