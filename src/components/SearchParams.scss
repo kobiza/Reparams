@@ -1,0 +1,14 @@
+.query-param-input {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.query-param-input-key {
+    flex: 1;
+}
+
+.query-param-input-value {
+    flex: 2;
+}

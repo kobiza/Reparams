@@ -1,0 +1,42 @@
+.page-title {
+    font-size: 36px;
+    line-height: 48px;
+    font-weight: 400;
+}
+
+.preset-item, .package-item {
+    margin: 10px 0;
+    padding: 20px;
+}
+
+.package-name-wrapper {
+    position: relative;
+}
+
+.package-name-edit {
+    position: absolute;
+    top: 0;
+}
+
+.package-name-view.hidden-x,
+.package-name-edit.hidden-x {
+    visibility: hidden;
+}
+
+.quick-actions-presets-input {
+    margin-top: 10px;
+}
+
+.multi-param-input-row {
+    margin-top: 10px;
+}
+
+.multi-param-input-key {
+    margin-right: 10px;
+}
+
+.preset-name-wrapper {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
