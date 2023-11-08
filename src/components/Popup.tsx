@@ -14,7 +14,7 @@ function Popup({currentTabUrl, tabId}: { currentTabUrl: string; tabId: string })
 
     const openNewTab = (newUrl: string) => {
         // @ts-ignores
-        chrome.tabs.create({url: newURL});
+        chrome.tabs.create({url: newUrl});
     }
 
     return (
