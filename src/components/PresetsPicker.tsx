@@ -62,10 +62,13 @@ const isPresetOn = ({entriesMap, key, value, paramsWithMultipleValues}: Predicat
     return value.split(separator).every(singleValue => currentValuesMap[singleValue])
 }
 
-
-const getSelectedPresets = ({presets, paramsWithMultipleValues}: PresetsPickerProps, _entries: SearchParamsEntries): Array<string> => {
+const getSelectedPresets = ({presets, paramsWithMultipleValues, entries}: {
+    presets: PresetsEntriesMapViewModel
+    paramsWithMultipleValues: ParamsWithMultipleValuesViewModel
+    entries: SearchParamsEntries
+}): Array<string> => {
     const presetsKeys = Object.keys(presets)
-    const entriesMap = getEntriesMap(_entries)
+    const entriesMap = getEntriesMap(entries)
 
     const selected = presetsKeys.filter(presetKey => {
         const presetEntries = presets[presetKey]
@@ -83,48 +86,60 @@ const getSelectedPresets = ({presets, paramsWithMultipleValues}: PresetsPickerPr
     })
 }
 
+const getEntriesToRemoveRemovingPreset = (presetKeyToRemove: string, {presets, paramsWithMultipleValues, entries}: {
+    presets: PresetsEntriesMapViewModel
+    paramsWithMultipleValues: ParamsWithMultipleValuesViewModel
+    entries: SearchParamsEntries
+}) => {
+    const _selectedPresets = getSelectedPresets({presets, paramsWithMultipleValues, entries})
+    const otherPresets = _selectedPresets.filter(currPresetKey => currPresetKey !== presetKeyToRemove)
+    const otherEntries = Object.values(pick(presets, otherPresets))
+    const mergedEntries = mergeEntries(otherEntries, paramsWithMultipleValues)
+    const otherEntriesMap = getEntriesMap(mergedEntries)
+    const entriesToRemove = presets[presetKeyToRemove].reduce<Array<[string, string]>>((acc, entry) => {
+        const [key, value] = entry
+        const multiData = paramsWithMultipleValues[key]
+
+        // param that used only on the removed preset
+        if (!otherEntriesMap[key]) {
+            acc.push(entry)
+        } else {
+            if (multiData) {
+                // multi data and exist on other preset -> filter the values that used only on the remove preset
+                const {separator} = multiData
+                const valuesToKeepMap = toTrueObj(otherEntriesMap[key].value.split(separator), v => v)
+                const valuesToRemove = value.split(separator).filter(value => {
+                    return !valuesToKeepMap[value]
+                })
+
+                acc.push([key, valuesToRemove.join(separator)])
+            }
+        }
+
+
+        return acc
+    }, [])
+
+    return entriesToRemove
+}
+
+const getEntriesAfterRemovingPreset = (sourceEntries: SearchParamsEntries, presetKeyToRemove: string, {paramsWithMultipleValues, presets}: {paramsWithMultipleValues: ParamsWithMultipleValuesViewModel, presets: PresetsEntriesMapViewModel}) => {
+    const entriesToRemove = getEntriesToRemoveRemovingPreset( presetKeyToRemove, {presets, paramsWithMultipleValues, entries: sourceEntries})
+
+    return removeEntries(sourceEntries, entriesToRemove, paramsWithMultipleValues)
+}
+
 const PresetsPicker = (props: PresetsPickerProps) => {
     const {className, presets, paramsWithMultipleValues, entries, setEntries, addEntriesAndNavigate} = props
     const presetsKeys = Object.keys(presets)
 
-    const removePreset = (sourceEntries: SearchParamsEntries, presetKeyToRemove: string) => {
-        const _selectedPresets = getSelectedPresets(props, sourceEntries)
-        const otherPresets = _selectedPresets.filter(currPresetKey => currPresetKey !== presetKeyToRemove)
-        const otherEntries = Object.values(pick(presets, otherPresets))
-        const mergedEntries = mergeEntries(otherEntries, paramsWithMultipleValues)
-        const otherEntriesMap = getEntriesMap(mergedEntries)
-        const entriesToRemove = presets[presetKeyToRemove].reduce<Array<[string, string]>>((acc, entry) => {
-            const [key, value] = entry
-            const multiData = paramsWithMultipleValues[key]
 
-            // param that used only on the removed preset
-            if (!otherEntriesMap[key]) {
-                acc.push(entry)
-            } else {
-                if (multiData) {
-                    // multi data and exist on other preset -> filter the values that used only on the remove preset
-                    const {separator} = multiData
-                    const valuesToKeepMap = toTrueObj(otherEntriesMap[key].value.split(separator), v => v)
-                    const valuesToRemove = value.split(separator).filter(value => {
-                        return !valuesToKeepMap[value]
-                    })
-
-                    acc.push([key, valuesToRemove.join(separator)])
-                }
-            }
-
-
-            return acc
-        }, [])
-
-        return removeEntries(sourceEntries, entriesToRemove, paramsWithMultipleValues)
-    }
 
     const removePresets = (presetsKeys: Array<string>) => {
         let newEntries = entries
 
         presetsKeys.forEach(presetKey => {
-            newEntries = removePreset(newEntries, presetKey)
+            newEntries = getEntriesAfterRemovingPreset(newEntries, presetKey, {paramsWithMultipleValues, presets})
         })
 
         setEntries(newEntries)
@@ -132,7 +147,7 @@ const PresetsPicker = (props: PresetsPickerProps) => {
 
     // todo - switch to https://github.com/i-like-robots/react-tag-autocomplete
 
-    const selectedPresets = getSelectedPresets(props, props.entries)
+    const selectedPresets = getSelectedPresets(props)
     const selected = selectedPresets.map(presetKey => ({value: presetKey, label: presetKey}))
     const suggestions = presetsKeys.map(presetKey => ({value: presetKey, label: presetKey}))
 

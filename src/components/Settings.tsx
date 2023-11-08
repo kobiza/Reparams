@@ -11,14 +11,14 @@ import {
     Accordion,
     AccordionDetails,
     AccordionSummary,
-    Box,
+    Box, Button,
     IconButton, Paper,
     Tab,
     Tabs,
-    TextField,
+    TextField, Typography,
 } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {Clear, Delete, Edit} from "@mui/icons-material";
+import {Delete, Edit} from "@mui/icons-material";
 import classNames from "classnames";
 import {forEach} from "lodash";
 
@@ -131,7 +131,8 @@ const PresetsEditor = ({packageIndex, presets, updatePackagePreset}: PresetsEdit
     return (
         <div>
             {presetsItems}
-            <button className="app-button apply-button" onClick={addNewPreset}>Add new Preset</button>
+            <Button color="secondary" sx={{color: '#fff', marginTop: '10px'}} onClick={addNewPreset}
+                    variant="contained">Add new Preset</Button>
         </div>
     )
 }
@@ -207,9 +208,10 @@ const ParamsEditor = ({
     }
     return (
         <div>
-            <h3>Params with multiple values</h3>
+            <Typography variant="h6" padding={1}>Params with multiple values</Typography>
             {paramsItems}
-            <button className="app-button apply-button" onClick={addNewMultiParam}>Add new param</button>
+            <Button color="secondary" sx={{color: '#fff', marginTop: '10px'}} onClick={addNewMultiParam}
+                    variant="contained">Add</Button>
         </div>
     )
 }
@@ -274,14 +276,17 @@ const QuickActionsEditor = ({
         return (
             <Paper key={id} elevation={2} className="preset-item">
                 <TextField
-                    InputLabelProps={{sx: {
-                        zIndex: 'unset'
-                        }}}
+                    InputLabelProps={{
+                        sx: {
+                            zIndex: 'unset'
+                        }
+                    }}
                     label="Quick action label"
                     size="small"
                     value={label} onChange={e => updateButtonLabel(e.target.value)}
                 />
-                <Tags sx={{width: 'auto'}} onAdd={onAdd} onDelete={onDelete} selected={selected} suggestions={suggestions} placeholderText='New preset'/>
+                <Tags sx={{width: 'auto'}} onAdd={onAdd} onDelete={onDelete} selected={selected}
+                      suggestions={suggestions} placeholderText='New preset'/>
             </Paper>
         )
     })
@@ -300,7 +305,8 @@ const QuickActionsEditor = ({
     return (
         <div>
             {quickActionsItems}
-            <button className="app-button apply-button" onClick={addNewQuickAction}>Add quick actions</button>
+            <Button color="secondary" sx={{color: '#fff', marginTop: '10px'}} onClick={addNewQuickAction}
+                    variant="contained">Add</Button>
         </div>
     )
 }
@@ -343,7 +349,7 @@ const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProp
     }
 
     const stopRenameMode = (e: SyntheticEvent) => {
-        setIsRenameActive(false)
+        // setIsRenameActive(false)
     }
 
     const handleRenameKey: KeyboardEventHandler = (e) => {
@@ -386,17 +392,23 @@ const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProp
             >
                 <div className="package-name-wrapper">
                     <div className={classNames("package-name-view", {'hidden-x': isRenameActive})}>
-                        <span>{label}</span>
+                        <Typography sx={{paddingLeft: '6px'}}>{label}</Typography>
                         <IconButton aria-label="delete" color="primary" size="small"
                                     sx={{padding: '0', marginLeft: '10px'}} onClick={startRenameMode}>
                             <Edit fontSize="inherit"/>
                         </IconButton>
                     </div>
                     <div className={classNames("package-name-edit", {'hidden-x': !isRenameActive})}>
-                        <input className="package-name-input" ref={packageNameInputRef} type="text" value={label}
-                               onKeyUp={handleRenameKey}
-                               onChange={e => updateCurrentPackageLabel(e.target.value)}
-                        onBlur={stopRenameMode}/>
+                        <TextField inputRef={packageNameInputRef} type="text" value={label}
+                                   onKeyUp={handleRenameKey}
+                                   onChange={e => updateCurrentPackageLabel(e.target.value)}
+                                   onBlur={stopRenameMode} inputProps={{sx: {padding: '0px', paddingLeft: '6px'},
+                        }}
+                        ></TextField>
+                        {/*<input className="package-name-input" ref={packageNameInputRef} type="text" value={label}*/}
+                        {/*       onKeyUp={handleRenameKey}*/}
+                        {/*       onChange={e => updateCurrentPackageLabel(e.target.value)}*/}
+                        {/*onBlur={stopRenameMode}/>*/}
                     </div>
                 </div>
 
@@ -436,14 +448,16 @@ const Settings = () => {
     } = editorStore
     const packagesList = appState.map((packageData, packageIndex) => {
         return (
-            <PackagePanel key={packageData.key} packageData={packageData} packageIndex={packageIndex} editorStore={editorStore}/>
+            <PackagePanel key={packageData.key} packageData={packageData} packageIndex={packageIndex}
+                          editorStore={editorStore}/>
         )
     })
     return (
         <div>
-            <h1 className="page-title">Settings</h1>
+            <Typography variant="h3" padding={1}>Settings</Typography>
             {packagesList}
-            <button className="app-button apply-button" onClick={addNewPackage}>Add new Package</button>
+            <Button color="secondary" sx={{color: '#fff', marginTop: '10px'}} onClick={addNewPackage}
+                    variant="contained">Add new Package</Button>
         </div>
     )
 }
