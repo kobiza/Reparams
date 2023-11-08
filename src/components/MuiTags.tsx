@@ -1,11 +1,12 @@
 import React from 'react'
 
 import './Tags.scss'
-import {Autocomplete, Checkbox, Chip, TextField} from "@mui/material";
+import {Autocomplete, Checkbox, Chip, TextField, Theme} from "@mui/material";
 import {toTrueObj} from "../utils/arrayUtils";
 
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import {SxProps} from "@mui/system";
 
 export type TagsItem = { value: string; label: string; }
 
@@ -15,10 +16,11 @@ export type TagsProps = {
     selected: Array<TagsItem>,
     suggestions: Array<TagsItem>,
     placeholderText: string,
-    className?: string
+    className?: string,
+    sx?: SxProps<Theme>
 }
 
-const Tags = ({selected, suggestions, placeholderText, className, onAdd, onDelete}: TagsProps) => {
+const Tags = ({selected, suggestions, placeholderText, className, onAdd, onDelete, sx}: TagsProps) => {
     const onChange = (e: any, newSelected: Array<{ value: string; label: string; }>) => {
         console.log('onChange', newSelected)
         const prevTrueObj = toTrueObj(selected, (v) => v.value)
@@ -36,10 +38,11 @@ const Tags = ({selected, suggestions, placeholderText, className, onAdd, onDelet
         }
     }
 
-    const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
-    const checkedIcon = <CheckBoxIcon fontSize="small" />;
+    const icon = <CheckBoxOutlineBlankIcon fontSize="small"/>;
+    const checkedIcon = <CheckBoxIcon fontSize="small"/>;
     return (
         <Autocomplete
+            sx={sx}
             className={className}
             multiple
             disableCloseOnSelect
@@ -54,13 +57,13 @@ const Tags = ({selected, suggestions, placeholderText, className, onAdd, onDelet
             //         <Chip {...getTagProps({ index })} label={option.value} color="secondary"/>
             //     ));
             // }}
-            renderOption={(props, option, { selected }) => {
+            renderOption={(props, option, {selected}) => {
                 return (
                     <li {...props}>
                         <Checkbox
                             icon={icon}
                             checkedIcon={checkedIcon}
-                            style={{ marginRight: 8 }}
+                            style={{marginRight: 8}}
                             checked={selected}
                         />
                         {option.label}
@@ -70,7 +73,6 @@ const Tags = ({selected, suggestions, placeholderText, className, onAdd, onDelet
             renderInput={(params) => (
                 <TextField hiddenLabel={true} {...params} placeholder={placeholderText}/>
             )}
-            sx={{width: '500px'}}
         />
     )
 }

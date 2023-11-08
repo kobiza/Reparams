@@ -5,8 +5,8 @@ import {uuidv4} from "../utils/utils";
 
 import './Settings.scss'
 import SearchParams from "./SearchParams";
-import {removeItem, replaceItem} from "../utils/arrayUtils";
-import Tags, {TagsProps} from "./Tags";
+import {removeItem, replaceItem, toTrueObj} from "../utils/arrayUtils";
+import Tags, {TagsProps} from "./MuiTags";
 import {
     Accordion,
     AccordionDetails,
@@ -20,6 +20,7 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {Clear, Delete, Edit} from "@mui/icons-material";
 import classNames from "classnames";
+import {forEach} from "lodash";
 
 
 interface TabPanelProps {
@@ -236,29 +237,33 @@ const QuickActionsEditor = ({
             updatePackageQuickActions(packageIndex, newQuickActions)
         }
 
-        const addPreset = (presetLabel: string) => {
+        const addPresets = (presetsKeys: Array<string>) => {
+            const newPresets = [...quickActions[index].presets, ...presetsKeys]
             const newQuickActions: SettingsPackage['quickActions'] = replaceItem(quickActions, {
                 ...quickActions[index],
-                presets: [...quickActions[index].presets, presetLabel]
+                presets: newPresets
             }, index)
 
             updatePackageQuickActions(packageIndex, newQuickActions)
         }
 
-        const removePreset = (indexToRemove: number) => {
+        const removePresets = (presets: Array<string>) => {
+            const keysToRemoveMap = toTrueObj(presets, item => item)
+            const newPresets = quickActions[index].presets.filter(presetKey => !keysToRemoveMap[presetKey])
+
             const newQuickActions: SettingsPackage['quickActions'] = replaceItem(quickActions, {
                 ...quickActions[index],
-                presets: removeItem(quickActions[index].presets, indexToRemove)
+                presets: newPresets
             }, index)
 
             updatePackageQuickActions(packageIndex, newQuickActions)
         }
 
-        const onAdd: TagsProps['onAdd'] = (preset) => {
-            addPreset(preset.label)
+        const onAdd: TagsProps['onAdd'] = (presets) => {
+            addPresets(presets.map(v => v.value))
         }
-        const onDelete: TagsProps['onDelete'] = (index) => {
-            removePreset(index)
+        const onDelete: TagsProps['onDelete'] = (presets) => {
+            removePresets(presets.map(v => v.value))
         }
         const selected: TagsProps['selected'] = presets.map(v => ({label: v, value: v}))
         const suggestions: TagsProps['suggestions'] = Object.values(allPresets).map(({label}) => ({
@@ -276,8 +281,7 @@ const QuickActionsEditor = ({
                     size="small"
                     value={label} onChange={e => updateButtonLabel(e.target.value)}
                 />
-                <Tags classNames="quick-actions-presets-input" onAdd={onAdd} onDelete={onDelete} selected={selected} suggestions={suggestions}
-                      placeholderText='New preset'/>
+                <Tags sx={{width: 'auto'}} onAdd={onAdd} onDelete={onDelete} selected={selected} suggestions={suggestions} placeholderText='New preset'/>
             </Paper>
         )
     })
