@@ -1,0 +1,14 @@
+.url-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.presets-picker-container {
+  display: flex;
+  gap: 10px;
+}
+
+.presets-picker {
+  flex: 1;
+}

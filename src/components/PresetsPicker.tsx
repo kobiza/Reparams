@@ -8,21 +8,21 @@ import {toTrueObj} from "../utils/arrayUtils";
 import {max, pick, sortBy} from 'lodash'
 
 import './PresetsPicker.scss'
-import {QuickActionData, SearchParamsEntries, SetEntries} from "../types/types";
+import {SearchParamsEntries, SetEntries} from "../types/types";
 import {mergeEntries, removeEntries} from "../utils/searchParamsUtils";
-import Tags, {TagsProps} from "./Tags";
+import Tags, {TagsProps} from "./MuiTags";
 
 
 // const PresetsPicker = ({presetsNames, allPresetsNames}: PresetsPickerProps) => {
 
 
-type PresetsPickerProps = {
+export type PresetsPickerProps = {
     entries: SearchParamsEntries
-    setEntries: SetEntries,
-    addEntriesAndNavigate: AddEntriesAndNavigate,
+    setEntries: SetEntries
+    addEntriesAndNavigate: AddEntriesAndNavigate
     presets: PresetsEntriesMapViewModel
-    quickActions: QuickActionData
     paramsWithMultipleValues: ParamsWithMultipleValuesViewModel
+    className?: string
 }
 
 type EntriesMap = { [entryKey: string]: { value: string, index: number } }
@@ -63,9 +63,9 @@ const isPresetOn = ({entriesMap, key, value, paramsWithMultipleValues}: Predicat
 }
 
 
-const getSelectedPresets = ({presets, entries, paramsWithMultipleValues}: PresetsPickerProps): Array<string> => {
+const getSelectedPresets = ({presets, paramsWithMultipleValues}: PresetsPickerProps, _entries: SearchParamsEntries): Array<string> => {
     const presetsKeys = Object.keys(presets)
-    const entriesMap = getEntriesMap(entries)
+    const entriesMap = getEntriesMap(_entries)
 
     const selected = presetsKeys.filter(presetKey => {
         const presetEntries = presets[presetKey]
@@ -84,17 +84,16 @@ const getSelectedPresets = ({presets, entries, paramsWithMultipleValues}: Preset
 }
 
 const PresetsPicker = (props: PresetsPickerProps) => {
-    const {presets, paramsWithMultipleValues, entries, setEntries, quickActions, addEntriesAndNavigate} = props
+    const {className, presets, paramsWithMultipleValues, entries, setEntries, addEntriesAndNavigate} = props
     const presetsKeys = Object.keys(presets)
 
-    const selectedPresets = getSelectedPresets(props)
-
-    const removePreset = (presetKey: string) => {
-        const otherPresets = selectedPresets.filter(currPresetKey => currPresetKey !== presetKey)
+    const removePreset = (sourceEntries: SearchParamsEntries, presetKeyToRemove: string) => {
+        const _selectedPresets = getSelectedPresets(props, sourceEntries)
+        const otherPresets = _selectedPresets.filter(currPresetKey => currPresetKey !== presetKeyToRemove)
         const otherEntries = Object.values(pick(presets, otherPresets))
         const mergedEntries = mergeEntries(otherEntries, paramsWithMultipleValues)
         const otherEntriesMap = getEntriesMap(mergedEntries)
-        const entriesToRemove = presets[presetKey].reduce<Array<[string, string]>>((acc, entry) => {
+        const entriesToRemove = presets[presetKeyToRemove].reduce<Array<[string, string]>>((acc, entry) => {
             const [key, value] = entry
             const multiData = paramsWithMultipleValues[key]
 
@@ -118,13 +117,22 @@ const PresetsPicker = (props: PresetsPickerProps) => {
             return acc
         }, [])
 
-        const newEntries = removeEntries(entries, entriesToRemove, paramsWithMultipleValues)
+        return removeEntries(sourceEntries, entriesToRemove, paramsWithMultipleValues)
+    }
+
+    const removePresets = (presetsKeys: Array<string>) => {
+        let newEntries = entries
+
+        presetsKeys.forEach(presetKey => {
+            newEntries = removePreset(newEntries, presetKey)
+        })
 
         setEntries(newEntries)
     }
 
     // todo - switch to https://github.com/i-like-robots/react-tag-autocomplete
 
+    const selectedPresets = getSelectedPresets(props, props.entries)
     const selected = selectedPresets.map(presetKey => ({value: presetKey, label: presetKey}))
     const suggestions = presetsKeys.map(presetKey => ({value: presetKey, label: presetKey}))
 
@@ -135,50 +143,30 @@ const PresetsPicker = (props: PresetsPickerProps) => {
         setEntries(newEntries)
     }
 
-    const addPresetsAndNavigate = (presetsKeys: Array<string>) => {
+    const addPresetsAndNavigate = (presetsKeys: Array<string>, shouldOpenNewTab: boolean) => {
         const entriesToAdd = presetsKeys.map(presetKey => presets[presetKey])
         const newEntries = mergeEntries([entries, ...entriesToAdd], props.paramsWithMultipleValues)
 
-        addEntriesAndNavigate(newEntries)
+        addEntriesAndNavigate(newEntries, shouldOpenNewTab)
     }
 
-    const onAdd: TagsProps['onAdd'] = ({value}) => {
-        addPresets([(value as string)])
+    const onAdd: TagsProps['onAdd'] = (itemsToAdd) => {
+        addPresets(itemsToAdd.map(v => v.value))
     }
 
-    const onDelete: TagsProps['onDelete'] = (tagIndex) => {
-        const presetKey = selectedPresets[tagIndex]
-        return removePreset(presetKey)
+    const onDelete: TagsProps['onDelete'] = (itemsToDelete) => {
+        removePresets(itemsToDelete.map(v => v.value))
     }
-
-    const quickActionButtons = quickActions.map((quickActionData) => {
-        const {label, presets} = quickActionData
-
-        const quickActionCb = () => addPresetsAndNavigate(presets)
-
-        return (
-            <button className="app-button quick-action-button" key={`quick-action-${label}`}
-                    onClick={quickActionCb}>{label}</button>
-        )
-    })
 
     return (
-        <div className="presets-picker">
-            <h2>Presets:</h2>
-            <Tags
-                onAdd={onAdd}
-                onDelete={onDelete}
-                selected={selected}
-                suggestions={suggestions}
-                placeholderText="Add new preset"
-            />
-            <div className="quick-actions">
-                <h2>Quick actions:</h2>
-                <div className="quick-actions-buttons">
-                    {quickActionButtons}
-                </div>
-            </div>
-        </div>
+        <Tags
+            className={className}
+            onAdd={onAdd}
+            onDelete={onDelete}
+            selected={selected}
+            suggestions={suggestions}
+            placeholderText="Add new preset"
+        />
 
     )
 }

@@ -1,7 +1,9 @@
+import {PaletteColorOptions} from "@mui/material";
+
 export type SearchParamsEntries = Array<[key: string, value: string]>
 
 export type SetEntries = (newSearchParamsEntries: SearchParamsEntries) => void
-export type AddEntriesAndNavigate = (newSearchParamsEntries: SearchParamsEntries) => void
+export type AddEntriesAndNavigate = (newSearchParamsEntries: SearchParamsEntries, shouldOpenNewTab: boolean) => void
 
 export type PresetsEntriesMap = {
     [id: string]: {
@@ -73,3 +75,18 @@ export type ViewerModel = {
 export type ViewerStore = {
     state: ViewerModel
 }
+
+
+// declare module '@mui/material/styles' {
+//     interface CustomPalette {
+//         mycolor1: PaletteColorOptions;
+//     }
+//     interface Palette extends CustomPalette {}
+//     interface PaletteOptions extends CustomPalette {}
+// }
+//
+// declare module '@mui/material/Button' {
+//     interface ButtonPropsColorOverrides {
+//         mycolor1: true;
+//     }
+// }

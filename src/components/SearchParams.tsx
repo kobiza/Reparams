@@ -2,8 +2,8 @@ import React, {useEffect, useRef} from "react";
 import {SearchParamsEntries, SetEntries} from "../types/types";
 import {updateEntryKey, updateEntryValue} from "../utils/searchParamsUtils";
 import './SearchParams.scss'
-import {IconButton, TextField} from "@mui/material";
-import {Clear} from "@mui/icons-material";
+import {Button, IconButton, TextField} from "@mui/material";
+import {Add, Clear} from "@mui/icons-material";
 import {removeItem} from "../utils/arrayUtils";
 import usePrevious from "./usePrevious";
 
@@ -15,6 +15,7 @@ type SearchParamsProps = {
 
 
 const SearchParams = ({entries, setEntries}: SearchParamsProps) => {
+    const shouldFocusNewParam = useRef<boolean>(false)
     const itemsRef = useRef<Array<HTMLDivElement | null>>([]);
     // you can access the elements with itemsRef.current[n]
 
@@ -25,10 +26,12 @@ const SearchParams = ({entries, setEntries}: SearchParamsProps) => {
     const prevEntriesLength = usePrevious<number>(entries.length)
 
     useEffect(() => {
-        if (prevEntriesLength === entries.length - 1) {
+        if (shouldFocusNewParam.current && prevEntriesLength === entries.length - 1) {
             itemsRef.current[entries.length - 1]!.focus()
+
+            shouldFocusNewParam.current = false
         }
-    }, [entries.length, prevEntriesLength])
+    }, [entries.length, prevEntriesLength, shouldFocusNewParam.current])
 
     const items = entries.map(([key, value], index) => {
         const updateCurrentEntryValue = (newValue: string) => {
@@ -49,11 +52,6 @@ const SearchParams = ({entries, setEntries}: SearchParamsProps) => {
             setEntries(newEntries)
         }
 
-        // const isLast = index === entries.length - 1
-
-        // const refProps = isLast ? {
-        //     ref: lastItemKeyRef
-        // } : {}
         return (
             <li className="query-param-input" key={index}>
                 <TextField
@@ -82,6 +80,7 @@ const SearchParams = ({entries, setEntries}: SearchParamsProps) => {
     })
 
     const addNewEntry = () => {
+        shouldFocusNewParam.current = true
         setEntries([...entries, ['', '']])
     }
 
@@ -89,8 +88,8 @@ const SearchParams = ({entries, setEntries}: SearchParamsProps) => {
         <div>
             <ul>
                 {items}
-                <button className="app-button apply-button" onClick={addNewEntry}>Add param</button>
             </ul>
+            <Button color="secondary" endIcon={<Add/>} sx={{color: '#fff', marginTop: '10px'}} onClick={addNewEntry} variant="contained">Add</Button>
         </div>
     )
 }

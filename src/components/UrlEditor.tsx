@@ -1,19 +1,23 @@
-import React, {useState} from 'react';
+import React, {MouseEventHandler, useState} from 'react';
 import './App.scss';
 import SearchParams from "./SearchParams";
-import PresetsPicker from "./PresetsPicker";
-import classnames from "classnames";
+import PresetsPicker, {PresetsPickerProps} from "./PresetsPicker";
+
 import {
     ParamsWithMultipleValuesViewModel,
     PresetsEntriesMapViewModel,
     QuickActionData
 } from "../types/types";
-import {Paper} from "@mui/material";
-import {divide} from "lodash";
+import {AppBar, Box, Button, Grid, Paper, Typography} from "@mui/material";
+
+import QuickActions from "./QuickActions";
+import './UrlEditor.scss'
+import {Add} from "@mui/icons-material";
 
 type UrlEditorProps = {
-    url: string,
-    updateUrl: (newUrl: string) => void,
+    currentTabUrl: string,
+    updateCurrentTabUrl: (newUrl: string) => void,
+    openNewTab: (newUrl: string) => void,
     presets: PresetsEntriesMapViewModel
     paramsWithMultipleValues: ParamsWithMultipleValuesViewModel,
     quickActions: QuickActionData
@@ -29,9 +33,17 @@ const addEntries = (url: string, newEntries: Array<[string, string]>) => {
     return newUrlData.toString()
 }
 
-function UrlEditor({url, updateUrl, className, presets, paramsWithMultipleValues, quickActions}: UrlEditorProps) {
+function UrlEditor({
+                       currentTabUrl,
+                       updateCurrentTabUrl,
+                       openNewTab,
+                       className,
+                       presets,
+                       paramsWithMultipleValues,
+                       quickActions
+                   }: UrlEditorProps) {
     // const urlData = new URL(url)
-    const [newUrl, setNewUrl] = useState(url)
+    const [newUrl, setNewUrl] = useState(currentTabUrl)
     const newUrlData = new URL(newUrl)
     const searchParamsEntries = [...newUrlData.searchParams.entries()]
     const setSearchParamsEntries = (newSearchParamsEntries: Array<[string, string]>) => {
@@ -40,29 +52,46 @@ function UrlEditor({url, updateUrl, className, presets, paramsWithMultipleValues
         })
     }
 
-    const addEntriesAndNavigate = (newSearchParamsEntries: Array<[string, string]>) => {
+    const addEntriesAndNavigate: PresetsPickerProps['addEntriesAndNavigate'] = (newSearchParamsEntries, shouldOpenNewTab) => {
         setNewUrl((prevUrl) => {
-            const nextUrl = addEntries(newUrl, newSearchParamsEntries)
+            const nextUrl = addEntries(prevUrl, newSearchParamsEntries)
 
-            updateUrl(nextUrl)
+            if (shouldOpenNewTab) {
+                openNewTab(nextUrl)
+            } else {
+                updateCurrentTabUrl(nextUrl)
+            }
 
             return nextUrl
         })
     }
 
 
-    const updateUrlHandler = () => {
-        updateUrl(newUrl)
+    const applyUrl: MouseEventHandler<HTMLButtonElement> = (e) => {
+        const shouldOpenNewTab = e.metaKey
+
+        if (shouldOpenNewTab) {
+            openNewTab(newUrl)
+        } else {
+            updateCurrentTabUrl(newUrl)
+        }
     }
 
     return (
-        <div>
-            <h1 className="app-title">Reparams</h1>
+        <div className="url-editor">
+            <AppBar position="relative">
+                <Typography variant="h3" padding={1}>Reparams</Typography>
+            </AppBar>
+            <div className="presets-picker-container">
+                <PresetsPicker className="presets-picker" entries={searchParamsEntries} setEntries={setSearchParamsEntries} presets={presets}
+                               paramsWithMultipleValues={paramsWithMultipleValues}
+                               addEntriesAndNavigate={addEntriesAndNavigate}/>
+                <Button variant="contained" onClick={applyUrl}>Apply</Button>
+            </div>
             <SearchParams entries={searchParamsEntries} setEntries={setSearchParamsEntries}/>
-            <PresetsPicker entries={searchParamsEntries} setEntries={setSearchParamsEntries} presets={presets}
-                           paramsWithMultipleValues={paramsWithMultipleValues} quickActions={quickActions}
-                           addEntriesAndNavigate={addEntriesAndNavigate}/>
-            <button className="app-button apply-button" onClick={updateUrlHandler}>Apply</button>
+            <QuickActions entries={searchParamsEntries} setEntries={setSearchParamsEntries} presets={presets}
+                          paramsWithMultipleValues={paramsWithMultipleValues} quickActions={quickActions}
+                          addEntriesAndNavigate={addEntriesAndNavigate}/>
         </div>
     );
 }
