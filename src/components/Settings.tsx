@@ -21,7 +21,10 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {Delete, Edit} from "@mui/icons-material";
 import classNames from "classnames";
 import {forEach} from "lodash";
+import SettingsHeader from "./SettingsHeader";
 
+
+export type SettingsPages = 'Packages' | 'Shortcuts'
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -349,7 +352,7 @@ const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProp
     }
 
     const stopRenameMode = (e: SyntheticEvent) => {
-        // setIsRenameActive(false)
+        setIsRenameActive(false)
     }
 
     const handleRenameKey: KeyboardEventHandler = (e) => {
@@ -405,10 +408,6 @@ const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProp
                                    onBlur={stopRenameMode} inputProps={{sx: {padding: '0px', paddingLeft: '6px'},
                         }}
                         ></TextField>
-                        {/*<input className="package-name-input" ref={packageNameInputRef} type="text" value={label}*/}
-                        {/*       onKeyUp={handleRenameKey}*/}
-                        {/*       onChange={e => updateCurrentPackageLabel(e.target.value)}*/}
-                        {/*onBlur={stopRenameMode}/>*/}
                     </div>
                 </div>
 
@@ -440,7 +439,7 @@ const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProp
     )
 }
 
-const Settings = () => {
+const PackagesPage = () => {
     const editorStore = useContext(EditorStoreContext)
     const {
         state: appState,
@@ -454,10 +453,25 @@ const Settings = () => {
     })
     return (
         <div>
-            <Typography variant="h3" padding={1}>Settings</Typography>
             {packagesList}
             <Button color="secondary" sx={{color: '#fff', marginTop: '10px'}} onClick={addNewPackage}
                     variant="contained">Add new Package</Button>
+        </div>
+    )
+}
+
+const ShortcutsPage = () => {
+    return (
+        <div></div>
+    )
+}
+
+const Settings = () => {
+    const [currentPage, setCurrentPage] = useState<SettingsPages>('Packages')
+    return (
+        <div className="settings-pages">
+            <SettingsHeader currentPage={currentPage} setCurrentPage={(page) => setCurrentPage(page)}></SettingsHeader>
+            {currentPage === 'Packages' ? <PackagesPage/> : <ShortcutsPage/>}
         </div>
     )
 }

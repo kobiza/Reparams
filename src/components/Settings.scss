@@ -1,8 +1,13 @@
-//.page-title {
-//    font-size: 36px;
-//    line-height: 48px;
-//    font-weight: 400;
-//}
+body {
+    overflow-y: scroll;
+}
+
+.settings-pages {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+}
 
 .preset-item, .package-item {
     margin: 10px 0;
