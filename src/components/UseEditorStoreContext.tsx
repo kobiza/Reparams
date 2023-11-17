@@ -1,6 +1,6 @@
 import React, {createContext, PropsWithChildren, useEffect, useState} from "react";
 import {EditorModel, EditorStore, SettingsPackage} from "../types/types";
-import {replaceItem} from "../utils/arrayUtils";
+import {removeItem, replaceItem} from "../utils/arrayUtils";
 import {getEmptySettingsPackage} from "../utils/utils";
 
 const noop = () => {
@@ -12,7 +12,8 @@ export const EditorStoreContext = createContext<EditorStore>({
     updatePackageQuickActions: noop,
     updatePackageLabel: noop,
     updatePackageUrlPattern: noop,
-    addNewPackage: noop
+    addNewPackage: noop,
+    deletePackage: noop
 });
 
 const localStorageKey = 'paparamsAppData'
@@ -83,6 +84,12 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
         })
     }
 
+    const deletePackage = (packageIndex: number) => {
+        setAppState((appState) => {
+            return removeItem(appState, packageIndex)
+        })
+    }
+
     return (
         <EditorStoreContext.Provider value={{
             state: appState,
@@ -91,7 +98,8 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
             updatePackageQuickActions,
             updatePackageLabel,
             updatePackageUrlPattern,
-            addNewPackage
+            addNewPackage,
+            deletePackage
         }}>
             {props.children}
         </EditorStoreContext.Provider>

@@ -66,6 +66,7 @@ export type EditorStore = {
     updatePackageLabel: (packageIndex: number, label: string) => void
     updatePackageUrlPattern: (packageIndex: number, urlPattern: string) => void
     addNewPackage: () => void
+    deletePackage: (packageIndex: number) => void
 }
 
 export type ViewerModel = {

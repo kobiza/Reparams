@@ -145,6 +145,7 @@ type ParamsEditorProps = {
     urlPattern: SettingsPackage['urlPattern']
     updatePackageParamsWithMultipleValues: EditorStore['updatePackageParamsWithMultipleValues']
     updatePackageUrlPattern: EditorStore['updatePackageUrlPattern']
+    deletePackage: EditorStore['deletePackage']
 }
 
 const PackageSettingsEditor = ({
@@ -152,7 +153,8 @@ const PackageSettingsEditor = ({
                                    paramsWithMultipleValues,
                                    updatePackageParamsWithMultipleValues,
                                    urlPattern,
-                                   updatePackageUrlPattern
+                                   updatePackageUrlPattern,
+                                   deletePackage
                                }: ParamsEditorProps) => {
     const paramsItems = Object.keys(paramsWithMultipleValues).map(id => {
         const {label, separator} = paramsWithMultipleValues[id]
@@ -213,6 +215,7 @@ const PackageSettingsEditor = ({
 
         updatePackageParamsWithMultipleValues(packageIndex, newParamsWithMultipleValues)
     }
+
     return (
         <div>
             <TextField
@@ -221,9 +224,13 @@ const PackageSettingsEditor = ({
                 value={urlPattern} onChange={e => updatePackageUrlPattern(packageIndex, e.target.value)}
             />
             <Typography variant="h6" padding={1}>Params with delimiter</Typography>
-            {paramsItems}
-            <Button color="secondary" sx={{color: '#fff', marginTop: '10px'}} onClick={addNewMultiParam}
-                    variant="contained">Add</Button>
+            <Box>
+                {paramsItems}
+                <Button color="secondary" sx={{color: '#fff', marginTop: '10px'}} onClick={addNewMultiParam}
+                        variant="contained">Add</Button>
+            </Box>
+            <Button color="warning" sx={{color: '#fff', marginTop: '10px'}} onClick={() => deletePackage(packageIndex)}
+                    variant="contained">Delete Package</Button>
         </div>
     )
 }
@@ -337,7 +344,8 @@ const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProp
         updatePackageParamsWithMultipleValues,
         updatePackageQuickActions,
         updatePackageLabel,
-        updatePackageUrlPattern
+        updatePackageUrlPattern,
+        deletePackage
     } = editorStore
 
     const [accordionOpen, setAccordionOpen] = useState(false)
@@ -446,7 +454,8 @@ const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProp
                                                paramsWithMultipleValues={paramsWithMultipleValues}
                                                updatePackageParamsWithMultipleValues={updatePackageParamsWithMultipleValues}
                                                urlPattern={urlPattern}
-                                               updatePackageUrlPattern={updatePackageUrlPattern}/>
+                                               updatePackageUrlPattern={updatePackageUrlPattern}
+                                               deletePackage={deletePackage}/>
                     </CustomTabPanel>
                 </Box>
             </AccordionDetails>
