@@ -7,6 +7,7 @@ import {
     ViewerModel
 } from "../types/types";
 import {assign} from "lodash";
+import {matchUrl} from "./urlMatchChecker";
 
 export const uuidv4 = () => {
     return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
@@ -31,8 +32,11 @@ export const mergeAppDataPackages = (appData: EditorModel): MergedAppData => {
     return mergedAppData
 }
 
-export const toViewerModel = (editorModel: EditorModel): ViewerModel => {
-    const packagesDataToMerge = editorModel.map(settingsPackage => {
+export const toViewerModel = (editorModel: EditorModel, currentTabUrl: string): ViewerModel => {
+    const packagesDataToMerge = editorModel.filter((settingsPackage) => {
+        const allUrlPatterns = settingsPackage.urlPattern.split(';')
+        return allUrlPatterns.some(urlPattern => matchUrl(currentTabUrl, urlPattern))
+    }).map(settingsPackage => {
         const presets: PresetsEntriesMapViewModel = Object.keys(settingsPackage.presets).reduce<PresetsEntriesMapViewModel>((acc, presetKey) => {
             const {label, entries} = settingsPackage.presets[presetKey]
             acc[label] = entries
@@ -72,6 +76,7 @@ export const getEmptySettingsPackage = (label: string): SettingsPackage => {
     return {
         key: uuidv4(),
         label,
+        urlPattern: '*://*/*',
         presets: {},
         paramsWithMultipleValues: {},
         quickActions: []

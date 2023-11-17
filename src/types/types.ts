@@ -32,6 +32,7 @@ export type ParamsWithMultipleValuesViewModel = {
 export type SettingsPackage = {
     key: string
     label: string
+    urlPattern: string
     presets: PresetsEntriesMap
     paramsWithMultipleValues: ParamsWithMultipleValues
     quickActions: QuickActionData
@@ -63,6 +64,7 @@ export type EditorStore = {
     updatePackageParamsWithMultipleValues: (packageIndex: number, paramsWithMultipleValues: SettingsPackage['paramsWithMultipleValues']) => void
     updatePackageQuickActions: (packageIndex: number, quickActions: SettingsPackage['quickActions']) => void
     updatePackageLabel: (packageIndex: number, label: string) => void
+    updatePackageUrlPattern: (packageIndex: number, urlPattern: string) => void
     addNewPackage: () => void
 }
 

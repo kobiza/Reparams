@@ -1,19 +1,10 @@
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import Button from '@mui/material/Button';
-import {SettingsPages} from "./Settings";
 
-
-type SettingsHeaderProps = {
-    currentPage: SettingsPages
-    setCurrentPage: (page: SettingsPages) => void
-}
-
-function SettingsHeader({currentPage, setCurrentPage}: SettingsHeaderProps) {
+function SettingsHeader() {
     return (
         <AppBar position="relative" component="nav">
             <Container maxWidth="xl">
@@ -31,16 +22,8 @@ function SettingsHeader({currentPage, setCurrentPage}: SettingsHeaderProps) {
                             flexGrow: 1
                         }}
                     >
-                        {`REPARAMS - Settings/${currentPage}`}
+                        {`REPARAMS - Settings`}
                     </Typography>
-                    <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                        <Button sx={{ color: '#fff' }} onClick={() => setCurrentPage('Packages')}>
-                            Packages
-                        </Button>
-                        <Button sx={{ color: '#fff' }} onClick={() => setCurrentPage('Shortcuts')}>
-                            Shortcuts
-                        </Button>
-                    </Box>
                 </Toolbar>
             </Container>
         </AppBar>

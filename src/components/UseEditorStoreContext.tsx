@@ -11,6 +11,7 @@ export const EditorStoreContext = createContext<EditorStore>({
     updatePackageParamsWithMultipleValues: noop,
     updatePackageQuickActions: noop,
     updatePackageLabel: noop,
+    updatePackageUrlPattern: noop,
     addNewPackage: noop
 });
 
@@ -66,6 +67,14 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
         _updatePackage(packageIndex, newPackage)
     }
 
+    const updatePackageUrlPattern = (packageIndex: number, urlPattern: string) => {
+        const newPackage = {
+            ...appState[packageIndex],
+            urlPattern
+        }
+        _updatePackage(packageIndex, newPackage)
+    }
+
     const addNewPackage = () => {
         const newPackage = getEmptySettingsPackage('Untitled package')
 
@@ -81,6 +90,7 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
             updatePackageParamsWithMultipleValues,
             updatePackageQuickActions,
             updatePackageLabel,
+            updatePackageUrlPattern,
             addNewPackage
         }}>
             {props.children}

@@ -119,6 +119,7 @@ const quickActions: QuickActionData = [
 export const appData: EditorModel = [{
     key: 'kobiz-package',
     label: 'kobiz package',
+    urlPattern: '*://*/*',
     presets,
     paramsWithMultipleValues,
     quickActions

@@ -142,14 +142,18 @@ const PresetsEditor = ({packageIndex, presets, updatePackagePreset}: PresetsEdit
 type ParamsEditorProps = {
     packageIndex: number
     paramsWithMultipleValues: SettingsPackage['paramsWithMultipleValues']
+    urlPattern: SettingsPackage['urlPattern']
     updatePackageParamsWithMultipleValues: EditorStore['updatePackageParamsWithMultipleValues']
+    updatePackageUrlPattern: EditorStore['updatePackageUrlPattern']
 }
 
-const ParamsEditor = ({
-                          packageIndex,
-                          paramsWithMultipleValues,
-                          updatePackageParamsWithMultipleValues
-                      }: ParamsEditorProps) => {
+const PackageSettingsEditor = ({
+                                   packageIndex,
+                                   paramsWithMultipleValues,
+                                   updatePackageParamsWithMultipleValues,
+                                   urlPattern,
+                                   updatePackageUrlPattern
+                               }: ParamsEditorProps) => {
     const paramsItems = Object.keys(paramsWithMultipleValues).map(id => {
         const {label, separator} = paramsWithMultipleValues[id]
 
@@ -190,7 +194,7 @@ const ParamsEditor = ({
                 />
                 <TextField
                     hiddenLabel
-                    placeholder="Separator"
+                    placeholder="Delimeter"
                     size="small"
                     value={separator} onChange={e => updateParamSeparator(e.target.value)}
                 />
@@ -211,7 +215,12 @@ const ParamsEditor = ({
     }
     return (
         <div>
-            <Typography variant="h6" padding={1}>Params with multiple values</Typography>
+            <TextField
+                label="Url Match"
+                size="small"
+                value={urlPattern} onChange={e => updatePackageUrlPattern(packageIndex, e.target.value)}
+            />
+            <Typography variant="h6" padding={1}>Params with delimiter</Typography>
             {paramsItems}
             <Button color="secondary" sx={{color: '#fff', marginTop: '10px'}} onClick={addNewMultiParam}
                     variant="contained">Add</Button>
@@ -321,13 +330,14 @@ type PackagePanelProps = {
 }
 
 const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProps) => {
-    const {key, label, presets, paramsWithMultipleValues, quickActions} = packageData
+    const {key, label, presets, paramsWithMultipleValues, quickActions, urlPattern} = packageData
     const [value, setValue] = React.useState(0);
     const {
         updatePackagePreset,
         updatePackageParamsWithMultipleValues,
         updatePackageQuickActions,
-        updatePackageLabel
+        updatePackageLabel,
+        updatePackageUrlPattern
     } = editorStore
 
     const [accordionOpen, setAccordionOpen] = useState(false)
@@ -405,7 +415,8 @@ const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProp
                         <TextField inputRef={packageNameInputRef} type="text" value={label}
                                    onKeyUp={handleRenameKey}
                                    onChange={e => updateCurrentPackageLabel(e.target.value)}
-                                   onBlur={stopRenameMode} inputProps={{sx: {padding: '0px', paddingLeft: '6px'},
+                                   onBlur={stopRenameMode} inputProps={{
+                            sx: {padding: '0px', paddingLeft: '6px'},
                         }}
                         ></TextField>
                     </div>
@@ -417,21 +428,25 @@ const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProp
                     <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                             <Tab label="Presets" {...a11yProps(0)} disableRipple={true}/>
-                            <Tab label="Params" {...a11yProps(1)} disableRipple={true}/>
-                            <Tab label="Quick Actions" {...a11yProps(2)} disableRipple={true}/>
+                            <Tab label="Quick Actions" {...a11yProps(1)} disableRipple={true}/>
+                            <Tab label="Settings" {...a11yProps(2)} disableRipple={true}/>
                         </Tabs>
                     </Box>
                     <CustomTabPanel value={value} index={0}>
                         <PresetsEditor packageIndex={packageIndex} presets={presets}
                                        updatePackagePreset={updatePackagePreset}/>
                     </CustomTabPanel>
+
                     <CustomTabPanel value={value} index={1}>
-                        <ParamsEditor packageIndex={packageIndex} paramsWithMultipleValues={paramsWithMultipleValues}
-                                      updatePackageParamsWithMultipleValues={updatePackageParamsWithMultipleValues}/>
-                    </CustomTabPanel>
-                    <CustomTabPanel value={value} index={2}>
                         <QuickActionsEditor packageIndex={packageIndex} quickActions={quickActions}
                                             updatePackageQuickActions={updatePackageQuickActions} presets={presets}/>
+                    </CustomTabPanel>
+                    <CustomTabPanel value={value} index={2}>
+                        <PackageSettingsEditor packageIndex={packageIndex}
+                                               paramsWithMultipleValues={paramsWithMultipleValues}
+                                               updatePackageParamsWithMultipleValues={updatePackageParamsWithMultipleValues}
+                                               urlPattern={urlPattern}
+                                               updatePackageUrlPattern={updatePackageUrlPattern}/>
                     </CustomTabPanel>
                 </Box>
             </AccordionDetails>
@@ -460,18 +475,11 @@ const PackagesPage = () => {
     )
 }
 
-const ShortcutsPage = () => {
-    return (
-        <div></div>
-    )
-}
-
 const Settings = () => {
-    const [currentPage, setCurrentPage] = useState<SettingsPages>('Packages')
     return (
         <div className="settings-pages">
-            <SettingsHeader currentPage={currentPage} setCurrentPage={(page) => setCurrentPage(page)}></SettingsHeader>
-            {currentPage === 'Packages' ? <PackagesPage/> : <ShortcutsPage/>}
+            <SettingsHeader/>
+            <PackagesPage/>
         </div>
     )
 }

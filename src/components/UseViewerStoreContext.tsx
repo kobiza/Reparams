@@ -17,10 +17,11 @@ const getSettings = (): EditorModel => {
     return appData ? JSON.parse(appData) : []
 }
 
-const UseViewerStoreContext = (props: PropsWithChildren) => {
+const UseViewerStoreContext = (props: PropsWithChildren<{currentTabUrl: string}>) => {
+    const {currentTabUrl} = props
     return (
         <ViewerStoreContext.Provider value={{
-            state: toViewerModel(getSettings()),
+            state: toViewerModel(getSettings(), currentTabUrl),
         }}>
             {props.children}
         </ViewerStoreContext.Provider>

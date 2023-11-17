@@ -6,6 +6,9 @@ import UseEditorStoreContext from "../components/UseEditorStoreContext";
 import getMuiTheme from "../utils/getMuiTheme";
 import {ThemeProvider} from "@mui/material";
 
+// const localStorageKey = 'paparamsAppData'
+// localStorage.setItem(localStorageKey, '')
+
 const root = createRoot(document.getElementById('root')!);
 
 const App = () => {
