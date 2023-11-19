@@ -3,8 +3,14 @@
   "version": "1.0.0",
   "manifest_version": 3,
   "action": {
-    "default_title": "Reparams",
+    "default_title": "ReParams",
     "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "icons2/icon16.png",
+    "32": "icons2/icon32.png",
+    "48": "icons2/icon32.png",
+    "128": "icons2/icon180.png"
   },
   "options_page": "options.html",
   "permissions": [

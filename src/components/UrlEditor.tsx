@@ -97,7 +97,7 @@ function UrlEditor({
                                 flexGrow: 1
                             }}
                         >
-                            REPARAMS
+                            ReParams
                         </Typography>
                     </Toolbar>
                 </Container>

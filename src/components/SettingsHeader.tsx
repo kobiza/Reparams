@@ -22,7 +22,7 @@ function SettingsHeader() {
                             flexGrow: 1
                         }}
                     >
-                        {`REPARAMS - Settings`}
+                        {`ReParams - Settings`}
                     </Typography>
                 </Toolbar>
             </Container>
