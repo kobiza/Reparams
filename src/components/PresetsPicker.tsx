@@ -180,7 +180,7 @@ const PresetsPicker = (props: PresetsPickerProps) => {
             onDelete={onDelete}
             selected={selected}
             suggestions={suggestions}
-            placeholderText="Add new preset"
+            placeholderText="Add preset"
         />
 
     )

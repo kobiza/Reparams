@@ -89,7 +89,7 @@ const SearchParams = ({entries, setEntries}: SearchParamsProps) => {
             <ul>
                 {items}
             </ul>
-            <Button color="secondary" endIcon={<Add/>} sx={{color: '#fff', marginTop: '10px'}} onClick={addNewEntry} variant="contained">Add</Button>
+            <Button color="secondary" sx={{marginTop: '10px'}} onClick={addNewEntry} variant="text">Add param</Button>
         </div>
     )
 }

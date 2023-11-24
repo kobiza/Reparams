@@ -11,14 +11,14 @@ import {
     Accordion,
     AccordionDetails,
     AccordionSummary,
-    Box, Button,
+    Box, Button, Divider,
     IconButton, Paper,
     Tab,
     Tabs,
     TextField, Typography,
 } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {Delete, Edit} from "@mui/icons-material";
+import {Add, Delete, Edit} from "@mui/icons-material";
 import classNames from "classnames";
 import {forEach} from "lodash";
 import SettingsHeader from "./SettingsHeader";
@@ -134,8 +134,8 @@ const PresetsEditor = ({packageIndex, presets, updatePackagePreset}: PresetsEdit
     return (
         <div>
             {presetsItems}
-            <Button color="secondary" sx={{color: '#fff', marginTop: '10px'}} onClick={addNewPreset}
-                    variant="contained">Add new Preset</Button>
+            <Button sx={{marginTop: '10px'}} onClick={addNewPreset}
+                    variant="text">Add Preset</Button>
         </div>
     )
 }
@@ -223,14 +223,16 @@ const PackageSettingsEditor = ({
                 size="small"
                 value={urlPattern} onChange={e => updatePackageUrlPattern(packageIndex, e.target.value)}
             />
-            <Typography variant="h6" padding={1}>Params with delimiter</Typography>
+            <Divider sx={{margin: '15px 0'}}/>
+            <Typography fontWeight="bold" padding={1}>Params with delimiter</Typography>
             <Box>
                 {paramsItems}
-                <Button color="secondary" sx={{color: '#fff', marginTop: '10px'}} onClick={addNewMultiParam}
-                        variant="contained">Add</Button>
+                <Button sx={{marginTop: '10px'}} onClick={addNewMultiParam}
+                        variant="text" startIcon={<Add/>}>Add</Button>
             </Box>
-            <Button color="warning" sx={{color: '#fff', marginTop: '10px'}} onClick={() => deletePackage(packageIndex)}
-                    variant="contained">Delete Package</Button>
+            <Divider sx={{margin: '15px 0'}}/>
+            <Button color="warning" startIcon={<Delete/>} sx={{marginTop: '10px'}} onClick={() => deletePackage(packageIndex)}
+                    variant="outlined">Delete Package</Button>
         </div>
     )
 }
@@ -324,8 +326,8 @@ const QuickActionsEditor = ({
     return (
         <div>
             {quickActionsItems}
-            <Button color="secondary" sx={{color: '#fff', marginTop: '10px'}} onClick={addNewQuickAction}
-                    variant="contained">Add</Button>
+            <Button sx={{marginTop: '10px'}} onClick={addNewQuickAction}
+                    variant="text">Add quick action</Button>
         </div>
     )
 }
@@ -478,8 +480,8 @@ const PackagesPage = () => {
     return (
         <div>
             {packagesList}
-            <Button color="secondary" sx={{color: '#fff', marginTop: '10px'}} onClick={addNewPackage}
-                    variant="contained">Add new Package</Button>
+            <Button sx={{marginTop: '10px'}} onClick={addNewPackage}
+                    variant="text">Add Package</Button>
         </div>
     )
 }
