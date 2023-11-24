@@ -142,9 +142,9 @@ const PresetsEditor = ({packageIndex, presets, updatePackagePreset}: PresetsEdit
 type ParamsEditorProps = {
     packageIndex: number
     paramsWithMultipleValues: SettingsPackage['paramsWithMultipleValues']
-    urlPattern: SettingsPackage['urlPattern']
+    urlPatterns: SettingsPackage['urlPatterns']
     updatePackageParamsWithMultipleValues: EditorStore['updatePackageParamsWithMultipleValues']
-    updatePackageUrlPattern: EditorStore['updatePackageUrlPattern']
+    updatePackageUrlPatterns: EditorStore['updatePackageUrlPatterns']
     deletePackage: EditorStore['deletePackage']
 }
 
@@ -152,8 +152,8 @@ const PackageSettingsEditor = ({
                                    packageIndex,
                                    paramsWithMultipleValues,
                                    updatePackageParamsWithMultipleValues,
-                                   urlPattern,
-                                   updatePackageUrlPattern,
+                                   urlPatterns,
+                                   updatePackageUrlPatterns,
                                    deletePackage
                                }: ParamsEditorProps) => {
     const paramsItems = Object.keys(paramsWithMultipleValues).map(id => {
@@ -216,13 +216,36 @@ const PackageSettingsEditor = ({
         updatePackageParamsWithMultipleValues(packageIndex, newParamsWithMultipleValues)
     }
 
+    const patternsInput = urlPatterns.map((v, index) => {
+        const updateCurrentPattern = (value: string) => {
+            const newUrlPatterns = replaceItem(urlPatterns, {value, id: v.id}, index)
+
+            updatePackageUrlPatterns(packageIndex, newUrlPatterns)
+        }
+        return (
+            <div key={v.id} style={{display: 'flex', marginTop: '10px'}}>
+                <TextField
+                    sx={{flex: '1'}}
+                    hiddenLabel
+                    size="small"
+                    value={v.value} onChange={e => updateCurrentPattern(e.target.value)}
+                />
+            </div>
+        )
+    })
+
+    const addNewUrlPattern = () => {
+        updatePackageUrlPatterns(packageIndex, [...urlPatterns, {id: uuidv4(), value: '*://*/*'}])
+    }
+
     return (
         <div>
-            <TextField
-                label="Url Match"
-                size="small"
-                value={urlPattern} onChange={e => updatePackageUrlPattern(packageIndex, e.target.value)}
-            />
+            <Typography fontWeight="bold" padding={1}>Url patterns</Typography>
+            <Box>
+                {patternsInput}
+                <Button sx={{marginTop: '10px'}} onClick={addNewUrlPattern}
+                        variant="text" startIcon={<Add/>}>Add</Button>
+            </Box>
             <Divider sx={{margin: '15px 0'}}/>
             <Typography fontWeight="bold" padding={1}>Params with delimiter</Typography>
             <Box>
@@ -327,7 +350,7 @@ const QuickActionsEditor = ({
         <div>
             {quickActionsItems}
             <Button sx={{marginTop: '10px'}} onClick={addNewQuickAction}
-                    variant="text">Add quick action</Button>
+                    variant="text">Add Quick Action</Button>
         </div>
     )
 }
@@ -339,14 +362,14 @@ type PackagePanelProps = {
 }
 
 const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProps) => {
-    const {key, label, presets, paramsWithMultipleValues, quickActions, urlPattern} = packageData
+    const {key, label, presets, paramsWithMultipleValues, quickActions, urlPatterns} = packageData
     const [value, setValue] = React.useState(0);
     const {
         updatePackagePreset,
         updatePackageParamsWithMultipleValues,
         updatePackageQuickActions,
         updatePackageLabel,
-        updatePackageUrlPattern,
+        updatePackageUrlPatterns,
         deletePackage
     } = editorStore
 
@@ -455,8 +478,8 @@ const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProp
                         <PackageSettingsEditor packageIndex={packageIndex}
                                                paramsWithMultipleValues={paramsWithMultipleValues}
                                                updatePackageParamsWithMultipleValues={updatePackageParamsWithMultipleValues}
-                                               urlPattern={urlPattern}
-                                               updatePackageUrlPattern={updatePackageUrlPattern}
+                                               urlPatterns={urlPatterns}
+                                               updatePackageUrlPatterns={updatePackageUrlPatterns}
                                                deletePackage={deletePackage}/>
                     </CustomTabPanel>
                 </Box>

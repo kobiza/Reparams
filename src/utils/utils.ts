@@ -34,7 +34,7 @@ export const mergeAppDataPackages = (appData: EditorModel): MergedAppData => {
 
 export const toViewerModel = (editorModel: EditorModel, currentTabUrl: string): ViewerModel => {
     const packagesDataToMerge = editorModel.filter((settingsPackage) => {
-        const allUrlPatterns = settingsPackage.urlPattern.split(';')
+        const allUrlPatterns = settingsPackage.urlPatterns.map(v => v.value)
         return allUrlPatterns.some(urlPattern => matchUrl(currentTabUrl, urlPattern))
     }).map(settingsPackage => {
         const presets: PresetsEntriesMapViewModel = Object.keys(settingsPackage.presets).reduce<PresetsEntriesMapViewModel>((acc, presetKey) => {
@@ -76,7 +76,7 @@ export const getEmptySettingsPackage = (label: string): SettingsPackage => {
     return {
         key: uuidv4(),
         label,
-        urlPattern: '*://*/*',
+        urlPatterns: [{id: uuidv4(), value: '*://*/*'}],
         presets: {},
         paramsWithMultipleValues: {},
         quickActions: []
