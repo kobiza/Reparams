@@ -5,9 +5,10 @@ import Settings from "../components/Settings";
 import UseEditorStoreContext from "../components/UseEditorStoreContext";
 import getMuiTheme from "../utils/getMuiTheme";
 import {ThemeProvider} from "@mui/material";
+import {runFixer1} from './dataFixer'
 
-// const localStorageKey = 'paparamsAppData'
-// localStorage.setItem(localStorageKey, '')
+
+// runFixer1()
 
 const root = createRoot(document.getElementById('root')!);
 
