@@ -19,7 +19,7 @@ export const uuidv4 = () => {
 export const mergeAppDataPackages = (appData: EditorModel): MergedAppData => {
     const mergedAppData: MergedAppData = {
         presets: {},
-        paramsWithMultipleValues: {},
+        paramsWithMultipleValues: [],
         quickActions: []
     }
 
@@ -43,8 +43,8 @@ export const toViewerModel = (editorModel: EditorModel, currentTabUrl: string): 
 
             return acc
         }, {})
-        const paramsWithMultipleValues: ParamsWithMultipleValuesViewModel = Object.keys(settingsPackage.paramsWithMultipleValues).reduce<ParamsWithMultipleValuesViewModel>((acc, id) => {
-            const {label, separator} = settingsPackage.paramsWithMultipleValues[id]
+        const paramsWithMultipleValues: ParamsWithMultipleValuesViewModel = settingsPackage.paramsWithMultipleValues.reduce<ParamsWithMultipleValuesViewModel>((acc, paramData) => {
+            const {label, separator} = paramData
             acc[label] = {separator}
 
             return acc
@@ -78,12 +78,11 @@ export const getEmptySettingsPackage = (label: string): SettingsPackage => {
         label,
         urlPatterns: [{id: uuidv4(), value: '*://*/*'}],
         presets: {},
-        paramsWithMultipleValues: {
-            [uuidv4()]: {
-                label: '',
-                separator: ''
-            }
-        },
+        paramsWithMultipleValues: [{
+            id: uuidv4(),
+            label: '',
+            separator: ''
+        }],
         quickActions: []
     }
 }

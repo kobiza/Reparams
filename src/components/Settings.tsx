@@ -160,31 +160,23 @@ const PackageSettingsEditor = ({
                                    updatePackageUrlPatterns,
                                    deletePackage
                                }: ParamsEditorProps) => {
-    const paramsItems = Object.keys(paramsWithMultipleValues).map(id => {
-        const {label, separator} = paramsWithMultipleValues[id]
+    const paramsItems = paramsWithMultipleValues.map((paramData, index) => {
+        const {label, separator, id} = paramData
 
         const updateParamLabel = (newParamLabel: string) => {
-            const newPresets: SettingsPackage['paramsWithMultipleValues'] = {
-                ...paramsWithMultipleValues,
-                [id]: {
-                    ...paramsWithMultipleValues[id],
-                    label: newParamLabel
-                }
-            }
+            const prevItem = paramsWithMultipleValues[index]
+            const newItem = {...prevItem, label: newParamLabel}
+            const newParamsWithMultipleValues = replaceItem(paramsWithMultipleValues, newItem, index)
 
-            updatePackageParamsWithMultipleValues(packageIndex, newPresets)
+            updatePackageParamsWithMultipleValues(packageIndex, newParamsWithMultipleValues)
         }
 
         const updateParamSeparator = (newParamSeparator: string) => {
-            const newPresets: SettingsPackage['paramsWithMultipleValues'] = {
-                ...paramsWithMultipleValues,
-                [id]: {
-                    ...paramsWithMultipleValues[id],
-                    separator: newParamSeparator
-                }
-            }
+            const prevItem = paramsWithMultipleValues[index]
+            const newItem = {...prevItem, separator: newParamSeparator}
+            const newParamsWithMultipleValues = replaceItem(paramsWithMultipleValues, newItem, index)
 
-            updatePackageParamsWithMultipleValues(packageIndex, newPresets)
+            updatePackageParamsWithMultipleValues(packageIndex, newParamsWithMultipleValues)
         }
 
         return (
@@ -209,13 +201,14 @@ const PackageSettingsEditor = ({
     })
 
     const addNewMultiParam = () => {
-        const newParamsWithMultipleValues: SettingsPackage['paramsWithMultipleValues'] = {
+        const newParamsWithMultipleValues = [
             ...paramsWithMultipleValues,
-            [uuidv4()]: {
+            {
+                id: uuidv4(),
                 label: '',
                 separator: ''
             }
-        }
+        ]
 
         updatePackageParamsWithMultipleValues(packageIndex, newParamsWithMultipleValues)
     }

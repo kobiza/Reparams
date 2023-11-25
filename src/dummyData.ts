@@ -79,12 +79,11 @@ export const presets: PresetsEntriesMap = {
     }
 }
 
-export const paramsWithMultipleValues: ParamsWithMultipleValues = {
-    experiments: {
-        label: 'experiments',
-        separator: ','
-    }
-}
+export const paramsWithMultipleValues: ParamsWithMultipleValues = [{
+    id: 'param-1',
+    label: 'experiments',
+    separator: ','
+}]
 
 const quickActions: QuickActionData = [
     {

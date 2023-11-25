@@ -16,12 +16,11 @@ export type PresetsEntriesMapViewModel = {
     [label: string]: SearchParamsEntries
 }
 
-export type ParamsWithMultipleValues = {
-    [id: string]: {
-        label: string
-        separator: string
-    }
-}
+export type ParamsWithMultipleValues = Array<{
+    id: string
+    label: string
+    separator: string
+}>
 
 export type ParamsWithMultipleValuesViewModel = {
     [label: string]: {
