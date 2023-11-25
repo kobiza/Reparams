@@ -1,7 +1,7 @@
 import React, {MouseEventHandler} from 'react'
 import type {
     AddEntriesAndNavigate,
-    ParamsWithMultipleValuesViewModel,
+    ParamsWithDelimiterViewModel,
     PresetsEntriesMapViewModel
 } from '../types/types'
 
@@ -20,7 +20,7 @@ export type PresetsPickerProps = {
     addEntriesAndNavigate: AddEntriesAndNavigate,
     presets: PresetsEntriesMapViewModel
     quickActions: QuickActionData
-    paramsWithDelimiter: ParamsWithMultipleValuesViewModel
+    paramsWithDelimiter: ParamsWithDelimiterViewModel
 }
 
 const PresetsPicker = (props: PresetsPickerProps) => {

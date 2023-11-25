@@ -4,7 +4,7 @@ import SearchParams from "./SearchParams";
 import PresetsPicker, {PresetsPickerProps} from "./PresetsPicker";
 
 import {
-    ParamsWithMultipleValuesViewModel,
+    ParamsWithDelimiterViewModel,
     PresetsEntriesMapViewModel,
     QuickActionData
 } from "../types/types";
@@ -21,7 +21,7 @@ type UrlEditorProps = {
     updateCurrentTabUrl: (newUrl: string) => void,
     openNewTab: (newUrl: string) => void,
     presets: PresetsEntriesMapViewModel
-    paramsWithDelimiter: ParamsWithMultipleValuesViewModel,
+    paramsWithDelimiter: ParamsWithDelimiterViewModel,
     quickActions: QuickActionData
     className?: string,
 }

@@ -1,4 +1,4 @@
-import {ParamsWithDelimiter, ParamsWithMultipleValuesViewModel, SearchParamsEntries} from "../types/types";
+import {ParamsWithDelimiter, ParamsWithDelimiterViewModel, SearchParamsEntries} from "../types/types";
 import {removeItem, replaceItem, toTrueObj} from "./arrayUtils";
 
 const mergeValues = (values1: Array<string>, values2: Array<string>): Array<string> => {
@@ -36,7 +36,7 @@ export const updateEntryKey = (entries: SearchParamsEntries, newKey: string, ind
     return replaceItem(entries, newEntry, index)
 }
 
-export const mergeEntryValues = (entries: SearchParamsEntries, newValue: string, index: number, paramsWithDelimiter: ParamsWithMultipleValuesViewModel): SearchParamsEntries => {
+export const mergeEntryValues = (entries: SearchParamsEntries, newValue: string, index: number, paramsWithDelimiter: ParamsWithDelimiterViewModel): SearchParamsEntries => {
     const key = entries[index][0]
 
     const multipleValuesData = paramsWithDelimiter[key]
@@ -55,7 +55,7 @@ export const mergeEntryValues = (entries: SearchParamsEntries, newValue: string,
     }
 }
 
-const addOrReplaceEntry = (entries: SearchParamsEntries, entry: [string, string], paramsWithDelimiter: ParamsWithMultipleValuesViewModel): SearchParamsEntries => {
+const addOrReplaceEntry = (entries: SearchParamsEntries, entry: [string, string], paramsWithDelimiter: ParamsWithDelimiterViewModel): SearchParamsEntries => {
     const [newKey, newValue] = entry
     const entryIndex = entries.findIndex(([key]) => key === newKey)
 
@@ -68,7 +68,7 @@ const addOrReplaceEntry = (entries: SearchParamsEntries, entry: [string, string]
     return mergeEntryValues(entries, newValue, entryIndex, paramsWithDelimiter)
 }
 
-const removeEntry = (entries: SearchParamsEntries, [entryKey, valueToRemove]: [string, string], paramsWithDelimiter: ParamsWithMultipleValuesViewModel): SearchParamsEntries => {
+const removeEntry = (entries: SearchParamsEntries, [entryKey, valueToRemove]: [string, string], paramsWithDelimiter: ParamsWithDelimiterViewModel): SearchParamsEntries => {
     const entryIndex = entries.findIndex(([key]) => key === entryKey)
 
     if (entryIndex !== -1) {
@@ -93,7 +93,7 @@ const removeEntry = (entries: SearchParamsEntries, [entryKey, valueToRemove]: [s
     return entries
 }
 
-export const mergeEntries = (entriesArr: Array<SearchParamsEntries>, paramsWithDelimiter: ParamsWithMultipleValuesViewModel): SearchParamsEntries => {
+export const mergeEntries = (entriesArr: Array<SearchParamsEntries>, paramsWithDelimiter: ParamsWithDelimiterViewModel): SearchParamsEntries => {
     if (entriesArr.length === 0) {
         return []
     }
@@ -114,7 +114,7 @@ export const mergeEntries = (entriesArr: Array<SearchParamsEntries>, paramsWithD
     return lastEntries
 }
 
-export const removeEntries = (entries: SearchParamsEntries, entriesToRemove: SearchParamsEntries, paramsWithDelimiter: ParamsWithMultipleValuesViewModel): SearchParamsEntries => {
+export const removeEntries = (entries: SearchParamsEntries, entriesToRemove: SearchParamsEntries, paramsWithDelimiter: ParamsWithDelimiterViewModel): SearchParamsEntries => {
     let lastEntries = entries
 
     entriesToRemove.forEach((entry) => {

@@ -145,7 +145,7 @@ type ParamsEditorProps = {
     urlPatterns: SettingsPackage['urlPatterns']
     label: SettingsPackage['label']
     addNewPackage: EditorStore['addNewPackage']
-    updatePackageParamsWithMultipleValues: EditorStore['updatePackageParamsWithMultipleValues']
+    updatePackageParamsWithDelimiter: EditorStore['updatePackageParamsWithDelimiter']
     updatePackageUrlPatterns: EditorStore['updatePackageUrlPatterns']
     deletePackage: EditorStore['deletePackage']
 }
@@ -153,7 +153,7 @@ type ParamsEditorProps = {
 const PackageSettingsEditor = ({
                                    packageIndex,
                                    paramsWithDelimiter,
-                                   updatePackageParamsWithMultipleValues,
+                                   updatePackageParamsWithDelimiter,
                                    urlPatterns,
                                    label,
                                    addNewPackage,
@@ -166,17 +166,17 @@ const PackageSettingsEditor = ({
         const updateParamLabel = (newParamLabel: string) => {
             const prevItem = paramsWithDelimiter[index]
             const newItem = {...prevItem, label: newParamLabel}
-            const newParamsWithMultipleValues = replaceItem(paramsWithDelimiter, newItem, index)
+            const newParamsWithDelimiter = replaceItem(paramsWithDelimiter, newItem, index)
 
-            updatePackageParamsWithMultipleValues(packageIndex, newParamsWithMultipleValues)
+            updatePackageParamsWithDelimiter(packageIndex, newParamsWithDelimiter)
         }
 
         const updateParamSeparator = (newParamSeparator: string) => {
             const prevItem = paramsWithDelimiter[index]
             const newItem = {...prevItem, separator: newParamSeparator}
-            const newParamsWithMultipleValues = replaceItem(paramsWithDelimiter, newItem, index)
+            const newParamsWithDelimiter = replaceItem(paramsWithDelimiter, newItem, index)
 
-            updatePackageParamsWithMultipleValues(packageIndex, newParamsWithMultipleValues)
+            updatePackageParamsWithDelimiter(packageIndex, newParamsWithDelimiter)
         }
 
         return (
@@ -201,7 +201,7 @@ const PackageSettingsEditor = ({
     })
 
     const addNewMultiParam = () => {
-        const newParamsWithMultipleValues = [
+        const newParamsWithDelimiter = [
             ...paramsWithDelimiter,
             {
                 id: uuidv4(),
@@ -210,7 +210,7 @@ const PackageSettingsEditor = ({
             }
         ]
 
-        updatePackageParamsWithMultipleValues(packageIndex, newParamsWithMultipleValues)
+        updatePackageParamsWithDelimiter(packageIndex, newParamsWithDelimiter)
     }
 
     const patternsInput = urlPatterns.map((v, index) => {
@@ -406,7 +406,7 @@ const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProp
     const {
         addNewPackage,
         updatePackagePreset,
-        updatePackageParamsWithMultipleValues,
+        updatePackageParamsWithDelimiter,
         updatePackageQuickActions,
         updatePackageLabel,
         updatePackageUrlPatterns,
@@ -519,7 +519,7 @@ const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProp
                                                label={label}
                                                paramsWithDelimiter={paramsWithDelimiter}
                                                addNewPackage={addNewPackage}
-                                               updatePackageParamsWithMultipleValues={updatePackageParamsWithMultipleValues}
+                                               updatePackageParamsWithDelimiter={updatePackageParamsWithDelimiter}
                                                urlPatterns={urlPatterns}
                                                updatePackageUrlPatterns={updatePackageUrlPatterns}
                                                deletePackage={deletePackage}/>

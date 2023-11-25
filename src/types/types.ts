@@ -22,7 +22,7 @@ export type ParamsWithDelimiter = Array<{
     separator: string
 }>
 
-export type ParamsWithMultipleValuesViewModel = {
+export type ParamsWithDelimiterViewModel = {
     [label: string]: {
         separator: string
     }
@@ -60,7 +60,7 @@ export type QuickActionData = Array<{
 export type EditorStore = {
     state: EditorModel
     updatePackagePreset: (packageIndex: number, presets: SettingsPackage['presets']) => void
-    updatePackageParamsWithMultipleValues: (packageIndex: number, paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']) => void
+    updatePackageParamsWithDelimiter: (packageIndex: number, paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']) => void
     updatePackageQuickActions: (packageIndex: number, quickActions: SettingsPackage['quickActions']) => void
     updatePackageLabel: (packageIndex: number, label: string) => void
     updatePackageUrlPatterns: (packageIndex: number, urlPatterns: SettingsPackage['urlPatterns']) => void
@@ -70,7 +70,7 @@ export type EditorStore = {
 
 export type ViewerModel = {
     presets: PresetsEntriesMapViewModel
-    paramsWithDelimiter: ParamsWithMultipleValuesViewModel
+    paramsWithDelimiter: ParamsWithDelimiterViewModel
     quickActions: QuickActionData
 }
 

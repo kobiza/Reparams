@@ -8,7 +8,7 @@ const noop = () => {
 export const EditorStoreContext = createContext<EditorStore>({
     state: [],
     updatePackagePreset: noop,
-    updatePackageParamsWithMultipleValues: noop,
+    updatePackageParamsWithDelimiter: noop,
     updatePackageQuickActions: noop,
     updatePackageLabel: noop,
     updatePackageUrlPatterns: noop,
@@ -44,7 +44,7 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
         _updatePackage(packageIndex, newPackage)
     }
 
-    const updatePackageParamsWithMultipleValues = (packageIndex: number, paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']) => {
+    const updatePackageParamsWithDelimiter = (packageIndex: number, paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']) => {
         const newPackage = {
             ...appState[packageIndex],
             paramsWithDelimiter
@@ -97,7 +97,7 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
         <EditorStoreContext.Provider value={{
             state: appState,
             updatePackagePreset,
-            updatePackageParamsWithMultipleValues,
+            updatePackageParamsWithDelimiter,
             updatePackageQuickActions,
             updatePackageLabel,
             updatePackageUrlPatterns,

@@ -1,7 +1,7 @@
 import React from 'react'
 import type {
     AddEntriesAndNavigate,
-    ParamsWithMultipleValuesViewModel,
+    ParamsWithDelimiterViewModel,
     PresetsEntriesMapViewModel
 } from '../types/types'
 import {toTrueObj} from "../utils/arrayUtils";
@@ -21,7 +21,7 @@ export type PresetsPickerProps = {
     setEntries: SetEntries
     addEntriesAndNavigate: AddEntriesAndNavigate
     presets: PresetsEntriesMapViewModel
-    paramsWithDelimiter: ParamsWithMultipleValuesViewModel
+    paramsWithDelimiter: ParamsWithDelimiterViewModel
     className?: string
 }
 
@@ -38,7 +38,7 @@ const getEntriesMap = (entries: SearchParamsEntries): EntriesMap => {
 }
 
 type PredicateArgs = {
-    entriesMap: EntriesMap, key: string, value: string, paramsWithDelimiter: ParamsWithMultipleValuesViewModel
+    entriesMap: EntriesMap, key: string, value: string, paramsWithDelimiter: ParamsWithDelimiterViewModel
 }
 const isPresetOn = ({entriesMap, key, value, paramsWithDelimiter}: PredicateArgs) => {
     const paramsWithDelimiterData = paramsWithDelimiter[key]
@@ -64,7 +64,7 @@ const isPresetOn = ({entriesMap, key, value, paramsWithDelimiter}: PredicateArgs
 
 const getSelectedPresets = ({presets, paramsWithDelimiter, entries}: {
     presets: PresetsEntriesMapViewModel
-    paramsWithDelimiter: ParamsWithMultipleValuesViewModel
+    paramsWithDelimiter: ParamsWithDelimiterViewModel
     entries: SearchParamsEntries
 }): Array<string> => {
     const presetsKeys = Object.keys(presets)
@@ -88,7 +88,7 @@ const getSelectedPresets = ({presets, paramsWithDelimiter, entries}: {
 
 const getEntriesToRemoveRemovingPreset = (presetKeyToRemove: string, {presets, paramsWithDelimiter, entries}: {
     presets: PresetsEntriesMapViewModel
-    paramsWithDelimiter: ParamsWithMultipleValuesViewModel
+    paramsWithDelimiter: ParamsWithDelimiterViewModel
     entries: SearchParamsEntries
 }) => {
     const _selectedPresets = getSelectedPresets({presets, paramsWithDelimiter, entries})
@@ -123,7 +123,7 @@ const getEntriesToRemoveRemovingPreset = (presetKeyToRemove: string, {presets, p
     return entriesToRemove
 }
 
-const getEntriesAfterRemovingPreset = (sourceEntries: SearchParamsEntries, presetKeyToRemove: string, {paramsWithDelimiter, presets}: {paramsWithDelimiter: ParamsWithMultipleValuesViewModel, presets: PresetsEntriesMapViewModel}) => {
+const getEntriesAfterRemovingPreset = (sourceEntries: SearchParamsEntries, presetKeyToRemove: string, {paramsWithDelimiter, presets}: {paramsWithDelimiter: ParamsWithDelimiterViewModel, presets: PresetsEntriesMapViewModel}) => {
     const entriesToRemove = getEntriesToRemoveRemovingPreset( presetKeyToRemove, {presets, paramsWithDelimiter, entries: sourceEntries})
 
     return removeEntries(sourceEntries, entriesToRemove, paramsWithDelimiter)

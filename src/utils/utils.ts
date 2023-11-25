@@ -1,7 +1,7 @@
 import {
     EditorModel,
     MergedAppData,
-    ParamsWithMultipleValuesViewModel,
+    ParamsWithDelimiterViewModel,
     PresetsEntriesMapViewModel,
     SettingsPackage,
     ViewerModel
@@ -43,7 +43,7 @@ export const toViewerModel = (editorModel: EditorModel, currentTabUrl: string): 
 
             return acc
         }, {})
-        const paramsWithDelimiter: ParamsWithMultipleValuesViewModel = settingsPackage.paramsWithDelimiter.reduce<ParamsWithMultipleValuesViewModel>((acc, paramData) => {
+        const paramsWithDelimiter: ParamsWithDelimiterViewModel = settingsPackage.paramsWithDelimiter.reduce<ParamsWithDelimiterViewModel>((acc, paramData) => {
             const {label, separator} = paramData
             acc[label] = {separator}
 
