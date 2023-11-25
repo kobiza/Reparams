@@ -3,8 +3,40 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import {Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material";
+import {Download, Upload} from "@mui/icons-material";
+import {useState} from "react";
+import ExportDialog from "./ExportDialog";
+import {EditorModel} from "../types/types";
 
-function SettingsHeader() {
+type SettingsHeaderProps = {
+    packages: EditorModel
+}
+
+function SettingsHeader({packages}: SettingsHeaderProps) {
+    const [importDialog, setImportDialog] = useState(false)
+    const openImportDialog = () => {
+        setImportDialog(true);
+    };
+
+    const closeImportDialog = () => {
+        setImportDialog(false);
+    };
+
+    const importPackages = () => {
+        // import
+        closeImportDialog()
+    }
+
+    const [exportDialog, setExportDialog] = useState(false)
+    const openExportDialog = () => {
+        setExportDialog(true);
+    };
+
+    const closeExportDialog = () => {
+        setExportDialog(false);
+    };
+
     return (
         <AppBar position="relative" component="nav">
             <Container maxWidth="xl">
@@ -24,6 +56,15 @@ function SettingsHeader() {
                     >
                         {`ReParams - Settings`}
                     </Typography>
+                    <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                        <Button startIcon={<Download/>} sx={{ color: '#fff' }} onClick={() => {}}>
+                            Import
+                        </Button>
+                        <Button startIcon={<Upload/>} sx={{ color: '#fff' }} onClick={openExportDialog}>
+                            Export
+                        </Button>
+                        <ExportDialog packages={packages} isOpen={exportDialog} closeDialog={closeExportDialog}/>
+                    </Box>
                 </Toolbar>
             </Container>
         </AppBar>

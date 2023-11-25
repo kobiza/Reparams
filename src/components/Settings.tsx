@@ -552,9 +552,13 @@ const PackagesPage = () => {
 }
 
 const Settings = () => {
+    const editorStore = useContext(EditorStoreContext)
+    const {
+        state: packages,
+    } = editorStore
     return (
         <div className="settings-pages">
-            <SettingsHeader/>
+            <SettingsHeader packages={packages}/>
             <PackagesPage/>
         </div>
     )
