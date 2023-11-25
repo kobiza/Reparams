@@ -11,7 +11,7 @@ import {
     Accordion,
     AccordionDetails,
     AccordionSummary,
-    Box, Button, Divider,
+    Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Divider,
     IconButton, Paper,
     Tab,
     Tabs,
@@ -143,6 +143,8 @@ type ParamsEditorProps = {
     packageIndex: number
     paramsWithMultipleValues: SettingsPackage['paramsWithMultipleValues']
     urlPatterns: SettingsPackage['urlPatterns']
+    label: SettingsPackage['label']
+    addNewPackage: EditorStore['addNewPackage']
     updatePackageParamsWithMultipleValues: EditorStore['updatePackageParamsWithMultipleValues']
     updatePackageUrlPatterns: EditorStore['updatePackageUrlPatterns']
     deletePackage: EditorStore['deletePackage']
@@ -153,6 +155,8 @@ const PackageSettingsEditor = ({
                                    paramsWithMultipleValues,
                                    updatePackageParamsWithMultipleValues,
                                    urlPatterns,
+                                   label,
+                                   addNewPackage,
                                    updatePackageUrlPatterns,
                                    deletePackage
                                }: ParamsEditorProps) => {
@@ -238,6 +242,24 @@ const PackageSettingsEditor = ({
         updatePackageUrlPatterns(packageIndex, [...urlPatterns, {id: uuidv4(), value: '*://*/*'}])
     }
 
+    const addPackageWithSameSettings = () => {
+        addNewPackage({paramsWithMultipleValues, urlPatterns})
+    }
+
+    const [deletePackageDialog, setDeletePackageDialog] = useState(false)
+    const openDeleteDialog = () => {
+        setDeletePackageDialog(true);
+    };
+
+    const closeDeleteDialog = () => {
+        setDeletePackageDialog(false);
+    };
+
+    const deleteCurrentPackage = () => {
+        deletePackage(packageIndex)
+        closeDeleteDialog()
+    }
+
     return (
         <div>
             <Typography fontWeight="bold" padding={1}>Url patterns</Typography>
@@ -254,8 +276,32 @@ const PackageSettingsEditor = ({
                         variant="text" startIcon={<Add/>}>Add</Button>
             </Box>
             <Divider sx={{margin: '15px 0'}}/>
-            <Button color="warning" startIcon={<Delete/>} sx={{marginTop: '10px'}} onClick={() => deletePackage(packageIndex)}
-                    variant="outlined">Delete Package</Button>
+            <div>
+                <Button sx={{marginTop: '10px'}} onClick={() => addPackageWithSameSettings()}
+                        variant="text">Add package with same settings</Button>
+            </div>
+            <div>
+                <Button color="warning" sx={{marginTop: '10px'}} onClick={openDeleteDialog}
+                        variant="text">Delete Package</Button>
+                <Dialog
+                    open={deletePackageDialog}
+                    onClose={closeDeleteDialog}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            {`Delete package "${label}"?`}
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={deleteCurrentPackage}>Yes</Button>
+                        <Button onClick={closeDeleteDialog} autoFocus>No</Button>
+                    </DialogActions>
+                </Dialog>
+            </div>
+
+
         </div>
     )
 }
@@ -365,6 +411,7 @@ const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProp
     const {key, label, presets, paramsWithMultipleValues, quickActions, urlPatterns} = packageData
     const [value, setValue] = React.useState(0);
     const {
+        addNewPackage,
         updatePackagePreset,
         updatePackageParamsWithMultipleValues,
         updatePackageQuickActions,
@@ -476,7 +523,9 @@ const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProp
                     </CustomTabPanel>
                     <CustomTabPanel value={value} index={2}>
                         <PackageSettingsEditor packageIndex={packageIndex}
+                                               label={label}
                                                paramsWithMultipleValues={paramsWithMultipleValues}
+                                               addNewPackage={addNewPackage}
                                                updatePackageParamsWithMultipleValues={updatePackageParamsWithMultipleValues}
                                                urlPatterns={urlPatterns}
                                                updatePackageUrlPatterns={updatePackageUrlPatterns}
@@ -503,7 +552,7 @@ const PackagesPage = () => {
     return (
         <div>
             {packagesList}
-            <Button sx={{marginTop: '10px'}} onClick={addNewPackage}
+            <Button sx={{marginTop: '10px'}} onClick={() => addNewPackage()}
                     variant="text">Add Package</Button>
         </div>
     )

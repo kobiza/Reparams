@@ -76,8 +76,11 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
         _updatePackage(packageIndex, newPackage)
     }
 
-    const addNewPackage = () => {
-        const newPackage = getEmptySettingsPackage('Untitled package')
+    const addNewPackage: EditorStore['addNewPackage'] = (newPackageOverrides = {}) => {
+        const newPackage = {
+            ...getEmptySettingsPackage('Untitled package'),
+            ...newPackageOverrides
+        }
 
         setAppState((appState) => {
             return [...appState, newPackage]

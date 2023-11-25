@@ -32,3 +32,9 @@ export const runFixer1 = () => {
         localStorage.setItem(localStorageKey, JSON.stringify(fixed))
     }
 }
+
+export const reset = () => {
+    const localStorageKey = 'paparamsAppData'
+// reset
+    localStorage.setItem(localStorageKey, '')
+}
