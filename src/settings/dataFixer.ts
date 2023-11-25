@@ -12,17 +12,23 @@ export const runFixer1 = () => {
             const {
                 key,
                 label,
-                // @ts-ignore
-                urlPattern,
+                urlPatterns,
                 presets,
-                paramsWithDelimiter,
+                // @ts-ignore
+                paramsWithMultipleValues,
                 quickActions
             } = v
+
+            const paramsWithDelimiter = Object.keys(paramsWithMultipleValues).map(v => ({
+                id: v,
+                label: paramsWithMultipleValues[v].label,
+                separator: paramsWithMultipleValues[v].separator
+            }))
 
             return {
                 key,
                 label,
-                urlPatterns: (urlPattern as string).split(';').map((v, index) => ({id: `p-${index}`, value: v})),
+                urlPatterns,
                 presets,
                 paramsWithDelimiter,
                 quickActions
