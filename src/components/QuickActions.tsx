@@ -20,15 +20,15 @@ export type PresetsPickerProps = {
     addEntriesAndNavigate: AddEntriesAndNavigate,
     presets: PresetsEntriesMapViewModel
     quickActions: QuickActionData
-    paramsWithMultipleValues: ParamsWithMultipleValuesViewModel
+    paramsWithDelimiter: ParamsWithMultipleValuesViewModel
 }
 
 const PresetsPicker = (props: PresetsPickerProps) => {
-    const {presets, paramsWithMultipleValues, entries, setEntries, quickActions, addEntriesAndNavigate} = props
+    const {presets, paramsWithDelimiter, entries, setEntries, quickActions, addEntriesAndNavigate} = props
 
     const addPresetsAndNavigate = (presetsKeys: Array<string>, shouldOpenNewTab: boolean) => {
         const entriesToAdd = presetsKeys.map(presetKey => presets[presetKey])
-        const newEntries = mergeEntries([entries, ...entriesToAdd], props.paramsWithMultipleValues)
+        const newEntries = mergeEntries([entries, ...entriesToAdd], props.paramsWithDelimiter)
 
         addEntriesAndNavigate(newEntries, shouldOpenNewTab)
     }

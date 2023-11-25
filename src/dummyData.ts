@@ -1,4 +1,4 @@
-import {EditorModel, ParamsWithMultipleValues, PresetsEntriesMap, QuickActionData} from "./types/types";
+import {EditorModel, ParamsWithDelimiter, PresetsEntriesMap, QuickActionData} from "./types/types";
 
 export const presets: PresetsEntriesMap = {
     "debug": {
@@ -79,7 +79,7 @@ export const presets: PresetsEntriesMap = {
     }
 }
 
-export const paramsWithMultipleValues: ParamsWithMultipleValues = [{
+export const paramsWithDelimiter: ParamsWithDelimiter = [{
     id: 'param-1',
     label: 'experiments',
     separator: ','
@@ -120,6 +120,6 @@ export const appData: EditorModel = [{
     label: 'kobiz package',
     urlPatterns: [{id: 'p-1', value: '*://*/*'}],
     presets,
-    paramsWithMultipleValues,
+    paramsWithDelimiter,
     quickActions
 }]

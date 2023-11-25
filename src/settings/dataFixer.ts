@@ -15,7 +15,7 @@ export const runFixer1 = () => {
                 // @ts-ignore
                 urlPattern,
                 presets,
-                paramsWithMultipleValues,
+                paramsWithDelimiter,
                 quickActions
             } = v
 
@@ -24,7 +24,7 @@ export const runFixer1 = () => {
                 label,
                 urlPatterns: (urlPattern as string).split(';').map((v, index) => ({id: `p-${index}`, value: v})),
                 presets,
-                paramsWithMultipleValues,
+                paramsWithDelimiter,
                 quickActions
             }
         })

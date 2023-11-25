@@ -141,7 +141,7 @@ const PresetsEditor = ({packageIndex, presets, updatePackagePreset}: PresetsEdit
 }
 type ParamsEditorProps = {
     packageIndex: number
-    paramsWithMultipleValues: SettingsPackage['paramsWithMultipleValues']
+    paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']
     urlPatterns: SettingsPackage['urlPatterns']
     label: SettingsPackage['label']
     addNewPackage: EditorStore['addNewPackage']
@@ -152,7 +152,7 @@ type ParamsEditorProps = {
 
 const PackageSettingsEditor = ({
                                    packageIndex,
-                                   paramsWithMultipleValues,
+                                   paramsWithDelimiter,
                                    updatePackageParamsWithMultipleValues,
                                    urlPatterns,
                                    label,
@@ -160,21 +160,21 @@ const PackageSettingsEditor = ({
                                    updatePackageUrlPatterns,
                                    deletePackage
                                }: ParamsEditorProps) => {
-    const paramsItems = paramsWithMultipleValues.map((paramData, index) => {
+    const paramsItems = paramsWithDelimiter.map((paramData, index) => {
         const {label, separator, id} = paramData
 
         const updateParamLabel = (newParamLabel: string) => {
-            const prevItem = paramsWithMultipleValues[index]
+            const prevItem = paramsWithDelimiter[index]
             const newItem = {...prevItem, label: newParamLabel}
-            const newParamsWithMultipleValues = replaceItem(paramsWithMultipleValues, newItem, index)
+            const newParamsWithMultipleValues = replaceItem(paramsWithDelimiter, newItem, index)
 
             updatePackageParamsWithMultipleValues(packageIndex, newParamsWithMultipleValues)
         }
 
         const updateParamSeparator = (newParamSeparator: string) => {
-            const prevItem = paramsWithMultipleValues[index]
+            const prevItem = paramsWithDelimiter[index]
             const newItem = {...prevItem, separator: newParamSeparator}
-            const newParamsWithMultipleValues = replaceItem(paramsWithMultipleValues, newItem, index)
+            const newParamsWithMultipleValues = replaceItem(paramsWithDelimiter, newItem, index)
 
             updatePackageParamsWithMultipleValues(packageIndex, newParamsWithMultipleValues)
         }
@@ -202,7 +202,7 @@ const PackageSettingsEditor = ({
 
     const addNewMultiParam = () => {
         const newParamsWithMultipleValues = [
-            ...paramsWithMultipleValues,
+            ...paramsWithDelimiter,
             {
                 id: uuidv4(),
                 label: '',
@@ -236,7 +236,7 @@ const PackageSettingsEditor = ({
     }
 
     const addPackageWithSameSettings = () => {
-        addNewPackage({paramsWithMultipleValues, urlPatterns})
+        addNewPackage({paramsWithDelimiter, urlPatterns})
     }
 
     const [deletePackageDialog, setDeletePackageDialog] = useState(false)
@@ -401,7 +401,7 @@ type PackagePanelProps = {
 }
 
 const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProps) => {
-    const {key, label, presets, paramsWithMultipleValues, quickActions, urlPatterns} = packageData
+    const {key, label, presets, paramsWithDelimiter, quickActions, urlPatterns} = packageData
     const [value, setValue] = React.useState(0);
     const {
         addNewPackage,
@@ -517,7 +517,7 @@ const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProp
                     <CustomTabPanel value={value} index={2}>
                         <PackageSettingsEditor packageIndex={packageIndex}
                                                label={label}
-                                               paramsWithMultipleValues={paramsWithMultipleValues}
+                                               paramsWithDelimiter={paramsWithDelimiter}
                                                addNewPackage={addNewPackage}
                                                updatePackageParamsWithMultipleValues={updatePackageParamsWithMultipleValues}
                                                urlPatterns={urlPatterns}

@@ -16,7 +16,7 @@ export type PresetsEntriesMapViewModel = {
     [label: string]: SearchParamsEntries
 }
 
-export type ParamsWithMultipleValues = Array<{
+export type ParamsWithDelimiter = Array<{
     id: string
     label: string
     separator: string
@@ -33,13 +33,13 @@ export type SettingsPackage = {
     label: string
     urlPatterns: Array<{ id: string, value: string }>
     presets: PresetsEntriesMap
-    paramsWithMultipleValues: ParamsWithMultipleValues
+    paramsWithDelimiter: ParamsWithDelimiter
     quickActions: QuickActionData
 }
 
 export type MergedAppData = {
     presets: PresetsEntriesMap
-    paramsWithMultipleValues: ParamsWithMultipleValues
+    paramsWithDelimiter: ParamsWithDelimiter
     quickActions: QuickActionData
 }
 
@@ -60,7 +60,7 @@ export type QuickActionData = Array<{
 export type EditorStore = {
     state: EditorModel
     updatePackagePreset: (packageIndex: number, presets: SettingsPackage['presets']) => void
-    updatePackageParamsWithMultipleValues: (packageIndex: number, paramsWithMultipleValues: SettingsPackage['paramsWithMultipleValues']) => void
+    updatePackageParamsWithMultipleValues: (packageIndex: number, paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']) => void
     updatePackageQuickActions: (packageIndex: number, quickActions: SettingsPackage['quickActions']) => void
     updatePackageLabel: (packageIndex: number, label: string) => void
     updatePackageUrlPatterns: (packageIndex: number, urlPatterns: SettingsPackage['urlPatterns']) => void
@@ -70,7 +70,7 @@ export type EditorStore = {
 
 export type ViewerModel = {
     presets: PresetsEntriesMapViewModel
-    paramsWithMultipleValues: ParamsWithMultipleValuesViewModel
+    paramsWithDelimiter: ParamsWithMultipleValuesViewModel
     quickActions: QuickActionData
 }
 

@@ -21,7 +21,7 @@ export type PresetsPickerProps = {
     setEntries: SetEntries
     addEntriesAndNavigate: AddEntriesAndNavigate
     presets: PresetsEntriesMapViewModel
-    paramsWithMultipleValues: ParamsWithMultipleValuesViewModel
+    paramsWithDelimiter: ParamsWithMultipleValuesViewModel
     className?: string
 }
 
@@ -38,18 +38,18 @@ const getEntriesMap = (entries: SearchParamsEntries): EntriesMap => {
 }
 
 type PredicateArgs = {
-    entriesMap: EntriesMap, key: string, value: string, paramsWithMultipleValues: ParamsWithMultipleValuesViewModel
+    entriesMap: EntriesMap, key: string, value: string, paramsWithDelimiter: ParamsWithMultipleValuesViewModel
 }
-const isPresetOn = ({entriesMap, key, value, paramsWithMultipleValues}: PredicateArgs) => {
-    const paramsWithMultipleValuesData = paramsWithMultipleValues[key]
+const isPresetOn = ({entriesMap, key, value, paramsWithDelimiter}: PredicateArgs) => {
+    const paramsWithDelimiterData = paramsWithDelimiter[key]
 
     if (!entriesMap[key]) {
         return false
     }
-    if (!paramsWithMultipleValuesData) {
+    if (!paramsWithDelimiterData) {
         return entriesMap[key].value === value
     }
-    const {separator} = paramsWithMultipleValuesData
+    const {separator} = paramsWithDelimiterData
     const currentValue = entriesMap[key].value
     if (!currentValue) {
         return false
@@ -62,9 +62,9 @@ const isPresetOn = ({entriesMap, key, value, paramsWithMultipleValues}: Predicat
     return value.split(separator).every(singleValue => currentValuesMap[singleValue])
 }
 
-const getSelectedPresets = ({presets, paramsWithMultipleValues, entries}: {
+const getSelectedPresets = ({presets, paramsWithDelimiter, entries}: {
     presets: PresetsEntriesMapViewModel
-    paramsWithMultipleValues: ParamsWithMultipleValuesViewModel
+    paramsWithDelimiter: ParamsWithMultipleValuesViewModel
     entries: SearchParamsEntries
 }): Array<string> => {
     const presetsKeys = Object.keys(presets)
@@ -74,7 +74,7 @@ const getSelectedPresets = ({presets, paramsWithMultipleValues, entries}: {
         const presetEntries = presets[presetKey]
 
         return presetEntries.length > 0 && presetEntries.every(([key, value]) => {
-            return isPresetOn({entriesMap, paramsWithMultipleValues, key, value})
+            return isPresetOn({entriesMap, paramsWithDelimiter, key, value})
         })
     })
 
@@ -86,19 +86,19 @@ const getSelectedPresets = ({presets, paramsWithMultipleValues, entries}: {
     })
 }
 
-const getEntriesToRemoveRemovingPreset = (presetKeyToRemove: string, {presets, paramsWithMultipleValues, entries}: {
+const getEntriesToRemoveRemovingPreset = (presetKeyToRemove: string, {presets, paramsWithDelimiter, entries}: {
     presets: PresetsEntriesMapViewModel
-    paramsWithMultipleValues: ParamsWithMultipleValuesViewModel
+    paramsWithDelimiter: ParamsWithMultipleValuesViewModel
     entries: SearchParamsEntries
 }) => {
-    const _selectedPresets = getSelectedPresets({presets, paramsWithMultipleValues, entries})
+    const _selectedPresets = getSelectedPresets({presets, paramsWithDelimiter, entries})
     const otherPresets = _selectedPresets.filter(currPresetKey => currPresetKey !== presetKeyToRemove)
     const otherEntries = Object.values(pick(presets, otherPresets))
-    const mergedEntries = mergeEntries(otherEntries, paramsWithMultipleValues)
+    const mergedEntries = mergeEntries(otherEntries, paramsWithDelimiter)
     const otherEntriesMap = getEntriesMap(mergedEntries)
     const entriesToRemove = presets[presetKeyToRemove].reduce<Array<[string, string]>>((acc, entry) => {
         const [key, value] = entry
-        const multiData = paramsWithMultipleValues[key]
+        const multiData = paramsWithDelimiter[key]
 
         // param that used only on the removed preset
         if (!otherEntriesMap[key]) {
@@ -123,14 +123,14 @@ const getEntriesToRemoveRemovingPreset = (presetKeyToRemove: string, {presets, p
     return entriesToRemove
 }
 
-const getEntriesAfterRemovingPreset = (sourceEntries: SearchParamsEntries, presetKeyToRemove: string, {paramsWithMultipleValues, presets}: {paramsWithMultipleValues: ParamsWithMultipleValuesViewModel, presets: PresetsEntriesMapViewModel}) => {
-    const entriesToRemove = getEntriesToRemoveRemovingPreset( presetKeyToRemove, {presets, paramsWithMultipleValues, entries: sourceEntries})
+const getEntriesAfterRemovingPreset = (sourceEntries: SearchParamsEntries, presetKeyToRemove: string, {paramsWithDelimiter, presets}: {paramsWithDelimiter: ParamsWithMultipleValuesViewModel, presets: PresetsEntriesMapViewModel}) => {
+    const entriesToRemove = getEntriesToRemoveRemovingPreset( presetKeyToRemove, {presets, paramsWithDelimiter, entries: sourceEntries})
 
-    return removeEntries(sourceEntries, entriesToRemove, paramsWithMultipleValues)
+    return removeEntries(sourceEntries, entriesToRemove, paramsWithDelimiter)
 }
 
 const PresetsPicker = (props: PresetsPickerProps) => {
-    const {className, presets, paramsWithMultipleValues, entries, setEntries, addEntriesAndNavigate} = props
+    const {className, presets, paramsWithDelimiter, entries, setEntries, addEntriesAndNavigate} = props
     const presetsKeys = Object.keys(presets)
 
 
@@ -139,7 +139,7 @@ const PresetsPicker = (props: PresetsPickerProps) => {
         let newEntries = entries
 
         presetsKeys.forEach(presetKey => {
-            newEntries = getEntriesAfterRemovingPreset(newEntries, presetKey, {paramsWithMultipleValues, presets})
+            newEntries = getEntriesAfterRemovingPreset(newEntries, presetKey, {paramsWithDelimiter, presets})
         })
 
         setEntries(newEntries)
@@ -153,14 +153,14 @@ const PresetsPicker = (props: PresetsPickerProps) => {
 
     const addPresets = (presetsKeys: Array<string>) => {
         const entriesToAdd = presetsKeys.map(presetKey => presets[presetKey])
-        const newEntries = mergeEntries([entries, ...entriesToAdd], props.paramsWithMultipleValues)
+        const newEntries = mergeEntries([entries, ...entriesToAdd], props.paramsWithDelimiter)
 
         setEntries(newEntries)
     }
 
     const addPresetsAndNavigate = (presetsKeys: Array<string>, shouldOpenNewTab: boolean) => {
         const entriesToAdd = presetsKeys.map(presetKey => presets[presetKey])
-        const newEntries = mergeEntries([entries, ...entriesToAdd], props.paramsWithMultipleValues)
+        const newEntries = mergeEntries([entries, ...entriesToAdd], props.paramsWithDelimiter)
 
         addEntriesAndNavigate(newEntries, shouldOpenNewTab)
     }

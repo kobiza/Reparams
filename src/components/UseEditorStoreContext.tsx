@@ -44,10 +44,10 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
         _updatePackage(packageIndex, newPackage)
     }
 
-    const updatePackageParamsWithMultipleValues = (packageIndex: number, paramsWithMultipleValues: SettingsPackage['paramsWithMultipleValues']) => {
+    const updatePackageParamsWithMultipleValues = (packageIndex: number, paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']) => {
         const newPackage = {
             ...appState[packageIndex],
-            paramsWithMultipleValues
+            paramsWithDelimiter
         }
         _updatePackage(packageIndex, newPackage)
     }

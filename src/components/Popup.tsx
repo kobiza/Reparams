@@ -25,7 +25,7 @@ function Popup({currentTabUrl, tabId}: { currentTabUrl: string; tabId: string })
                 updateCurrentTabUrl={updateCurrentTabUrl}
                 openNewTab={openNewTab}
                 presets={state.presets}
-                paramsWithMultipleValues={state.paramsWithMultipleValues}
+                paramsWithDelimiter={state.paramsWithDelimiter}
                 quickActions={state.quickActions}/>
             {/*<Settings/>*/}
         </div>

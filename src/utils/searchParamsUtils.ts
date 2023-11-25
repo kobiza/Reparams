@@ -1,4 +1,4 @@
-import {ParamsWithMultipleValues, ParamsWithMultipleValuesViewModel, SearchParamsEntries} from "../types/types";
+import {ParamsWithDelimiter, ParamsWithMultipleValuesViewModel, SearchParamsEntries} from "../types/types";
 import {removeItem, replaceItem, toTrueObj} from "./arrayUtils";
 
 const mergeValues = (values1: Array<string>, values2: Array<string>): Array<string> => {
@@ -36,10 +36,10 @@ export const updateEntryKey = (entries: SearchParamsEntries, newKey: string, ind
     return replaceItem(entries, newEntry, index)
 }
 
-export const mergeEntryValues = (entries: SearchParamsEntries, newValue: string, index: number, paramsWithMultipleValues: ParamsWithMultipleValuesViewModel): SearchParamsEntries => {
+export const mergeEntryValues = (entries: SearchParamsEntries, newValue: string, index: number, paramsWithDelimiter: ParamsWithMultipleValuesViewModel): SearchParamsEntries => {
     const key = entries[index][0]
 
-    const multipleValuesData = paramsWithMultipleValues[key]
+    const multipleValuesData = paramsWithDelimiter[key]
 
     if (multipleValuesData) {
         const multipleValuesSeparator = multipleValuesData.separator
@@ -55,7 +55,7 @@ export const mergeEntryValues = (entries: SearchParamsEntries, newValue: string,
     }
 }
 
-const addOrReplaceEntry = (entries: SearchParamsEntries, entry: [string, string], paramsWithMultipleValues: ParamsWithMultipleValuesViewModel): SearchParamsEntries => {
+const addOrReplaceEntry = (entries: SearchParamsEntries, entry: [string, string], paramsWithDelimiter: ParamsWithMultipleValuesViewModel): SearchParamsEntries => {
     const [newKey, newValue] = entry
     const entryIndex = entries.findIndex(([key]) => key === newKey)
 
@@ -65,14 +65,14 @@ const addOrReplaceEntry = (entries: SearchParamsEntries, entry: [string, string]
     }
 
     // replace
-    return mergeEntryValues(entries, newValue, entryIndex, paramsWithMultipleValues)
+    return mergeEntryValues(entries, newValue, entryIndex, paramsWithDelimiter)
 }
 
-const removeEntry = (entries: SearchParamsEntries, [entryKey, valueToRemove]: [string, string], paramsWithMultipleValues: ParamsWithMultipleValuesViewModel): SearchParamsEntries => {
+const removeEntry = (entries: SearchParamsEntries, [entryKey, valueToRemove]: [string, string], paramsWithDelimiter: ParamsWithMultipleValuesViewModel): SearchParamsEntries => {
     const entryIndex = entries.findIndex(([key]) => key === entryKey)
 
     if (entryIndex !== -1) {
-        const multipleValuesData = paramsWithMultipleValues[entryKey]
+        const multipleValuesData = paramsWithDelimiter[entryKey]
         if (multipleValuesData) {
             const {separator} = multipleValuesData
             const [, currVal] = entries[entryIndex]
@@ -93,7 +93,7 @@ const removeEntry = (entries: SearchParamsEntries, [entryKey, valueToRemove]: [s
     return entries
 }
 
-export const mergeEntries = (entriesArr: Array<SearchParamsEntries>, paramsWithMultipleValues: ParamsWithMultipleValuesViewModel): SearchParamsEntries => {
+export const mergeEntries = (entriesArr: Array<SearchParamsEntries>, paramsWithDelimiter: ParamsWithMultipleValuesViewModel): SearchParamsEntries => {
     if (entriesArr.length === 0) {
         return []
     }
@@ -107,18 +107,18 @@ export const mergeEntries = (entriesArr: Array<SearchParamsEntries>, paramsWithM
 
     rest.forEach(arr => {
         arr.forEach((entry => {
-            lastEntries = addOrReplaceEntry(lastEntries, entry, paramsWithMultipleValues)
+            lastEntries = addOrReplaceEntry(lastEntries, entry, paramsWithDelimiter)
         }))
     })
 
     return lastEntries
 }
 
-export const removeEntries = (entries: SearchParamsEntries, entriesToRemove: SearchParamsEntries, paramsWithMultipleValues: ParamsWithMultipleValuesViewModel): SearchParamsEntries => {
+export const removeEntries = (entries: SearchParamsEntries, entriesToRemove: SearchParamsEntries, paramsWithDelimiter: ParamsWithMultipleValuesViewModel): SearchParamsEntries => {
     let lastEntries = entries
 
     entriesToRemove.forEach((entry) => {
-        lastEntries = removeEntry(lastEntries, entry, paramsWithMultipleValues)
+        lastEntries = removeEntry(lastEntries, entry, paramsWithDelimiter)
     })
 
     return lastEntries

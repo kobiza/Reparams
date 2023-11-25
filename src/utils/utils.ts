@@ -19,13 +19,13 @@ export const uuidv4 = () => {
 export const mergeAppDataPackages = (appData: EditorModel): MergedAppData => {
     const mergedAppData: MergedAppData = {
         presets: {},
-        paramsWithMultipleValues: [],
+        paramsWithDelimiter: [],
         quickActions: []
     }
 
     appData.forEach((appDataPackage) => {
         assign(mergedAppData.presets, appDataPackage.presets)
-        assign(mergedAppData.paramsWithMultipleValues, appDataPackage.paramsWithMultipleValues)
+        assign(mergedAppData.paramsWithDelimiter, appDataPackage.paramsWithDelimiter)
         mergedAppData.quickActions = [...mergedAppData.quickActions, ...appDataPackage.quickActions]
     })
 
@@ -43,7 +43,7 @@ export const toViewerModel = (editorModel: EditorModel, currentTabUrl: string): 
 
             return acc
         }, {})
-        const paramsWithMultipleValues: ParamsWithMultipleValuesViewModel = settingsPackage.paramsWithMultipleValues.reduce<ParamsWithMultipleValuesViewModel>((acc, paramData) => {
+        const paramsWithDelimiter: ParamsWithMultipleValuesViewModel = settingsPackage.paramsWithDelimiter.reduce<ParamsWithMultipleValuesViewModel>((acc, paramData) => {
             const {label, separator} = paramData
             acc[label] = {separator}
 
@@ -52,20 +52,20 @@ export const toViewerModel = (editorModel: EditorModel, currentTabUrl: string): 
 
         return {
             presets,
-            paramsWithMultipleValues,
+            paramsWithDelimiter,
             quickActions: settingsPackage.quickActions
         }
     })
 
     const viewerModel: ViewerModel = {
         presets: {},
-        paramsWithMultipleValues: {},
+        paramsWithDelimiter: {},
         quickActions: []
     }
 
     packagesDataToMerge.forEach((appDataPackage) => {
         assign(viewerModel.presets, appDataPackage.presets)
-        assign(viewerModel.paramsWithMultipleValues, appDataPackage.paramsWithMultipleValues)
+        assign(viewerModel.paramsWithDelimiter, appDataPackage.paramsWithDelimiter)
         viewerModel.quickActions = [...viewerModel.quickActions, ...appDataPackage.quickActions]
     })
 
@@ -78,7 +78,7 @@ export const getEmptySettingsPackage = (label: string): SettingsPackage => {
         label,
         urlPatterns: [{id: uuidv4(), value: '*://*/*'}],
         presets: {},
-        paramsWithMultipleValues: [{
+        paramsWithDelimiter: [{
             id: uuidv4(),
             label: '',
             separator: ''

@@ -21,7 +21,7 @@ type UrlEditorProps = {
     updateCurrentTabUrl: (newUrl: string) => void,
     openNewTab: (newUrl: string) => void,
     presets: PresetsEntriesMapViewModel
-    paramsWithMultipleValues: ParamsWithMultipleValuesViewModel,
+    paramsWithDelimiter: ParamsWithMultipleValuesViewModel,
     quickActions: QuickActionData
     className?: string,
 }
@@ -41,7 +41,7 @@ function UrlEditor({
                        openNewTab,
                        className,
                        presets,
-                       paramsWithMultipleValues,
+                       paramsWithDelimiter,
                        quickActions
                    }: UrlEditorProps) {
     // const urlData = new URL(url)
@@ -104,13 +104,13 @@ function UrlEditor({
             </AppBar>
             <div className="presets-picker-container">
                 <PresetsPicker className="presets-picker" entries={searchParamsEntries} setEntries={setSearchParamsEntries} presets={presets}
-                               paramsWithMultipleValues={paramsWithMultipleValues}
+                               paramsWithDelimiter={paramsWithDelimiter}
                                addEntriesAndNavigate={addEntriesAndNavigate}/>
                 <Button variant="contained" onClick={applyUrl}>Apply</Button>
             </div>
             <SearchParams entries={searchParamsEntries} setEntries={setSearchParamsEntries}/>
             <QuickActions entries={searchParamsEntries} setEntries={setSearchParamsEntries} presets={presets}
-                          paramsWithMultipleValues={paramsWithMultipleValues} quickActions={quickActions}
+                          paramsWithDelimiter={paramsWithDelimiter} quickActions={quickActions}
                           addEntriesAndNavigate={addEntriesAndNavigate}/>
         </div>
     );

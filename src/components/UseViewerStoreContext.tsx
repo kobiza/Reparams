@@ -5,7 +5,7 @@ import {toViewerModel} from "../utils/utils";
 export const ViewerStoreContext = createContext<ViewerStore>({
     state: {
         presets: {},
-        paramsWithMultipleValues: {},
+        paramsWithDelimiter: {},
         quickActions: []
     },
 });
