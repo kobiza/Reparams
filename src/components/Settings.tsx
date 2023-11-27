@@ -535,6 +535,7 @@ const PackagesPage = () => {
     const {
         state: appState,
         addNewPackage,
+        addPackages,
     } = editorStore
     const packagesList = appState.map((packageData, packageIndex) => {
         return (
@@ -558,7 +559,7 @@ const Settings = () => {
     } = editorStore
     return (
         <div className="settings-pages">
-            <SettingsHeader packages={packages}/>
+            <SettingsHeader packages={packages} addPackages={editorStore.addPackages}/>
             <PackagesPage/>
         </div>
     )

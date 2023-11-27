@@ -1,7 +1,8 @@
 import React, {createContext, PropsWithChildren, useEffect, useState} from "react";
 import {EditorModel, EditorStore, SettingsPackage} from "../types/types";
-import {removeItem, replaceItem} from "../utils/arrayUtils";
-import {getEmptySettingsPackage} from "../utils/utils";
+import {removeItem, replaceItem, toTrueObj} from "../utils/arrayUtils";
+import {getEmptySettingsPackage, uuidv4} from "../utils/utils";
+import * as repl from "repl";
 
 const noop = () => {
 }
@@ -13,6 +14,7 @@ export const EditorStoreContext = createContext<EditorStore>({
     updatePackageLabel: noop,
     updatePackageUrlPatterns: noop,
     addNewPackage: noop,
+    addPackages: noop,
     deletePackage: noop
 });
 
@@ -87,6 +89,41 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
         })
     }
 
+    const addAndDuplicateExistingPackages = (packagesToAdd: Array<SettingsPackage>) => {
+        setAppState((appState) => {
+            const currentPackagesKeys = toTrueObj(appState, v => v.key)
+            const packagesToAddWithNewIds = packagesToAdd.map(v => {
+                if (!currentPackagesKeys[v.key]) {
+                    return v
+                }
+
+                return {
+                    ...v,
+                    key: uuidv4()
+                }
+            })
+
+            return [...appState, ...packagesToAddWithNewIds]
+        })
+    }
+
+    const addAndReplaceExistingPackages = (packagesToAdd: Array<SettingsPackage>) => {
+        setAppState((appState) => {
+            const newPackagesKey = toTrueObj(packagesToAdd, v => v.key)
+            const packagesToKeep = appState.filter(v => !newPackagesKey[v.key])
+
+            return [...packagesToKeep, ...packagesToAdd]
+        })
+    }
+
+    const addPackages: EditorStore['addPackages'] = (packagesToAdd, replace) => {
+        if (replace) {
+            addAndReplaceExistingPackages(packagesToAdd)
+        } else {
+            addAndDuplicateExistingPackages(packagesToAdd)
+        }
+    }
+
     const deletePackage = (packageIndex: number) => {
         setAppState((appState) => {
             return removeItem(appState, packageIndex)
@@ -102,6 +139,7 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
             updatePackageLabel,
             updatePackageUrlPatterns,
             addNewPackage,
+            addPackages,
             deletePackage
         }}>
             {props.children}

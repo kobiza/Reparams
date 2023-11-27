@@ -7,20 +7,50 @@ import {Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Di
 import {Download, Upload} from "@mui/icons-material";
 import {useState} from "react";
 import ExportDialog from "./ExportDialog";
-import {EditorModel} from "../types/types";
+import {EditorModel, EditorStore} from "../types/types";
+import ImportDialog from "./ImportDialog";
+import _ from 'lodash'
 
 type SettingsHeaderProps = {
     packages: EditorModel
+    addPackages: EditorStore['addPackages']
 }
 
-function SettingsHeader({packages}: SettingsHeaderProps) {
-    const [importDialog, setImportDialog] = useState(false)
+
+//key: 'kobiz-package',
+//     label: 'kobiz package',
+//     urlPatterns: [{id: 'p-1', value: '*://*/*'}],
+//     presets,
+//     paramsWithDelimiter,
+//     quickActions
+const getEditorModelFromClipboard = (text: string) => {
+    try {
+        const clipboardJson = JSON.parse(text)
+        if (_.isArray(clipboardJson) &&
+            ['key', 'label', 'urlPatterns', 'presets', 'paramsWithDelimiter', 'quickActions'].every(key => {
+                return !_.isUndefined(clipboardJson[0][key])
+            })) {
+            return clipboardJson as EditorModel
+        } else {
+            return null
+        }
+    } catch (e) {
+        return null
+    }
+}
+
+function SettingsHeader({packages, addPackages}: SettingsHeaderProps) {
+    const [importDialogData, setImportDialogData] = useState<EditorModel | null>(null)
     const openImportDialog = () => {
-        setImportDialog(true);
+        navigator.clipboard.readText()
+            .then(text => {
+                const editorModel = getEditorModelFromClipboard(text)
+                setImportDialogData(editorModel);
+            })
     };
 
     const closeImportDialog = () => {
-        setImportDialog(false);
+        setImportDialogData(null);
     };
 
     const importPackages = () => {
@@ -57,9 +87,10 @@ function SettingsHeader({packages}: SettingsHeaderProps) {
                         {`ReParams - Settings`}
                     </Typography>
                     <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                        <Button startIcon={<Download/>} sx={{ color: '#fff' }} onClick={() => {}}>
+                        <Button startIcon={<Download/>} sx={{ color: '#fff' }} onClick={openImportDialog}>
                             Import
                         </Button>
+                        <ImportDialog packages={packages} packagesToImport={importDialogData} isOpen={!!importDialogData} closeDialog={closeImportDialog} addPackages={addPackages}/>
                         <Button startIcon={<Upload/>} sx={{ color: '#fff' }} onClick={openExportDialog}>
                             Export
                         </Button>

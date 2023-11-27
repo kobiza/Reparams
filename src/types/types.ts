@@ -65,6 +65,7 @@ export type EditorStore = {
     updatePackageLabel: (packageIndex: number, label: string) => void
     updatePackageUrlPatterns: (packageIndex: number, urlPatterns: SettingsPackage['urlPatterns']) => void
     addNewPackage: (newPackageOverrides?: Partial<SettingsPackage>) => void
+    addPackages: (packagesToAdd: Array<SettingsPackage>, replace: boolean) => void
     deletePackage: (packageIndex: number) => void
 }
 

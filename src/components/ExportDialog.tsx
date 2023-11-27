@@ -7,7 +7,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
 import {replaceItem} from "../utils/arrayUtils";
 import {EditorModel} from "../types/types";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle} from "@mui/material";
 
 type PackageItem = { key: string, label: string, checked: boolean }
@@ -61,11 +61,15 @@ type ExportDialogProps = {
 }
 
 export default function ExportDialog({packages, isOpen, closeDialog}: ExportDialogProps) {
-    const [selectedPackages, setSelectedPackages] = useState<Array<PackageItem>>(packages.map(v => ({
-        key: v.key,
-        label: v.label,
-        checked: true
-    })))
+    const [selectedPackages, setSelectedPackages] = useState<Array<PackageItem>>([])
+
+    useEffect(() => {
+        setSelectedPackages((packages || []).map(v => ({
+            key: v.key,
+            label: v.label,
+            checked: true
+        })))
+    }, [packages])
 
     const exportPackages = () => {
         const packagesToExport = packages.filter((v, index) => {
