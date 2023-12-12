@@ -4,9 +4,8 @@ const CopyWebpackPlugin = require("copy-webpack-plugin")
 
 module.exports = {
     entry: {
-        content: [path.join(__dirname, 'src/content')],
-        Popup: [path.join(__dirname, 'src/popup/Popup')],
-        Settings: [path.join(__dirname, 'src/settings/Settings')],
+        Popup: [path.join(__dirname, 'src/js/popup/Popup')],
+        Settings: [path.join(__dirname, 'src/js/settings/Settings')],
         // hot: 'webpack/hot/dev-server.js',
         // background: [path.join(__dirname, 'src/background')],
     },
