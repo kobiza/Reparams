@@ -4,9 +4,9 @@ import {EditorStore, SearchParamsEntries, SettingsPackage} from "../../types/typ
 import {uuidv4} from "../../utils/utils";
 
 import './Settings.scss'
-import SearchParams from "../SearchParams";
+import SearchParams from "../common/SearchParams";
 import {removeItem, replaceItem, toTrueObj} from "../../utils/arrayUtils";
-import Tags, {TagsProps} from "../MuiTags";
+import Tags, {TagsProps} from "../common/MuiTags";
 import {
     Accordion,
     AccordionDetails,

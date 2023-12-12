@@ -1,5 +1,5 @@
 import React from 'react'
-import '../App.scss'
+import '../common/App.scss'
 import { createRoot } from 'react-dom/client'
 import Popup from "./Popup";
 import UseViewerStoreContext from "./UseViewerStoreContext";

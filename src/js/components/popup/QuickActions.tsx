@@ -3,18 +3,14 @@ import type {
     AddEntriesAndNavigate,
     ParamsWithDelimiterViewModel,
     PresetsEntriesMapViewModel
-} from '../types/types'
+} from '../../types/types'
 
-import './PresetsPicker.scss'
-import {QuickActionData, SearchParamsEntries, SetEntries} from "../types/types";
-import {mergeEntries} from "../utils/searchParamsUtils";
-import {Button, Grid, Typography} from "@mui/material";
-
-
-// const PresetsPicker = ({presetsNames, allPresetsNames}: PresetsPickerProps) => {
+import {QuickActionData, SearchParamsEntries, SetEntries} from "../../types/types";
+import {mergeEntries} from "../../utils/searchParamsUtils";
+import {Button, Typography} from "@mui/material";
 
 
-export type PresetsPickerProps = {
+export type QuickActionsProps = {
     entries: SearchParamsEntries
     setEntries: SetEntries,
     addEntriesAndNavigate: AddEntriesAndNavigate,
@@ -23,7 +19,7 @@ export type PresetsPickerProps = {
     paramsWithDelimiter: ParamsWithDelimiterViewModel
 }
 
-const PresetsPicker = (props: PresetsPickerProps) => {
+const QuickActions = (props: QuickActionsProps) => {
     const {presets, paramsWithDelimiter, entries, setEntries, quickActions, addEntriesAndNavigate} = props
 
     const addPresetsAndNavigate = (presetsKeys: Array<string>, shouldOpenNewTab: boolean) => {
@@ -59,4 +55,4 @@ const PresetsPicker = (props: PresetsPickerProps) => {
     )
 }
 
-export default PresetsPicker
+export default QuickActions

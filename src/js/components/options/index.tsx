@@ -1,5 +1,5 @@
 import React from 'react'
-import '../App.scss'
+import '../common/App.scss'
 import {createRoot} from 'react-dom/client'
 import Settings from "./Settings";
 import UseEditorStoreContext from "./UseEditorStoreContext";
