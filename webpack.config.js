@@ -1,5 +1,5 @@
 const path = require("path");
-const webpack = require("webpack")
+// const webpack = require("webpack")
 const CopyWebpackPlugin = require("copy-webpack-plugin")
 
 module.exports = {
@@ -7,7 +7,7 @@ module.exports = {
         content: [path.join(__dirname, 'src/content')],
         Popup: [path.join(__dirname, 'src/popup/Popup')],
         Settings: [path.join(__dirname, 'src/settings/Settings')],
-        hot: 'webpack/hot/dev-server.js',
+        // hot: 'webpack/hot/dev-server.js',
         // background: [path.join(__dirname, 'src/background')],
     },
     output: {
@@ -20,7 +20,7 @@ module.exports = {
         },
         compress: true,
         port: 9000,
-        hot: true,
+        // hot: true,
     },
     resolve: {
         extensions: [".tsx", ".ts", ".js", ".jsx"],
@@ -55,7 +55,7 @@ module.exports = {
         ]
     },
     plugins: [
-        new webpack.HotModuleReplacementPlugin(),
+        // new webpack.HotModuleReplacementPlugin(),
         new CopyWebpackPlugin({
             patterns: [
                 {
