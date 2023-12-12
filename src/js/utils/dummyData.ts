@@ -1,4 +1,4 @@
-import {EditorModel, ParamsWithDelimiter, PresetsEntriesMap, QuickActionData} from "./types/types";
+import {EditorModel, ParamsWithDelimiter, PresetsEntriesMap, QuickActionData} from "../types/types";
 
 export const presets: PresetsEntriesMap = {
     "debug": {
