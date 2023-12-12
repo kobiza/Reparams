@@ -1,7 +1,7 @@
 import React from 'react'
 import '../App.scss'
 import {createRoot} from 'react-dom/client'
-import Settings from "../Settings";
+import Settings from "./Settings";
 import UseEditorStoreContext from "../UseEditorStoreContext";
 import getMuiTheme from "../../utils/getMuiTheme";
 import {ThemeProvider} from "@mui/material";

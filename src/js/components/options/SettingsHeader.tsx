@@ -7,7 +7,7 @@ import {Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Di
 import {Download, Upload} from "@mui/icons-material";
 import {useState} from "react";
 import ExportDialog from "./ExportDialog";
-import {EditorModel, EditorStore} from "../types/types";
+import {EditorModel, EditorStore} from "../../types/types";
 import ImportDialog from "./ImportDialog";
 import _ from 'lodash'
 
