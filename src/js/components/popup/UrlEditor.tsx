@@ -1,5 +1,4 @@
 import React, {MouseEventHandler, useState} from 'react';
-import '../App.scss';
 import SearchParams from "../SearchParams";
 import PresetsPicker, {PresetsPickerProps} from "../PresetsPicker";
 
