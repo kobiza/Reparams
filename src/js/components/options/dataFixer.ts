@@ -1,4 +1,4 @@
-import {EditorModel} from "../types/types";
+import {EditorModel} from "../../types/types";
 
 export const runFixer1 = () => {
     const localStorageKey = 'paparamsAppData'
