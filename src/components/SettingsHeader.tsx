@@ -84,7 +84,7 @@ function SettingsHeader({packages, addPackages}: SettingsHeaderProps) {
                             flexGrow: 1
                         }}
                     >
-                        {`ReParams - Settings`}
+                        {`bili - Settings`}
                     </Typography>
                     <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                         <Button startIcon={<Download/>} sx={{ color: '#fff' }} onClick={openImportDialog}>
