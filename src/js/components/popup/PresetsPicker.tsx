@@ -3,14 +3,14 @@ import type {
     AddEntriesAndNavigate,
     ParamsWithDelimiterViewModel,
     PresetsEntriesMapViewModel
-} from '../types/types'
-import {toTrueObj} from "../utils/arrayUtils";
+} from '../../types/types'
+import {toTrueObj} from "../../utils/arrayUtils";
 import {max, pick, sortBy} from 'lodash'
 
 import './PresetsPicker.scss'
-import {SearchParamsEntries, SetEntries} from "../types/types";
-import {mergeEntries, removeEntries} from "../utils/searchParamsUtils";
-import Tags, {TagsProps} from "./MuiTags";
+import {SearchParamsEntries, SetEntries} from "../../types/types";
+import {mergeEntries, removeEntries} from "../../utils/searchParamsUtils";
+import Tags, {TagsProps} from "../common/MuiTags";
 
 
 // const PresetsPicker = ({presetsNames, allPresetsNames}: PresetsPickerProps) => {

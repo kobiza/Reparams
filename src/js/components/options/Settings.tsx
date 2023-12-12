@@ -1,12 +1,12 @@
 import React, {KeyboardEventHandler, SyntheticEvent, useContext, useEffect, useRef, useState} from "react";
 import {EditorStoreContext} from "./UseEditorStoreContext";
-import {EditorStore, SearchParamsEntries, SettingsPackage} from "../types/types";
-import {uuidv4} from "../utils/utils";
+import {EditorStore, SearchParamsEntries, SettingsPackage} from "../../types/types";
+import {uuidv4} from "../../utils/utils";
 
 import './Settings.scss'
-import SearchParams from "./SearchParams";
-import {removeItem, replaceItem, toTrueObj} from "../utils/arrayUtils";
-import Tags, {TagsProps} from "./MuiTags";
+import SearchParams from "../common/SearchParams";
+import {removeItem, replaceItem, toTrueObj} from "../../utils/arrayUtils";
+import Tags, {TagsProps} from "../common/MuiTags";
 import {
     Accordion,
     AccordionDetails,

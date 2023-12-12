@@ -1,4 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
+import './popup.scss'
 import UrlEditor from "./UrlEditor";
 import {ViewerStoreContext} from "./UseViewerStoreContext";
 

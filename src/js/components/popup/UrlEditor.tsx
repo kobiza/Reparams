@@ -1,13 +1,12 @@
 import React, {MouseEventHandler, useState} from 'react';
-import './App.scss';
-import SearchParams from "./SearchParams";
+import SearchParams from "../common/SearchParams";
 import PresetsPicker, {PresetsPickerProps} from "./PresetsPicker";
 
 import {
     ParamsWithDelimiterViewModel,
     PresetsEntriesMapViewModel,
     QuickActionData
-} from "../types/types";
+} from "../../types/types";
 import {AppBar, Box, Button, Grid, Paper, Typography} from "@mui/material";
 
 import QuickActions from "./QuickActions";

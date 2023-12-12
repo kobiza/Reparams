@@ -5,8 +5,8 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import {replaceItem} from "../utils/arrayUtils";
-import {EditorModel} from "../types/types";
+import {replaceItem} from "../../utils/arrayUtils";
+import {EditorModel} from "../../types/types";
 import {useEffect, useState} from "react";
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle} from "@mui/material";
 

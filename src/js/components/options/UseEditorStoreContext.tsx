@@ -1,7 +1,7 @@
 import React, {createContext, PropsWithChildren, useEffect, useState} from "react";
-import {EditorModel, EditorStore, SettingsPackage} from "../types/types";
-import {removeItem, replaceItem, toTrueObj} from "../utils/arrayUtils";
-import {getEmptySettingsPackage, uuidv4} from "../utils/utils";
+import {EditorModel, EditorStore, SettingsPackage} from "../../types/types";
+import {removeItem, replaceItem, toTrueObj} from "../../utils/arrayUtils";
+import {getEmptySettingsPackage, uuidv4} from "../../utils/utils";
 import * as repl from "repl";
 
 const noop = () => {

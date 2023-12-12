@@ -1,10 +1,10 @@
 import React, {useEffect, useRef} from "react";
-import {SearchParamsEntries, SetEntries} from "../types/types";
-import {updateEntryKey, updateEntryValue} from "../utils/searchParamsUtils";
+import {SearchParamsEntries, SetEntries} from "../../types/types";
+import {updateEntryKey, updateEntryValue} from "../../utils/searchParamsUtils";
 import './SearchParams.scss'
 import {Button, IconButton, TextField} from "@mui/material";
 import {Add, Clear} from "@mui/icons-material";
-import {removeItem} from "../utils/arrayUtils";
+import {removeItem} from "../../utils/arrayUtils";
 import usePrevious from "./usePrevious";
 
 type SearchParamsProps = {

@@ -1,8 +1,7 @@
 import React from 'react'
 
-import './Tags.scss'
 import {Autocomplete, Checkbox, Chip, TextField, Theme} from "@mui/material";
-import {toTrueObj} from "../utils/arrayUtils";
+import {toTrueObj} from "../../utils/arrayUtils";
 
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';

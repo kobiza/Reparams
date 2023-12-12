@@ -1,11 +1,10 @@
 import React from 'react'
-import '../components/App.scss'
+import '../common/App.scss'
 import {createRoot} from 'react-dom/client'
-import Settings from "../components/Settings";
-import UseEditorStoreContext from "../components/UseEditorStoreContext";
-import getMuiTheme from "../utils/getMuiTheme";
+import Settings from "./Settings";
+import UseEditorStoreContext from "./UseEditorStoreContext";
+import getMuiTheme from "../../utils/getMuiTheme";
 import {ThemeProvider} from "@mui/material";
-import {reset, runFixer1} from './dataFixer'
 
 
 // runFixer1()
