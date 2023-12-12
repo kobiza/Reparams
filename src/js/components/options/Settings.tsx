@@ -1,5 +1,5 @@
 import React, {KeyboardEventHandler, SyntheticEvent, useContext, useEffect, useRef, useState} from "react";
-import {EditorStoreContext} from "../UseEditorStoreContext";
+import {EditorStoreContext} from "./UseEditorStoreContext";
 import {EditorStore, SearchParamsEntries, SettingsPackage} from "../../types/types";
 import {uuidv4} from "../../utils/utils";
 

@@ -2,7 +2,7 @@ import React from 'react'
 import '../App.scss'
 import { createRoot } from 'react-dom/client'
 import Popup from "./Popup";
-import UseViewerStoreContext from "../UseViewerStoreContext";
+import UseViewerStoreContext from "./UseViewerStoreContext";
 import {ThemeProvider} from "@mui/material";
 import getMuiTheme from "../../utils/getMuiTheme";
 

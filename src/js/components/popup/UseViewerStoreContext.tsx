@@ -1,6 +1,6 @@
 import React, {createContext, PropsWithChildren} from "react";
-import {EditorModel, ViewerStore} from "../types/types";
-import {toViewerModel} from "../utils/utils";
+import {EditorModel, ViewerStore} from "../../types/types";
+import {toViewerModel} from "../../utils/utils";
 
 export const ViewerStoreContext = createContext<ViewerStore>({
     state: {

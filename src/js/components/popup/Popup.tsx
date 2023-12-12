@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import UrlEditor from "./UrlEditor";
-import {ViewerStoreContext} from "../UseViewerStoreContext";
+import {ViewerStoreContext} from "./UseViewerStoreContext";
 
 // import Settings from "./Settings";
 
