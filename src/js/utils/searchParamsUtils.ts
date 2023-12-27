@@ -36,7 +36,7 @@ export const updateEntryKey = (entries: SearchParamsEntries, newKey: string, ind
     return replaceItem(entries, newEntry, index)
 }
 
-export const mergeEntryValues = (entries: SearchParamsEntries, newValue: string, index: number, paramsWithDelimiter: ParamsWithDelimiterViewModel): SearchParamsEntries => {
+const mergeEntryValues = (entries: SearchParamsEntries, newValue: string, index: number, paramsWithDelimiter: ParamsWithDelimiterViewModel): SearchParamsEntries => {
     const key = entries[index][0]
 
     const multipleValuesData = paramsWithDelimiter[key]
