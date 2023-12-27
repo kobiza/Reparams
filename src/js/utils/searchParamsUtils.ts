@@ -86,7 +86,10 @@ const removeEntry = (entries: SearchParamsEntries, [entryKey, valueToRemove]: [s
                 return removeItem(entries, entryIndex)
             }
         } else {
-            return removeItem(entries, entryIndex)
+            const [, currVal] = entries[entryIndex]
+            if (currVal === valueToRemove) {
+                return removeItem(entries, entryIndex)
+            }
         }
     }
 
