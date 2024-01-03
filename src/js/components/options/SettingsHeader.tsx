@@ -69,7 +69,7 @@ function SettingsHeader({packages, addPackages}: SettingsHeaderProps) {
 
     return (
         <AppBar position="relative" component="nav">
-            <Container maxWidth="xl">
+            <Container maxWidth={false}>
                 <Toolbar disableGutters>
                     <Typography
                         variant="h6"
