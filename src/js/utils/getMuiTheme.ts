@@ -13,6 +13,7 @@ const theme = createTheme({
     //     },
     // },
     typography: {
+        fontFamily: ['monospace'].join(','),
         button: {
             textTransform: 'none'
         }

@@ -88,7 +88,7 @@ function UrlEditor({
                             noWrap
                             sx={{
                                 mr: 2,
-                                fontFamily: 'monospace',
+                                fontFamily: ['Leckerli One', 'monospace'].join(','),
                                 fontWeight: 700,
                                 letterSpacing: '.3rem',
                                 color: 'inherit',
