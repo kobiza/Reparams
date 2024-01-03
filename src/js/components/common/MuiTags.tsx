@@ -50,6 +50,7 @@ const Tags = ({selected, suggestions, placeholderText, className, onAdd, onDelet
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.value === value.value}
             value={selected}
+            ListboxProps={{sx: {maxHeight: '340px'}}}
             onChange={onChange}
             // renderTags={(tagValue, getTagProps) => {
             //     return tagValue.map((option, index) => (
@@ -70,7 +71,7 @@ const Tags = ({selected, suggestions, placeholderText, className, onAdd, onDelet
                 )
             }}
             renderInput={(params) => (
-                <TextField hiddenLabel={true} {...params} placeholder={placeholderText}/>
+                <TextField hiddenLabel={true} {...params} placeholder={placeholderText} autoFocus={true}/>
             )}
         />
     )

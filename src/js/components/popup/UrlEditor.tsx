@@ -102,15 +102,17 @@ function UrlEditor({
                 </Container>
             </AppBar>
             <div className="presets-picker-container">
-                <PresetsPicker className="presets-picker" entries={searchParamsEntries} setEntries={setSearchParamsEntries} presets={presets}
+                <PresetsPicker className="presets-picker" entries={searchParamsEntries}
+                               setEntries={setSearchParamsEntries} presets={presets}
                                paramsWithDelimiter={paramsWithDelimiter}
                                addEntriesAndNavigate={addEntriesAndNavigate}/>
                 <Button variant="contained" onClick={applyUrl}>Apply</Button>
             </div>
             <SearchParams entries={searchParamsEntries} setEntries={setSearchParamsEntries}/>
-            <QuickActions entries={searchParamsEntries} setEntries={setSearchParamsEntries} presets={presets}
-                          paramsWithDelimiter={paramsWithDelimiter} quickActions={quickActions}
-                          addEntriesAndNavigate={addEntriesAndNavigate}/>
+            {quickActions.length > 0 &&
+                <QuickActions entries={searchParamsEntries} setEntries={setSearchParamsEntries} presets={presets}
+                              paramsWithDelimiter={paramsWithDelimiter} quickActions={quickActions}
+                              addEntriesAndNavigate={addEntriesAndNavigate}/>}
         </div>
     );
 }

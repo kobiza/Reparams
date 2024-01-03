@@ -1,6 +1,6 @@
 .url-editor {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: min-content min-content 1fr min-content;
   gap: 20px;
 }
 
