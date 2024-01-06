@@ -114,7 +114,7 @@ const PresetsEditor = ({packageIndex, presets, updatePackagePreset}: PresetsEdit
                         <Delete fontSize="inherit"/>
                     </IconButton>
                 </div>
-                <SearchParams entries={presetData.entries} setEntries={updatePresetEntries}/>
+                <SearchParams entries={presetData.entries} setEntries={updatePresetEntries} paramsWithDelimiter={{}}/>
             </Paper>
         )
     })

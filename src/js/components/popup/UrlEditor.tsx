@@ -48,6 +48,7 @@ function UrlEditor({
     const newUrlData = new URL(newUrl)
     const searchParamsEntries = [...newUrlData.searchParams.entries()]
     const setSearchParamsEntries = (newSearchParamsEntries: Array<[string, string]>) => {
+        console.log('set', newSearchParamsEntries)
         setNewUrl((prevUrl) => {
             return addEntries(prevUrl, newSearchParamsEntries)
         })
@@ -108,7 +109,7 @@ function UrlEditor({
                                addEntriesAndNavigate={addEntriesAndNavigate}/>
                 <Button variant="contained" onClick={applyUrl}>Apply</Button>
             </div>
-            <SearchParams entries={searchParamsEntries} setEntries={setSearchParamsEntries}/>
+            <SearchParams entries={searchParamsEntries} setEntries={setSearchParamsEntries} paramsWithDelimiter={paramsWithDelimiter}/>
             {quickActions.length > 0 &&
                 <QuickActions entries={searchParamsEntries} setEntries={setSearchParamsEntries} presets={presets}
                               paramsWithDelimiter={paramsWithDelimiter} quickActions={quickActions}
