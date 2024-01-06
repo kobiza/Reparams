@@ -1,6 +1,6 @@
 
 import React, {KeyboardEventHandler} from "react";
-import {Autocomplete, TextField, Theme} from "@mui/material";
+import {Theme} from "@mui/material";
 import {SxProps} from "@mui/system";
 import FreeSoloTags from "./FreeSoloTags";
 

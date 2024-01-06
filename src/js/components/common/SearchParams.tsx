@@ -15,7 +15,6 @@ import {
 import {Clear, ZoomIn} from "@mui/icons-material";
 import {removeItem} from "../../utils/arrayUtils";
 import usePrevious from "./usePrevious";
-import FreeSoloTags from "./FreeSoloTags";
 import ParamWithDelimiterValueInput from "./ParamWithDelimiterValueInput";
 
 type SearchParamsProps = {
@@ -24,7 +23,10 @@ type SearchParamsProps = {
     paramsWithDelimiter: ParamsWithDelimiterViewModel
 }
 
-const ZoomInDialog = ({entries, setEntries, paramsWithDelimiter, itemInZoomDialog, closeDialog}: SearchParamsProps & {itemInZoomDialog: number, closeDialog: () => void}) => {
+const ZoomInDialog = ({entries, setEntries, paramsWithDelimiter, itemInZoomDialog, closeDialog}: SearchParamsProps & {
+    itemInZoomDialog: number,
+    closeDialog: () => void
+}) => {
     const [zoomInKey, zoomInValue] = entries[itemInZoomDialog]
     const lastKey = useRef('')
 
@@ -50,9 +52,9 @@ const ZoomInDialog = ({entries, setEntries, paramsWithDelimiter, itemInZoomDialo
     }
 
     return <ParamWithDelimiterValueInput className="query-param-input-value" value={zoomInValue}
-                                  onChange={updateEntryValueForIndex(itemInZoomDialog)}
+                                         onChange={updateEntryValueForIndex(itemInZoomDialog)}
                                          onTextInputKeyUp={handleRenameKey}
-                                  delimiter={paramsWithDelimiter[zoomInKey].separator} sx={{width: 'auto'}}/>
+                                         delimiter={paramsWithDelimiter[zoomInKey].separator} sx={{width: 'auto'}}/>
 }
 
 
@@ -95,7 +97,7 @@ const SearchParams = ({entries, setEntries, paramsWithDelimiter}: SearchParamsPr
             setEntries(newEntries)
         }
 
-        const isMultipleValues = !!paramsWithDelimiter[key]
+        const isParamsWithDelimiter = !!paramsWithDelimiter[key]
 
         return (
             <li className="query-param-input" key={index}>
@@ -108,37 +110,29 @@ const SearchParams = ({entries, setEntries, paramsWithDelimiter}: SearchParamsPr
                     onChange={e => updateCurrentEntryKey(e.target.value)}
                     inputRef={el => itemsRef.current[index] = el}
                 />
-                {isMultipleValues ? <TextField
-                        className="query-param-input-value"
-                        hiddenLabel
-                        placeholder="Value"
-                        size="small"
-                        value={value}
-                        onChange={e => updateCurrentEntryValue(e.target.value)}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        aria-label="toggle password visibility"
-                                        onClick={() => {
-                                            setItemInZoomDialog(index)
-                                        }}
-                                        edge="end"
-                                    >
-                                        <ZoomIn/>
-                                    </IconButton>
-                                </InputAdornment>
-                            )
-                        }}
-                    /> :
-                    <TextField
-                        className="query-param-input-value"
-                        hiddenLabel
-                        placeholder="Value"
-                        size="small"
-                        value={value}
-                        onChange={e => updateCurrentEntryValue(e.target.value)}
-                    />}
+                <TextField
+                    className="query-param-input-value"
+                    hiddenLabel
+                    placeholder="Value"
+                    size="small"
+                    value={value}
+                    onChange={e => updateCurrentEntryValue(e.target.value)}
+                    InputProps={isParamsWithDelimiter ? {
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton
+                                    aria-label="toggle password visibility"
+                                    onClick={() => {
+                                        setItemInZoomDialog(index)
+                                    }}
+                                    edge="end"
+                                >
+                                    <ZoomIn/>
+                                </IconButton>
+                            </InputAdornment>
+                        )
+                    } : {}}
+                />
                 <IconButton aria-label="delete" color="primary" size="small"
                             sx={{padding: '0', marginLeft: '10px'}} onClick={removeSearchParam}>
                     <Clear fontSize="inherit"/>
@@ -175,7 +169,9 @@ const SearchParams = ({entries, setEntries, paramsWithDelimiter}: SearchParamsPr
                     {`Edit ${zoomInKey}`}
                 </DialogTitle>
                 <DialogContent>
-                    {isZoomOpen && <ZoomInDialog closeDialog={closeDialog} itemInZoomDialog={itemInZoomDialog} paramsWithDelimiter={paramsWithDelimiter} setEntries={setEntries} entries={entries}/>}
+                    {isZoomOpen && <ZoomInDialog closeDialog={closeDialog} itemInZoomDialog={itemInZoomDialog}
+                                                 paramsWithDelimiter={paramsWithDelimiter} setEntries={setEntries}
+                                                 entries={entries}/>}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={closeDialog}>Close</Button>
