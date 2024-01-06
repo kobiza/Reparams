@@ -7,11 +7,10 @@ import {
     PresetsEntriesMapViewModel,
     QuickActionData
 } from "../../types/types";
-import {AppBar, Box, Button, Grid, Paper, Typography} from "@mui/material";
+import {AppBar, Button, Typography} from "@mui/material";
 
 import QuickActions from "./QuickActions";
 import './UrlEditor.scss'
-import {Add} from "@mui/icons-material";
 import Container from "@mui/material/Container";
 import Toolbar from "@mui/material/Toolbar";
 
@@ -48,7 +47,6 @@ function UrlEditor({
     const newUrlData = new URL(newUrl)
     const searchParamsEntries = [...newUrlData.searchParams.entries()]
     const setSearchParamsEntries = (newSearchParamsEntries: Array<[string, string]>) => {
-        console.log('set', newSearchParamsEntries)
         setNewUrl((prevUrl) => {
             return addEntries(prevUrl, newSearchParamsEntries)
         })
@@ -102,12 +100,17 @@ function UrlEditor({
                     </Toolbar>
                 </Container>
             </AppBar>
-            <div className="presets-picker-container">
-                <PresetsPicker className="presets-picker" entries={searchParamsEntries}
-                               setEntries={setSearchParamsEntries} presets={presets}
-                               paramsWithDelimiter={paramsWithDelimiter}
-                               addEntriesAndNavigate={addEntriesAndNavigate}/>
-                <Button variant="contained" onClick={applyUrl}>Apply</Button>
+            <div>
+                {/*todo add condition to show only when have preset , should move the apply button to another place*/}
+                {(
+                    <div className="presets-picker-container">
+                        <PresetsPicker className="presets-picker" entries={searchParamsEntries}
+                                       setEntries={setSearchParamsEntries} presets={presets}
+                                       paramsWithDelimiter={paramsWithDelimiter}
+                                       addEntriesAndNavigate={addEntriesAndNavigate}/>
+                        <Button variant="contained" onClick={applyUrl}>Apply</Button>
+                    </div>
+                )}
             </div>
             <SearchParams entries={searchParamsEntries} setEntries={setSearchParamsEntries} paramsWithDelimiter={paramsWithDelimiter}/>
             {quickActions.length > 0 &&

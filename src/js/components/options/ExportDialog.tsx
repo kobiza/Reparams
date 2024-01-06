@@ -77,7 +77,6 @@ export default function ExportDialog({packages, isOpen, closeDialog}: ExportDial
         })
 
         navigator.clipboard.writeText(JSON.stringify(packagesToExport))
-        // console.log(packagesToExport)
 
         closeDialog()
     }
