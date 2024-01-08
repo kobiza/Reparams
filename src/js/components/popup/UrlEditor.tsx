@@ -8,7 +8,7 @@ import {
     PresetsEntriesMapViewModel,
     QuickActionData
 } from "../../types/types";
-import {AppBar, Button, Fab, Typography} from "@mui/material";
+import {AppBar, Box, Button, Fab, Typography} from "@mui/material";
 
 import QuickActions from "./QuickActions";
 import './UrlEditor.scss'
@@ -79,8 +79,14 @@ function UrlEditor({
     }
 
     return (
-        <div className="url-editor">
-            <AppBar className="row1" position="relative" component="nav">
+        <Box className="url-editor" sx={{
+            bgcolor: 'background.default',
+            color: 'text.primary',
+        }}>
+            <AppBar color="primary" className="row1" position="relative" sx={{
+                bgcolor: 'primary.main',
+                color: 'text.secondary'
+            }}>
                 <Container maxWidth="xl">
                     <Toolbar disableGutters>
                         <Typography
@@ -124,7 +130,7 @@ function UrlEditor({
             }}>
                 Apply
             </Fab>
-        </div>
+        </Box>
     );
 }
 
