@@ -1,3 +1,4 @@
+import {isEmpty} from "lodash";
 import React, {MouseEventHandler, useState} from 'react';
 import SearchParams from "../common/SearchParams";
 import PresetsPicker, {PresetsPickerProps} from "./PresetsPicker";
@@ -7,11 +8,10 @@ import {
     PresetsEntriesMapViewModel,
     QuickActionData
 } from "../../types/types";
-import {AppBar, Box, Button, Grid, Paper, Typography} from "@mui/material";
+import {AppBar, Button, Fab, Typography} from "@mui/material";
 
 import QuickActions from "./QuickActions";
 import './UrlEditor.scss'
-import {Add} from "@mui/icons-material";
 import Container from "@mui/material/Container";
 import Toolbar from "@mui/material/Toolbar";
 
@@ -80,7 +80,7 @@ function UrlEditor({
 
     return (
         <div className="url-editor">
-            <AppBar position="relative" component="nav">
+            <AppBar className="row1" position="relative" component="nav">
                 <Container maxWidth="xl">
                     <Toolbar disableGutters>
                         <Typography
@@ -88,9 +88,9 @@ function UrlEditor({
                             noWrap
                             sx={{
                                 mr: 2,
-                                fontFamily: 'monospace',
+                                fontFamily: ['Leckerli One', 'monospace'].join(','),
                                 fontWeight: 700,
-                                letterSpacing: '.3rem',
+                                letterSpacing: '2px',
                                 color: 'inherit',
                                 textDecoration: 'none',
                                 flexGrow: 1
@@ -101,16 +101,29 @@ function UrlEditor({
                     </Toolbar>
                 </Container>
             </AppBar>
-            <div className="presets-picker-container">
-                <PresetsPicker className="presets-picker" entries={searchParamsEntries} setEntries={setSearchParamsEntries} presets={presets}
-                               paramsWithDelimiter={paramsWithDelimiter}
-                               addEntriesAndNavigate={addEntriesAndNavigate}/>
-                <Button variant="contained" onClick={applyUrl}>Apply</Button>
+            {!isEmpty(presets) && (
+                <div className="presets-picker-container row2">
+                    <PresetsPicker className="presets-picker" entries={searchParamsEntries}
+                                   setEntries={setSearchParamsEntries} presets={presets}
+                                   paramsWithDelimiter={paramsWithDelimiter}
+                                   addEntriesAndNavigate={addEntriesAndNavigate}/>
+                </div>
+            )}
+            <SearchParams className="search-params-container row3" entries={searchParamsEntries}
+                          setEntries={setSearchParamsEntries} paramsWithDelimiter={paramsWithDelimiter}/>
+            <div className="row4">
+                {quickActions.length > 0 &&
+                    <QuickActions  entries={searchParamsEntries} setEntries={setSearchParamsEntries} presets={presets}
+                                   paramsWithDelimiter={paramsWithDelimiter} quickActions={quickActions}
+                                   addEntriesAndNavigate={addEntriesAndNavigate}/>}
             </div>
-            <SearchParams entries={searchParamsEntries} setEntries={setSearchParamsEntries}/>
-            <QuickActions entries={searchParamsEntries} setEntries={setSearchParamsEntries} presets={presets}
-                          paramsWithDelimiter={paramsWithDelimiter} quickActions={quickActions}
-                          addEntriesAndNavigate={addEntriesAndNavigate}/>
+            <Fab color="primary" onClick={applyUrl} variant="extended" sx={{
+                position: 'fixed',
+                bottom: 16,
+                right: 16,
+            }}>
+                Apply
+            </Fab>
         </div>
     );
 }

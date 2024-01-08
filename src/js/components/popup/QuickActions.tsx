@@ -8,6 +8,7 @@ import type {
 import {QuickActionData, SearchParamsEntries, SetEntries} from "../../types/types";
 import {mergeEntries} from "../../utils/searchParamsUtils";
 import {Button, Typography} from "@mui/material";
+import classNames from "classnames";
 
 
 export type QuickActionsProps = {
@@ -17,6 +18,7 @@ export type QuickActionsProps = {
     presets: PresetsEntriesMapViewModel
     quickActions: QuickActionData
     paramsWithDelimiter: ParamsWithDelimiterViewModel
+    className?: string
 }
 
 const QuickActions = (props: QuickActionsProps) => {
@@ -43,7 +45,7 @@ const QuickActions = (props: QuickActionsProps) => {
     })
 
     return (
-        <div className="quick-actions">
+        <div className={classNames('quick-actions', props.className)}>
             <Typography>
                 <Typography variant="h6" padding={1}>Quick actions:</Typography>
             </Typography>

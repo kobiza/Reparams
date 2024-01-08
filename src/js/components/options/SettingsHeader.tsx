@@ -69,16 +69,16 @@ function SettingsHeader({packages, addPackages}: SettingsHeaderProps) {
 
     return (
         <AppBar position="relative" component="nav">
-            <Container maxWidth="xl">
+            <Container maxWidth={false}>
                 <Toolbar disableGutters>
                     <Typography
                         variant="h6"
                         noWrap
                         sx={{
                             mr: 2,
-                            fontFamily: 'monospace',
+                            fontFamily: ['Leckerli One', 'monospace'].join(','),
                             fontWeight: 700,
-                            letterSpacing: '.3rem',
+                            letterSpacing: '2px',
                             color: 'inherit',
                             textDecoration: 'none',
                             flexGrow: 1

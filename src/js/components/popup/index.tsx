@@ -22,6 +22,8 @@ const App = ({currentTabUrl, tabId}: { currentTabUrl: string; tabId: string }) =
     )
 }
 
+const playgroundUrl = 'https://www.my-site.com/?name=Bar&age=25&experiments=spec1,spec2'
+
 // @ts-ignore
 if (chrome.tabs) {
     // @ts-ignore
@@ -30,6 +32,6 @@ if (chrome.tabs) {
         root.render(<App currentTabUrl={url} tabId={id}/>);
     })
 } else {
-    root.render(<App currentTabUrl={'https://www.my-site.com/?name=Bar&age=25'} tabId={'tab'}/>);
+    root.render(<App currentTabUrl={playgroundUrl} tabId={'tab'}/>);
 }
 

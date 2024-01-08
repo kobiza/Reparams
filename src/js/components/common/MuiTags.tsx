@@ -21,7 +21,6 @@ export type TagsProps = {
 
 const Tags = ({selected, suggestions, placeholderText, className, onAdd, onDelete, sx}: TagsProps) => {
     const onChange = (e: any, newSelected: Array<{ value: string; label: string; }>) => {
-        console.log('onChange', newSelected)
         const prevTrueObj = toTrueObj(selected, (v) => v.value)
         const nextTrueObj = toTrueObj(newSelected, (v) => v.value)
 
@@ -50,6 +49,7 @@ const Tags = ({selected, suggestions, placeholderText, className, onAdd, onDelet
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.value === value.value}
             value={selected}
+            ListboxProps={{sx: {maxHeight: '340px'}}}
             onChange={onChange}
             // renderTags={(tagValue, getTagProps) => {
             //     return tagValue.map((option, index) => (
@@ -70,7 +70,7 @@ const Tags = ({selected, suggestions, placeholderText, className, onAdd, onDelet
                 )
             }}
             renderInput={(params) => (
-                <TextField hiddenLabel={true} {...params} placeholder={placeholderText}/>
+                <TextField hiddenLabel={true} {...params} placeholder={placeholderText} autoFocus={true}/>
             )}
         />
     )

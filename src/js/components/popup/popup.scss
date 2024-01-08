@@ -1,9 +1,16 @@
 
+body {
+  margin: 0;
+}
+
 ul {
   padding-left: 0;
   margin: 0;
 }
 
 .popup {
-  padding: 10px 20px;
+  min-height: 500px;
+  width: 700px;
+  padding: 20px;
+  display: grid;
 }
