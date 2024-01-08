@@ -16,8 +16,10 @@
 
 .quick-actions {
   margin-top: 20px;
+  padding-right: 100px;
 }
 .quick-action-buttons {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }

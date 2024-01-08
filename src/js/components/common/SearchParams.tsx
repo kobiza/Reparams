@@ -16,11 +16,13 @@ import {Clear, ZoomIn} from "@mui/icons-material";
 import {removeItem} from "../../utils/arrayUtils";
 import usePrevious from "./usePrevious";
 import ParamWithDelimiterValueInput from "./ParamWithDelimiterValueInput";
+import classNames from "classnames";
 
 type SearchParamsProps = {
     entries: SearchParamsEntries
     setEntries: SetEntries
     paramsWithDelimiter: ParamsWithDelimiterViewModel
+    className?: string,
 }
 
 const ZoomInDialog = ({entries, setEntries, paramsWithDelimiter, itemInZoomDialog, closeDialog}: SearchParamsProps & {
@@ -58,7 +60,7 @@ const ZoomInDialog = ({entries, setEntries, paramsWithDelimiter, itemInZoomDialo
 }
 
 
-const SearchParams = ({entries, setEntries, paramsWithDelimiter}: SearchParamsProps) => {
+const SearchParams = ({entries, setEntries, paramsWithDelimiter, className}: SearchParamsProps) => {
     const shouldFocusNewParam = useRef<boolean>(false)
     const itemsRef = useRef<Array<HTMLDivElement | null>>([]);
     const [itemInZoomDialog, setItemInZoomDialog] = useState(-1)
@@ -154,7 +156,7 @@ const SearchParams = ({entries, setEntries, paramsWithDelimiter}: SearchParamsPr
     const isZoomOpen = itemInZoomDialog !== -1
 
     return (
-        <div>
+        <div className={classNames(className)}>
             <ul>
                 {items}
             </ul>

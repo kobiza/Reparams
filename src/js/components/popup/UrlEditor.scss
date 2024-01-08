@@ -1,14 +1,26 @@
 .url-editor {
+  position: relative;
   display: grid;
   grid-template-rows: min-content min-content 1fr min-content;
-  gap: 20px;
+  //gap: 20px;
 }
 
-.presets-picker-container {
-  display: flex;
-  gap: 10px;
+.row1, .row2, .row3 {
+  margin-bottom: 20px;
 }
 
-.presets-picker {
-  flex: 1;
+.row1 {
+  grid-area: 1/1/2/2;
+}
+
+.row2 {
+  grid-area: 2/1/3/2;
+}
+
+.row3 {
+  grid-area: 3/1/4/2;
+}
+
+.row4 {
+  grid-area: 4/1/5/2;
 }

@@ -78,7 +78,7 @@ function SettingsHeader({packages, addPackages}: SettingsHeaderProps) {
                             mr: 2,
                             fontFamily: ['Leckerli One', 'monospace'].join(','),
                             fontWeight: 700,
-                            letterSpacing: '.3rem',
+                            letterSpacing: '2px',
                             color: 'inherit',
                             textDecoration: 'none',
                             flexGrow: 1
