@@ -83,10 +83,7 @@ function UrlEditor({
             bgcolor: 'background.default',
             color: 'text.primary',
         }}>
-            <AppBar color="primary" className="row1" position="relative" sx={{
-                bgcolor: 'primary.main',
-                color: 'text.secondary'
-            }}>
+            <AppBar className="row1" position="relative">
                 <Container maxWidth="xl">
                     <Toolbar disableGutters>
                         <Typography

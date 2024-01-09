@@ -8,21 +8,10 @@ const theme = createTheme({
     palette: {
         mode: "dark",
         primary: {
-            main: '#9aff96',
+            main: '#207fe6',
         },
         secondary: {
-            main: '#CDFAD5',
-        },
-        error: {
-            main: '#ff8080',
-        },
-        text: {
-            primary: 'rgba(255,255,255,0.87)',
-            secondary: '#000000'
-        },
-        background: {
-            default: '#000000',
-            paper: '#877f7f',
+            main: '#ac6fe6',
         },
     },
     typography: {
