@@ -9,8 +9,10 @@ ul {
 }
 
 .popup {
-  min-height: 500px;
+  min-height: 600px;
   width: 700px;
-  padding: 20px;
-  display: grid;
+}
+
+.app-bar {
+  position: fixed;
 }

@@ -76,7 +76,6 @@ function SettingsHeader({packages, addPackages}: SettingsHeaderProps) {
                         noWrap
                         sx={{
                             mr: 2,
-                            fontFamily: ['Leckerli One', 'monospace'].join(','),
                             fontWeight: 700,
                             letterSpacing: '2px',
                             color: 'inherit',
