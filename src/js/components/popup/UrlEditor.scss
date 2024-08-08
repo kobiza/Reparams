@@ -1,8 +1,24 @@
 .url-editor {
   position: relative;
   display: grid;
-  grid-template-rows: min-content min-content 1fr min-content;
+  grid-template-rows: min-content min-content 1fr;
+  padding: 20px;
+  top: 130px;
   //gap: 20px;
+}
+
+.presets-picker-container {
+  position: fixed;
+  width: 100%;
+  left: 0;
+  display: grid;
+  top: 60px;
+  background: #FFFFFF;
+  z-index: 2;
+}
+
+.presets-picker {
+  margin: 20px 20px 0;
 }
 
 .row1, .row2, .row3 {
@@ -21,6 +37,14 @@
   grid-area: 3/1/4/2;
 }
 
-.row4 {
-  grid-area: 4/1/5/2;
+.actions-bar {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  //display: flex;
+  //gap: 10px;
+}
+
+.search-params-container {
+  margin-bottom: 50px;
 }
