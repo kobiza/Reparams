@@ -13,6 +13,16 @@
     "128": "icons/icon180.png"
   },
   "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.bundle.js"
+      ]
+    }
+  ],
   "permissions": [
     "storage",
     "clipboardWrite",
