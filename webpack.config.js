@@ -76,9 +76,9 @@ module.exports = {
             ],
         }),
     ],
-    mode: 'development',
-    devtool: 'source-map',
+    mode: process.env.NODE_ENV === 'development' ? 'development' : 'production',
+    // devtool: 'source-map',
     optimization: {
-        minimize: false
+        minimize: process.env.NODE_ENV !== 'development'
     },
 };
