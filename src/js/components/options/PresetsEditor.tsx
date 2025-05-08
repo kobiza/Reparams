@@ -1,5 +1,8 @@
 import React from 'react';
-import { Button, IconButton, Paper, TextField } from '@mui/material';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Paper from '@mui/material/Paper';
+import TextField from '@mui/material/TextField';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { uuidv4 } from '../../utils/utils';
 import { SettingsPackage, EditorStore, SearchParamsEntries } from '../../types/types';

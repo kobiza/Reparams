@@ -1,5 +1,7 @@
 import React from 'react';
-import { Button, Paper, TextField } from '@mui/material';
+import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
+import TextField from '@mui/material/TextField';
 import { uuidv4 } from '../../utils/utils';
 import { SettingsPackage, EditorStore } from '../../types/types';
 import { replaceItem, toTrueObj } from '../../utils/arrayUtils';
