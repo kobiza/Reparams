@@ -5,16 +5,14 @@ import {ViewerStoreContext} from "./UseViewerStoreContext";
 
 // import Settings from "./Settings";
 
-function Popup({currentTabUrl, tabId}: { currentTabUrl: string; tabId: string }) {
+function Popup({currentTabUrl, tabId}: { currentTabUrl: string; tabId: number }) {
     const {state} = useContext(ViewerStoreContext)
 
     const updateCurrentTabUrl = (newUrl: string) => {
-        // @ts-ignores
         chrome.tabs.update(tabId, {url: newUrl}, () => window.close());
     }
 
     const openNewTab = (newUrl: string) => {
-        // @ts-ignores
         chrome.tabs.create({url: newUrl});
     }
 

@@ -6,8 +6,8 @@ import {
     SettingsPackage,
     ViewerModel
 } from "../types/types";
-import {assign} from "lodash";
-import {matchUrl} from "./urlMatchChecker";
+import { assign } from "lodash";
+import { matchUrl } from "./urlMatchChecker";
 
 export const uuidv4 = () => {
     return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
@@ -32,20 +32,30 @@ export const mergeAppDataPackages = (appData: EditorModel): MergedAppData => {
     return mergedAppData
 }
 
-export const toViewerModel = (editorModel: EditorModel, currentTabUrl: string): ViewerModel => {
-    const packagesDataToMerge = editorModel.filter((settingsPackage) => {
+export const getRelevantPackages = (editorModel: EditorModel, currentTabUrl: string, isCommonConfig: boolean): EditorModel => {
+    return editorModel.filter((settingsPackage) => {
         const allUrlPatterns = settingsPackage.urlPatterns.map(v => v.value)
-        return allUrlPatterns.some(urlPattern => matchUrl(currentTabUrl, urlPattern))
-    }).map(settingsPackage => {
+        const matchesUrl = allUrlPatterns.some(urlPattern => matchUrl(currentTabUrl, urlPattern))
+
+        if (isCommonConfig) {
+            return matchesUrl || settingsPackage.label === 'common'
+        }
+
+        return matchesUrl
+    })
+}
+
+export const toViewerModel = (relevantPackages: EditorModel, currentTabUrl: string): ViewerModel => {
+    const packagesDataToMerge = relevantPackages.map(settingsPackage => {
         const presets: PresetsEntriesMapViewModel = Object.keys(settingsPackage.presets).reduce<PresetsEntriesMapViewModel>((acc, presetKey) => {
-            const {label, entries} = settingsPackage.presets[presetKey]
+            const { label, entries } = settingsPackage.presets[presetKey]
             acc[label] = entries
 
             return acc
         }, {})
         const paramsWithDelimiter: ParamsWithDelimiterViewModel = settingsPackage.paramsWithDelimiter.reduce<ParamsWithDelimiterViewModel>((acc, paramData) => {
-            const {label, separator} = paramData
-            acc[label] = {separator}
+            const { label, separator } = paramData
+            acc[label] = { separator }
 
             return acc
         }, {})
@@ -76,7 +86,7 @@ export const getEmptySettingsPackage = (label: string): SettingsPackage => {
     return {
         key: uuidv4(),
         label,
-        urlPatterns: [{id: uuidv4(), value: '*://*/*'}],
+        urlPatterns: [{ id: uuidv4(), value: '*://*/*' }],
         presets: {},
         paramsWithDelimiter: [{
             id: uuidv4(),
