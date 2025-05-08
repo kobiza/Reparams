@@ -1,4 +1,4 @@
-import {PaletteColorOptions} from "@mui/material";
+import { PaletteColorOptions } from "@mui/material";
 
 export type SearchParamsEntries = Array<[key: string, value: string]>
 
@@ -31,7 +31,9 @@ export type ParamsWithDelimiterViewModel = {
 export type SettingsPackage = {
     key: string
     label: string
-    urlPatterns: Array<{ id: string, value: string }>
+    conditions: {
+        urlPatterns: Array<{ id: string, value: string }>
+    }
     presets: PresetsEntriesMap
     paramsWithDelimiter: ParamsWithDelimiter
     quickActions: QuickActionData
@@ -63,7 +65,7 @@ export type EditorStore = {
     updatePackageParamsWithDelimiter: (packageIndex: number, paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']) => void
     updatePackageQuickActions: (packageIndex: number, quickActions: SettingsPackage['quickActions']) => void
     updatePackageLabel: (packageIndex: number, label: string) => void
-    updatePackageUrlPatterns: (packageIndex: number, urlPatterns: SettingsPackage['urlPatterns']) => void
+    updatePackageUrlPatterns: (packageIndex: number, urlPatterns: SettingsPackage['conditions']['urlPatterns']) => void
     addNewPackage: (newPackageOverrides?: Partial<SettingsPackage>) => void
     addPackages: (packagesToAdd: Array<SettingsPackage>, replace: boolean) => void
     deletePackage: (packageIndex: number) => void

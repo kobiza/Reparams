@@ -34,7 +34,7 @@ export const mergeAppDataPackages = (appData: EditorModel): MergedAppData => {
 
 export const getRelevantPackages = (editorModel: EditorModel, currentTabUrl: string, isCommonConfig: boolean): EditorModel => {
     return editorModel.filter((settingsPackage) => {
-        const allUrlPatterns = settingsPackage.urlPatterns.map(v => v.value)
+        const allUrlPatterns = settingsPackage.conditions.urlPatterns.map(v => v.value)
         const matchesUrl = allUrlPatterns.some(urlPattern => matchUrl(currentTabUrl, urlPattern))
 
         if (isCommonConfig) {
@@ -86,13 +86,11 @@ export const getEmptySettingsPackage = (label: string): SettingsPackage => {
     return {
         key: uuidv4(),
         label,
-        urlPatterns: [{ id: uuidv4(), value: '*://*/*' }],
+        conditions: {
+            urlPatterns: [{ id: uuidv4(), value: '*://*/*' }],
+        },
         presets: {},
-        paramsWithDelimiter: [{
-            id: uuidv4(),
-            label: '',
-            separator: ''
-        }],
+        paramsWithDelimiter: [],
         quickActions: []
     }
 }

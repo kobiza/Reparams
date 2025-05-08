@@ -25,7 +25,7 @@ type PackagePanelProps = {
 }
 
 const PackagePanel = ({ packageData, packageIndex, editorStore }: PackagePanelProps) => {
-    const { key, label, presets, paramsWithDelimiter, quickActions, urlPatterns } = packageData
+    const { key, label, presets, paramsWithDelimiter, quickActions, conditions } = packageData
     const [value, setValue] = useState(0);
     const {
         addNewPackage,
@@ -145,7 +145,7 @@ const PackagePanel = ({ packageData, packageIndex, editorStore }: PackagePanelPr
                                 paramsWithDelimiter={paramsWithDelimiter}
                                 addNewPackage={addNewPackage}
                                 updatePackageParamsWithDelimiter={updatePackageParamsWithDelimiter}
-                                urlPatterns={urlPatterns}
+                                urlPatterns={conditions.urlPatterns}
                                 updatePackageUrlPatterns={updatePackageUrlPatterns}
                                 deletePackage={deletePackage} />
                         </CustomTabPanel>

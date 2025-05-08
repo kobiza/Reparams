@@ -1,10 +1,10 @@
-import {EditorModel} from "../../types/types";
+import { EditorModel } from "../../types/types";
 
 export const runFixer1 = () => {
     const localStorageKey = 'paparamsAppData'
-// reset
-// localStorage.setItem(localStorageKey, '')
-// fixer
+    // reset
+    // localStorage.setItem(localStorageKey, '')
+    // fixer
     const a = localStorage.getItem(localStorageKey)
     if (a) {
         const model = JSON.parse(a) as EditorModel
@@ -12,7 +12,7 @@ export const runFixer1 = () => {
             const {
                 key,
                 label,
-                urlPatterns,
+                conditions,
                 presets,
                 // @ts-ignore
                 paramsWithMultipleValues,
@@ -28,7 +28,7 @@ export const runFixer1 = () => {
             return {
                 key,
                 label,
-                urlPatterns,
+                conditions,
                 presets,
                 paramsWithDelimiter,
                 quickActions
@@ -41,6 +41,6 @@ export const runFixer1 = () => {
 
 export const reset = () => {
     const localStorageKey = 'paparamsAppData'
-// reset
+    // reset
     localStorage.setItem(localStorageKey, '')
 }

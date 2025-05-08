@@ -70,10 +70,14 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
         _updatePackage(packageIndex, newPackage)
     }
 
-    const updatePackageUrlPatterns = (packageIndex: number, urlPatterns: SettingsPackage['urlPatterns']) => {
+    const updatePackageUrlPatterns = (packageIndex: number, urlPatterns: SettingsPackage['conditions']['urlPatterns']) => {
+        const prevPackage = appState[packageIndex]  
         const newPackage = {
-            ...appState[packageIndex],
-            urlPatterns
+            ...prevPackage,
+            conditions: {
+                ...prevPackage.conditions,
+                urlPatterns
+            }
         }
         _updatePackage(packageIndex, newPackage)
     }

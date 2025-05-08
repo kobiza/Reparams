@@ -17,7 +17,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 interface ParamsEditorProps {
     packageIndex: number
     paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']
-    urlPatterns: SettingsPackage['urlPatterns']
+    urlPatterns: SettingsPackage['conditions']['urlPatterns']
     label: SettingsPackage['label']
     addNewPackage: EditorStore['addNewPackage']
     updatePackageParamsWithDelimiter: EditorStore['updatePackageParamsWithDelimiter']
@@ -125,7 +125,7 @@ const PackageSettingsEditor = ({
     }
 
     const addPackageWithSameSettings = () => {
-        addNewPackage({ paramsWithDelimiter, urlPatterns })
+        addNewPackage({ paramsWithDelimiter, conditions: { urlPatterns } })
     }
 
     const [deletePackageDialog, setDeletePackageDialog] = useState(false)
