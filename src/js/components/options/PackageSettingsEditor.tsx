@@ -12,7 +12,8 @@ import AddIcon from '@mui/icons-material/Add';
 import { uuidv4 } from '../../utils/utils';
 import { SettingsPackage, EditorStore } from '../../types/types';
 import { replaceItem } from '../../utils/arrayUtils';
-
+import IconButton from '@mui/material/IconButton';
+import ClearIcon from '@mui/icons-material/Clear';
 interface ParamsEditorProps {
     packageIndex: number
     paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']
@@ -53,12 +54,15 @@ const PackageSettingsEditor = ({
             updatePackageParamsWithDelimiter(packageIndex, newParamsWithDelimiter)
         }
 
+        const removeParam = () => {
+            const newParamsWithDelimiter = paramsWithDelimiter.filter((_, i) => i !== index)
+            updatePackageParamsWithDelimiter(packageIndex, newParamsWithDelimiter)
+        }
+
         return (
-            <div key={id} className="multi-param-input-row">
+            <div key={id} className="multi-param-input-row" style={{ display: 'flex', alignItems: 'center' }}>
                 <TextField
-                    sx={{
-                        marginRight: '10px'
-                    }}
+                    sx={{ marginRight: '10px', flex: 1 }}
                     hiddenLabel
                     placeholder="Parameter key"
                     size="small"
@@ -70,6 +74,10 @@ const PackageSettingsEditor = ({
                     size="small"
                     value={separator} onChange={e => updateParamSeparator(e.target.value)}
                 />
+                <IconButton aria-label="delete" color="primary" size="small"
+                    sx={{ padding: '0', marginLeft: '10px' }} onClick={removeParam}>
+                    <ClearIcon fontSize="inherit" />
+                </IconButton>
             </div>
         )
     })
@@ -90,17 +98,24 @@ const PackageSettingsEditor = ({
     const patternsInput = urlPatterns.map((v, index) => {
         const updateCurrentPattern = (value: string) => {
             const newUrlPatterns = replaceItem(urlPatterns, { value, id: v.id }, index)
-
+            updatePackageUrlPatterns(packageIndex, newUrlPatterns)
+        }
+        const removePattern = () => {
+            const newUrlPatterns = urlPatterns.filter((_, i) => i !== index)
             updatePackageUrlPatterns(packageIndex, newUrlPatterns)
         }
         return (
-            <div key={v.id} style={{ display: 'flex', marginTop: '10px' }}>
+            <div key={v.id} style={{ display: 'flex', marginTop: '10px', alignItems: 'center' }}>
                 <TextField
                     sx={{ flex: '1' }}
                     hiddenLabel
                     size="small"
                     value={v.value} onChange={e => updateCurrentPattern(e.target.value)}
                 />
+                <IconButton aria-label="delete" color="primary" size="small"
+                    sx={{ padding: '0', marginLeft: '10px' }} onClick={removePattern}>
+                    <ClearIcon fontSize="inherit" />
+                </IconButton>
             </div>
         )
     })
