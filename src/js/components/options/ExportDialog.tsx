@@ -5,10 +5,14 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import {replaceItem} from "../../utils/arrayUtils";
-import {EditorModel} from "../../types/types";
-import {useEffect, useState} from "react";
-import {Button, Dialog, DialogActions, DialogContent, DialogTitle} from "@mui/material";
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import { replaceItem } from "../../utils/arrayUtils";
+import { EditorModel } from "../../types/types";
+import { useEffect, useState } from "react";
 
 type PackageItem = { key: string, label: string, checked: boolean }
 type ExportDialogContentProps = {
@@ -16,11 +20,11 @@ type ExportDialogContentProps = {
     setSelectedPackages: React.Dispatch<React.SetStateAction<PackageItem[]>>
 }
 
-function ExportDialogContent({selectedPackages, setSelectedPackages}: ExportDialogContentProps) {
+function ExportDialogContent({ selectedPackages, setSelectedPackages }: ExportDialogContentProps) {
 
     return (
-        <List sx={{width: '400px', bgcolor: 'background.paper'}}>
-            {selectedPackages.map(({key, label, checked}, index) => {
+        <List sx={{ width: '400px', bgcolor: 'background.paper' }}>
+            {selectedPackages.map(({ key, label, checked }, index) => {
                 const labelId = `checkbox-list-label-${key}`;
                 const handleToggle = () => {
                     const newVal = replaceItem(selectedPackages, {
@@ -42,10 +46,10 @@ function ExportDialogContent({selectedPackages, setSelectedPackages}: ExportDial
                                     checked={checked}
                                     tabIndex={-1}
                                     disableRipple
-                                    inputProps={{'aria-labelledby': labelId}}
+                                    inputProps={{ 'aria-labelledby': labelId }}
                                 />
                             </ListItemIcon>
-                            <ListItemText id={labelId} primary={label}/>
+                            <ListItemText id={labelId} primary={label} />
                         </ListItemButton>
                     </ListItem>
                 );
@@ -60,7 +64,7 @@ type ExportDialogProps = {
     closeDialog: () => void
 }
 
-export default function ExportDialog({packages, isOpen, closeDialog}: ExportDialogProps) {
+export default function ExportDialog({ packages, isOpen, closeDialog }: ExportDialogProps) {
     const [selectedPackages, setSelectedPackages] = useState<Array<PackageItem>>([])
 
     useEffect(() => {
@@ -91,7 +95,7 @@ export default function ExportDialog({packages, isOpen, closeDialog}: ExportDial
                 {"Export packages"}
             </DialogTitle>
             <DialogContent>
-                <ExportDialogContent selectedPackages={selectedPackages} setSelectedPackages={setSelectedPackages}/>
+                <ExportDialogContent selectedPackages={selectedPackages} setSelectedPackages={setSelectedPackages} />
             </DialogContent>
             <DialogActions>
                 <Button onClick={exportPackages} autoFocus>Export</Button>

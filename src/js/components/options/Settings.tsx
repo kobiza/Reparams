@@ -1,26 +1,34 @@
-import React, {KeyboardEventHandler, SyntheticEvent, useContext, useEffect, useRef, useState} from "react";
-import {EditorStoreContext} from "./UseEditorStoreContext";
-import {EditorStore, SearchParamsEntries, SettingsPackage} from "../../types/types";
-import {uuidv4} from "../../utils/utils";
+import React, { KeyboardEventHandler, SyntheticEvent, useContext, useEffect, useRef, useState } from "react";
+import { EditorStoreContext } from "./UseEditorStoreContext";
+import { EditorStore, SearchParamsEntries, SettingsPackage } from "../../types/types";
+import { uuidv4 } from "../../utils/utils";
 
 import './Settings.scss'
 import SearchParams from "../common/SearchParams";
-import {removeItem, replaceItem, toTrueObj} from "../../utils/arrayUtils";
-import Tags, {TagsProps} from "../common/MuiTags";
-import {
-    Accordion,
-    AccordionDetails,
-    AccordionSummary,
-    Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, Divider,
-    IconButton, Paper,
-    Tab,
-    Tabs,
-    TextField, Typography,
-} from "@mui/material";
+import { removeItem, replaceItem, toTrueObj } from "../../utils/arrayUtils";
+import Tags, { TagsProps } from "../common/MuiTags";
+import Accordion from '@mui/material/Accordion';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
+import Paper from '@mui/material/Paper';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {Add, Delete, Edit} from "@mui/icons-material";
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import classNames from "classnames";
-import {forEach} from "lodash";
+import { forEach } from "lodash";
 import SettingsHeader from "./SettingsHeader";
 
 
@@ -33,7 +41,7 @@ interface TabPanelProps {
 }
 
 function CustomTabPanel(props: TabPanelProps) {
-    const {children, value, index, ...other} = props;
+    const { children, value, index, ...other } = props;
 
     return (
         <div
@@ -44,7 +52,7 @@ function CustomTabPanel(props: TabPanelProps) {
             {...other}
         >
             {value === index && (
-                <Box sx={{p: 3}}>
+                <Box sx={{ p: 3 }}>
                     {children}
                 </Box>
             )}
@@ -65,7 +73,7 @@ type PresetsEditorProps = {
     updatePackagePreset: EditorStore['updatePackagePreset']
 }
 
-const PresetsEditor = ({packageIndex, presets, updatePackagePreset}: PresetsEditorProps) => {
+const PresetsEditor = ({ packageIndex, presets, updatePackagePreset }: PresetsEditorProps) => {
     const presetsItems = Object.entries(presets).map(([presetKey, presetData]) => {
         const presetRename = (newName: string) => {
             const newPresets: SettingsPackage['presets'] = {
@@ -110,11 +118,11 @@ const PresetsEditor = ({packageIndex, presets, updatePackagePreset}: PresetsEdit
                         value={presetData.label} onChange={e => presetRename(e.target.value)}
                     />
                     <IconButton aria-label="delete" color="primary" size="small"
-                                onClick={removePreset}>
-                        <Delete fontSize="inherit"/>
+                        onClick={removePreset}>
+                        <DeleteIcon fontSize="inherit" />
                     </IconButton>
                 </div>
-                <SearchParams entries={presetData.entries} setEntries={updatePresetEntries} paramsWithDelimiter={{}}/>
+                <SearchParams entries={presetData.entries} setEntries={updatePresetEntries} paramsWithDelimiter={{}} />
             </Paper>
         )
     })
@@ -134,8 +142,8 @@ const PresetsEditor = ({packageIndex, presets, updatePackagePreset}: PresetsEdit
     return (
         <div>
             {presetsItems}
-            <Button sx={{marginTop: '10px'}} onClick={addNewPreset}
-                    variant="text">Add Preset</Button>
+            <Button sx={{ marginTop: '10px' }} onClick={addNewPreset}
+                variant="text">Add Preset</Button>
         </div>
     )
 }
@@ -151,21 +159,21 @@ type ParamsEditorProps = {
 }
 
 const PackageSettingsEditor = ({
-                                   packageIndex,
-                                   paramsWithDelimiter,
-                                   updatePackageParamsWithDelimiter,
-                                   urlPatterns,
-                                   label,
-                                   addNewPackage,
-                                   updatePackageUrlPatterns,
-                                   deletePackage
-                               }: ParamsEditorProps) => {
+    packageIndex,
+    paramsWithDelimiter,
+    updatePackageParamsWithDelimiter,
+    urlPatterns,
+    label,
+    addNewPackage,
+    updatePackageUrlPatterns,
+    deletePackage
+}: ParamsEditorProps) => {
     const paramsItems = paramsWithDelimiter.map((paramData, index) => {
-        const {label, separator, id} = paramData
+        const { label, separator, id } = paramData
 
         const updateParamLabel = (newParamLabel: string) => {
             const prevItem = paramsWithDelimiter[index]
-            const newItem = {...prevItem, label: newParamLabel}
+            const newItem = { ...prevItem, label: newParamLabel }
             const newParamsWithDelimiter = replaceItem(paramsWithDelimiter, newItem, index)
 
             updatePackageParamsWithDelimiter(packageIndex, newParamsWithDelimiter)
@@ -173,7 +181,7 @@ const PackageSettingsEditor = ({
 
         const updateParamSeparator = (newParamSeparator: string) => {
             const prevItem = paramsWithDelimiter[index]
-            const newItem = {...prevItem, separator: newParamSeparator}
+            const newItem = { ...prevItem, separator: newParamSeparator }
             const newParamsWithDelimiter = replaceItem(paramsWithDelimiter, newItem, index)
 
             updatePackageParamsWithDelimiter(packageIndex, newParamsWithDelimiter)
@@ -215,14 +223,14 @@ const PackageSettingsEditor = ({
 
     const patternsInput = urlPatterns.map((v, index) => {
         const updateCurrentPattern = (value: string) => {
-            const newUrlPatterns = replaceItem(urlPatterns, {value, id: v.id}, index)
+            const newUrlPatterns = replaceItem(urlPatterns, { value, id: v.id }, index)
 
             updatePackageUrlPatterns(packageIndex, newUrlPatterns)
         }
         return (
-            <div key={v.id} style={{display: 'flex', marginTop: '10px'}}>
+            <div key={v.id} style={{ display: 'flex', marginTop: '10px' }}>
                 <TextField
-                    sx={{flex: '1'}}
+                    sx={{ flex: '1' }}
                     hiddenLabel
                     size="small"
                     value={v.value} onChange={e => updateCurrentPattern(e.target.value)}
@@ -232,11 +240,11 @@ const PackageSettingsEditor = ({
     })
 
     const addNewUrlPattern = () => {
-        updatePackageUrlPatterns(packageIndex, [...urlPatterns, {id: uuidv4(), value: '*://*/*'}])
+        updatePackageUrlPatterns(packageIndex, [...urlPatterns, { id: uuidv4(), value: '*://*/*' }])
     }
 
     const addPackageWithSameSettings = () => {
-        addNewPackage({paramsWithDelimiter, urlPatterns})
+        addNewPackage({ paramsWithDelimiter, urlPatterns })
     }
 
     const [deletePackageDialog, setDeletePackageDialog] = useState(false)
@@ -258,24 +266,24 @@ const PackageSettingsEditor = ({
             <Typography fontWeight="bold" padding={1}>Url patterns</Typography>
             <Box>
                 {patternsInput}
-                <Button sx={{marginTop: '10px'}} onClick={addNewUrlPattern}
-                        variant="text" startIcon={<Add/>}>Add</Button>
+                <Button sx={{ marginTop: '10px' }} onClick={addNewUrlPattern}
+                    variant="text" startIcon={<AddIcon />}>Add</Button>
             </Box>
-            <Divider sx={{margin: '15px 0'}}/>
+            <Divider sx={{ margin: '15px 0' }} />
             <Typography fontWeight="bold" padding={1}>Params with delimiter</Typography>
             <Box>
                 {paramsItems}
-                <Button sx={{marginTop: '10px'}} onClick={addNewMultiParam}
-                        variant="text" startIcon={<Add/>}>Add</Button>
+                <Button sx={{ marginTop: '10px' }} onClick={addNewMultiParam}
+                    variant="text" startIcon={<AddIcon />}>Add</Button>
             </Box>
-            <Divider sx={{margin: '15px 0'}}/>
+            <Divider sx={{ margin: '15px 0' }} />
             <div>
-                <Button sx={{marginTop: '10px'}} onClick={() => addPackageWithSameSettings()}
-                        variant="text">Add package with same settings</Button>
+                <Button sx={{ marginTop: '10px' }} onClick={() => addPackageWithSameSettings()}
+                    variant="text">Add package with same settings</Button>
             </div>
             <div>
-                <Button color="warning" sx={{marginTop: '10px'}} onClick={openDeleteDialog}
-                        variant="text">Delete Package</Button>
+                <Button color="warning" sx={{ marginTop: '10px' }} onClick={openDeleteDialog}
+                    variant="text">Delete Package</Button>
                 <Dialog
                     open={deletePackageDialog}
                     onClose={closeDeleteDialog}
@@ -307,12 +315,12 @@ type QuickActionsEditorProps = {
 }
 
 const QuickActionsEditor = ({
-                                packageIndex,
-                                quickActions,
-                                updatePackageQuickActions,
-                                presets: allPresets
-                            }: QuickActionsEditorProps) => {
-    const quickActionsItems = quickActions.map(({label, presets, shortcut, id}, index) => {
+    packageIndex,
+    quickActions,
+    updatePackageQuickActions,
+    presets: allPresets
+}: QuickActionsEditorProps) => {
+    const quickActionsItems = quickActions.map(({ label, presets, shortcut, id }, index) => {
         const updateButtonLabel = (newParamLabel: string) => {
             const newQuickActions: SettingsPackage['quickActions'] = replaceItem(quickActions, {
                 ...quickActions[index],
@@ -350,8 +358,8 @@ const QuickActionsEditor = ({
         const onDelete: TagsProps['onDelete'] = (presets) => {
             removePresets(presets.map(v => v.value))
         }
-        const selected: TagsProps['selected'] = presets.map(v => ({label: v, value: v}))
-        const suggestions: TagsProps['suggestions'] = Object.values(allPresets).map(({label}) => ({
+        const selected: TagsProps['selected'] = presets.map(v => ({ label: v, value: v }))
+        const suggestions: TagsProps['suggestions'] = Object.values(allPresets).map(({ label }) => ({
             label: label,
             value: label
         }))
@@ -368,8 +376,8 @@ const QuickActionsEditor = ({
                     size="small"
                     value={label} onChange={e => updateButtonLabel(e.target.value)}
                 />
-                <Tags sx={{width: 'auto'}} onAdd={onAdd} onDelete={onDelete} selected={selected}
-                      suggestions={suggestions} placeholderText='New preset'/>
+                <Tags sx={{ width: 'auto' }} onAdd={onAdd} onDelete={onDelete} selected={selected}
+                    suggestions={suggestions} placeholderText='New preset' />
             </Paper>
         )
     })
@@ -388,8 +396,8 @@ const QuickActionsEditor = ({
     return (
         <div>
             {quickActionsItems}
-            <Button sx={{marginTop: '10px'}} onClick={addNewQuickAction}
-                    variant="text">Add Quick Action</Button>
+            <Button sx={{ marginTop: '10px' }} onClick={addNewQuickAction}
+                variant="text">Add Quick Action</Button>
         </div>
     )
 }
@@ -400,8 +408,8 @@ type PackagePanelProps = {
     editorStore: EditorStore
 }
 
-const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProps) => {
-    const {key, label, presets, paramsWithDelimiter, quickActions, urlPatterns} = packageData
+const PackagePanel = ({ packageData, packageIndex, editorStore }: PackagePanelProps) => {
+    const { key, label, presets, paramsWithDelimiter, quickActions, urlPatterns } = packageData
     const [value, setValue] = React.useState(0);
     const {
         addNewPackage,
@@ -467,7 +475,7 @@ const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProp
     return (
         <Accordion key={key} expanded={accordionOpen} onChange={handleAccordionChange}>
             <AccordionSummary
-                expandIcon={<ExpandMoreIcon/>}
+                expandIcon={<ExpandMoreIcon />}
                 aria-controls="panel1a-content"
                 id="panel1a-header"
                 sx={{
@@ -477,52 +485,52 @@ const PackagePanel = ({packageData, packageIndex, editorStore}: PackagePanelProp
                 }}
             >
                 <div className="package-name-wrapper">
-                    <div className={classNames("package-name-view", {'hidden-x': isRenameActive})}>
-                        <Typography sx={{paddingLeft: '6px'}}>{label}</Typography>
+                    <div className={classNames("package-name-view", { 'hidden-x': isRenameActive })}>
+                        <Typography sx={{ paddingLeft: '6px' }}>{label}</Typography>
                         <IconButton aria-label="delete" color="primary" size="small"
-                                    sx={{padding: '0', marginLeft: '10px'}} onClick={startRenameMode}>
-                            <Edit fontSize="inherit"/>
+                            sx={{ padding: '0', marginLeft: '10px' }} onClick={startRenameMode}>
+                            <EditIcon fontSize="inherit" />
                         </IconButton>
                     </div>
-                    <div className={classNames("package-name-edit", {'hidden-x': !isRenameActive})}>
+                    <div className={classNames("package-name-edit", { 'hidden-x': !isRenameActive })}>
                         <TextField inputRef={packageNameInputRef} type="text" value={label}
-                                   onKeyUp={handleRenameKey}
-                                   onChange={e => updateCurrentPackageLabel(e.target.value)}
-                                   onBlur={stopRenameMode} inputProps={{
-                            sx: {padding: '0px', paddingLeft: '6px'},
-                        }}
+                            onKeyUp={handleRenameKey}
+                            onChange={e => updateCurrentPackageLabel(e.target.value)}
+                            onBlur={stopRenameMode} inputProps={{
+                                sx: { padding: '0px', paddingLeft: '6px' },
+                            }}
                         ></TextField>
                     </div>
                 </div>
 
             </AccordionSummary>
             <AccordionDetails>
-                <Box sx={{width: '100%'}}>
-                    <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
+                <Box sx={{ width: '100%' }}>
+                    <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                            <Tab label="Presets" {...a11yProps(0)} disableRipple={true}/>
-                            <Tab label="Quick Actions" {...a11yProps(1)} disableRipple={true}/>
-                            <Tab label="Settings" {...a11yProps(2)} disableRipple={true}/>
+                            <Tab label="Presets" {...a11yProps(0)} disableRipple={true} />
+                            <Tab label="Quick Actions" {...a11yProps(1)} disableRipple={true} />
+                            <Tab label="Settings" {...a11yProps(2)} disableRipple={true} />
                         </Tabs>
                     </Box>
                     <CustomTabPanel value={value} index={0}>
                         <PresetsEditor packageIndex={packageIndex} presets={presets}
-                                       updatePackagePreset={updatePackagePreset}/>
+                            updatePackagePreset={updatePackagePreset} />
                     </CustomTabPanel>
 
                     <CustomTabPanel value={value} index={1}>
                         <QuickActionsEditor packageIndex={packageIndex} quickActions={quickActions}
-                                            updatePackageQuickActions={updatePackageQuickActions} presets={presets}/>
+                            updatePackageQuickActions={updatePackageQuickActions} presets={presets} />
                     </CustomTabPanel>
                     <CustomTabPanel value={value} index={2}>
                         <PackageSettingsEditor packageIndex={packageIndex}
-                                               label={label}
-                                               paramsWithDelimiter={paramsWithDelimiter}
-                                               addNewPackage={addNewPackage}
-                                               updatePackageParamsWithDelimiter={updatePackageParamsWithDelimiter}
-                                               urlPatterns={urlPatterns}
-                                               updatePackageUrlPatterns={updatePackageUrlPatterns}
-                                               deletePackage={deletePackage}/>
+                            label={label}
+                            paramsWithDelimiter={paramsWithDelimiter}
+                            addNewPackage={addNewPackage}
+                            updatePackageParamsWithDelimiter={updatePackageParamsWithDelimiter}
+                            urlPatterns={urlPatterns}
+                            updatePackageUrlPatterns={updatePackageUrlPatterns}
+                            deletePackage={deletePackage} />
                     </CustomTabPanel>
                 </Box>
             </AccordionDetails>
@@ -540,14 +548,14 @@ const PackagesPage = () => {
     const packagesList = appState.map((packageData, packageIndex) => {
         return (
             <PackagePanel key={packageData.key} packageData={packageData} packageIndex={packageIndex}
-                          editorStore={editorStore}/>
+                editorStore={editorStore} />
         )
     })
     return (
         <div>
             {packagesList}
-            <Button sx={{marginTop: '10px'}} onClick={() => addNewPackage()}
-                    variant="text">Add Package</Button>
+            <Button sx={{ marginTop: '10px' }} onClick={() => addNewPackage()}
+                variant="text">Add Package</Button>
         </div>
     )
 }
@@ -559,8 +567,8 @@ const Settings = () => {
     } = editorStore
     return (
         <div className="settings-pages">
-            <SettingsHeader packages={packages} addPackages={editorStore.addPackages}/>
-            <PackagesPage/>
+            <SettingsHeader packages={packages} addPackages={editorStore.addPackages} />
+            <PackagesPage />
         </div>
     )
 }

@@ -1,13 +1,14 @@
-import React, {MouseEventHandler} from 'react'
+import React, { MouseEventHandler } from 'react'
 import type {
     AddEntriesAndNavigate,
     ParamsWithDelimiterViewModel,
     PresetsEntriesMapViewModel
 } from '../../types/types'
 
-import {QuickActionData, SearchParamsEntries, SetEntries} from "../../types/types";
-import {mergeEntries} from "../../utils/searchParamsUtils";
-import {Button, Typography} from "@mui/material";
+import { QuickActionData, SearchParamsEntries, SetEntries } from "../../types/types";
+import { mergeEntries } from "../../utils/searchParamsUtils";
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 import classNames from "classnames";
 
 
@@ -22,7 +23,7 @@ export type QuickActionsProps = {
 }
 
 const QuickActions = (props: QuickActionsProps) => {
-    const {presets, paramsWithDelimiter, entries, setEntries, quickActions, addEntriesAndNavigate} = props
+    const { presets, paramsWithDelimiter, entries, setEntries, quickActions, addEntriesAndNavigate } = props
 
     const addPresetsAndNavigate = (presetsKeys: Array<string>, shouldOpenNewTab: boolean) => {
         const entriesToAdd = presetsKeys.map(presetKey => presets[presetKey])
@@ -32,7 +33,7 @@ const QuickActions = (props: QuickActionsProps) => {
     }
 
     const quickActionButtons = quickActions.map((quickActionData) => {
-        const {label, presets} = quickActionData
+        const { label, presets } = quickActionData
 
         const quickActionCb: MouseEventHandler<HTMLButtonElement> = (e) => {
             const shouldOpenNewTab = e.metaKey

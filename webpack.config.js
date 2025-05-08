@@ -1,6 +1,7 @@
 const path = require("path");
 // const webpack = require("webpack")
 const CopyWebpackPlugin = require("copy-webpack-plugin")
+const HtmlWebpackPlugin = require("html-webpack-plugin")
 
 module.exports = {
     entry: {
@@ -13,6 +14,9 @@ module.exports = {
     output: {
         path: __dirname + '/build',
         filename: '[name].bundle.js',
+    },
+    performance: {
+        hints: false
     },
     devServer: {
         static: {
@@ -68,18 +72,38 @@ module.exports = {
                         }))
                     }
                 },
-                { from: "src/options.html" },
-                { from: "src/popup.html" },
                 {
                     from: "src/icons",
                     to: "icons"
                 }
             ],
         }),
+        new HtmlWebpackPlugin({
+            template: 'src/popup.html',
+            filename: 'popup.html',
+            chunks: ['vendors', 'popup'],
+            inject: 'body'
+        }),
+        new HtmlWebpackPlugin({
+            template: 'src/options.html',
+            filename: 'options.html',
+            chunks: ['vendors', 'options'],
+            inject: 'body'
+        }),
     ],
     mode: process.env.NODE_ENV === 'development' ? 'development' : 'production',
-    // devtool: 'source-map',
+    devtool: process.env.NODE_ENV === 'development' ? 'source-map' : false,
     optimization: {
-        minimize: process.env.NODE_ENV !== 'development'
+        minimize: process.env.NODE_ENV !== 'development',
+        splitChunks: {
+            chunks: 'all',
+            cacheGroups: {
+                vendor: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: 'vendors',
+                    chunks: 'all',
+                },
+            },
+        },
     },
 };

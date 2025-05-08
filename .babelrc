@@ -1,0 +1,22 @@
+{
+    "plugins": [
+        [
+            "import",
+            {
+                "libraryName": "@mui/material",
+                "libraryDirectory": "",
+                "camel2DashComponentName": false
+            },
+            "mui"
+        ],
+        [
+            "import",
+            {
+                "libraryName": "lodash",
+                "libraryDirectory": "",
+                "camel2DashComponentName": false
+            },
+            "lodash"
+        ]
+    ]
+}

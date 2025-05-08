@@ -1,14 +1,17 @@
-import {isEmpty} from "lodash";
-import React, {MouseEventHandler, useState} from 'react';
+import { isEmpty } from "lodash";
+import React, { MouseEventHandler, useState } from 'react';
 import SearchParams from "../common/SearchParams";
-import PresetsPicker, {PresetsPickerProps} from "./PresetsPicker";
+import PresetsPicker, { PresetsPickerProps } from "./PresetsPicker";
 
 import {
     ParamsWithDelimiterViewModel,
     PresetsEntriesMapViewModel,
     QuickActionData
 } from "../../types/types";
-import {AppBar, Button, Fab, Typography} from "@mui/material";
+import AppBar from '@mui/material/AppBar';
+import Button from '@mui/material/Button';
+import Fab from '@mui/material/Fab';
+import Typography from '@mui/material/Typography';
 
 import QuickActions from "./QuickActions";
 import './UrlEditor.scss'
@@ -35,14 +38,14 @@ const addEntries = (url: string, newEntries: Array<[string, string]>) => {
 }
 
 function UrlEditor({
-                       currentTabUrl,
-                       updateCurrentTabUrl,
-                       openNewTab,
-                       className,
-                       presets,
-                       paramsWithDelimiter,
-                       quickActions
-                   }: UrlEditorProps) {
+    currentTabUrl,
+    updateCurrentTabUrl,
+    openNewTab,
+    className,
+    presets,
+    paramsWithDelimiter,
+    quickActions
+}: UrlEditorProps) {
     // const urlData = new URL(url)
     const [newUrl, setNewUrl] = useState(currentTabUrl)
     const newUrlData = new URL(newUrl)
@@ -104,18 +107,18 @@ function UrlEditor({
             {!isEmpty(presets) && (
                 <div className="presets-picker-container row2">
                     <PresetsPicker className="presets-picker" entries={searchParamsEntries}
-                                   setEntries={setSearchParamsEntries} presets={presets}
-                                   paramsWithDelimiter={paramsWithDelimiter}
-                                   addEntriesAndNavigate={addEntriesAndNavigate}/>
+                        setEntries={setSearchParamsEntries} presets={presets}
+                        paramsWithDelimiter={paramsWithDelimiter}
+                        addEntriesAndNavigate={addEntriesAndNavigate} />
                 </div>
             )}
             <SearchParams className="search-params-container row3" entries={searchParamsEntries}
-                          setEntries={setSearchParamsEntries} paramsWithDelimiter={paramsWithDelimiter}/>
+                setEntries={setSearchParamsEntries} paramsWithDelimiter={paramsWithDelimiter} />
             <div className="row4">
                 {quickActions.length > 0 &&
-                    <QuickActions  entries={searchParamsEntries} setEntries={setSearchParamsEntries} presets={presets}
-                                   paramsWithDelimiter={paramsWithDelimiter} quickActions={quickActions}
-                                   addEntriesAndNavigate={addEntriesAndNavigate}/>}
+                    <QuickActions entries={searchParamsEntries} setEntries={setSearchParamsEntries} presets={presets}
+                        paramsWithDelimiter={paramsWithDelimiter} quickActions={quickActions}
+                        addEntriesAndNavigate={addEntriesAndNavigate} />}
             </div>
             <Fab color="primary" onClick={applyUrl} variant="extended" sx={{
                 position: 'fixed',

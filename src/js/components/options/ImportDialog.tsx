@@ -5,10 +5,15 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import {replaceItem, toTrueObj} from "../../utils/arrayUtils";
-import {EditorModel, EditorStore} from "../../types/types";
-import {useEffect, useState} from "react";
-import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from "@mui/material";
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Typography from '@mui/material/Typography';
+import { replaceItem, toTrueObj } from "../../utils/arrayUtils";
+import { EditorModel, EditorStore } from "../../types/types";
+import { useEffect, useState } from "react";
 import * as trace_events from "trace_events";
 
 type PackageItem = { key: string, label: string, checked: boolean }
@@ -17,11 +22,11 @@ type ImportDialogContentProps = {
     setSelectedPackages: React.Dispatch<React.SetStateAction<PackageItem[]>>
 }
 
-function ImportDialogContent({selectedPackages, setSelectedPackages}: ImportDialogContentProps) {
+function ImportDialogContent({ selectedPackages, setSelectedPackages }: ImportDialogContentProps) {
 
     return (
-        <List sx={{width: '400px', bgcolor: 'background.paper'}}>
-            {selectedPackages.map(({key, label, checked}, index) => {
+        <List sx={{ width: '400px', bgcolor: 'background.paper' }}>
+            {selectedPackages.map(({ key, label, checked }, index) => {
                 const labelId = `checkbox-list-label-${key}`;
                 const handleToggle = () => {
                     const newVal = replaceItem(selectedPackages, {
@@ -43,10 +48,10 @@ function ImportDialogContent({selectedPackages, setSelectedPackages}: ImportDial
                                     checked={checked}
                                     tabIndex={-1}
                                     disableRipple
-                                    inputProps={{'aria-labelledby': labelId}}
+                                    inputProps={{ 'aria-labelledby': labelId }}
                                 />
                             </ListItemIcon>
-                            <ListItemText id={labelId} primary={label}/>
+                            <ListItemText id={labelId} primary={label} />
                         </ListItemButton>
                     </ListItem>
                 );
@@ -71,7 +76,7 @@ type AreYouSureModalProps = {
     closeDialog: () => void
 }
 
-function AreYouSureModal({message, replacePackages, duplicatePackages, isOpen, closeDialog}: AreYouSureModalProps) {
+function AreYouSureModal({ message, replacePackages, duplicatePackages, isOpen, closeDialog }: AreYouSureModalProps) {
     const replaceAndClose = () => {
         replacePackages()
         closeDialog()
@@ -99,12 +104,12 @@ function AreYouSureModal({message, replacePackages, duplicatePackages, isOpen, c
 }
 
 export default function ImportDialog({
-                                         packagesToImport,
-                                         isOpen,
-                                         closeDialog,
-                                         packages,
-                                         addPackages
-                                     }: ImportDialogProps) {
+    packagesToImport,
+    isOpen,
+    closeDialog,
+    packages,
+    addPackages
+}: ImportDialogProps) {
     const [selectedPackages, setSelectedPackages] = useState<Array<PackageItem>>([])
 
     useEffect(() => {
@@ -163,7 +168,7 @@ export default function ImportDialog({
                 </DialogTitle>
                 <DialogContent>
                     <Typography>Select packages to import</Typography>
-                    <ImportDialogContent selectedPackages={selectedPackages} setSelectedPackages={setSelectedPackages}/>
+                    <ImportDialogContent selectedPackages={selectedPackages} setSelectedPackages={setSelectedPackages} />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={importPackages} autoFocus>Import</Button>
@@ -171,8 +176,8 @@ export default function ImportDialog({
                 </DialogActions>
             </Dialog>
             <AreYouSureModal message="Some of the packages already exist, choose an action"
-                             replacePackages={forceImportPackages(true)} duplicatePackages={forceImportPackages(false)}
-                             isOpen={replaceRequiredModal} closeDialog={closeReplaceRequiredModal}/>
+                replacePackages={forceImportPackages(true)} duplicatePackages={forceImportPackages(false)}
+                isOpen={replaceRequiredModal} closeDialog={closeReplaceRequiredModal} />
         </React.Fragment>
     )
 }

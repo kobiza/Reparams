@@ -1,19 +1,18 @@
-import React, {KeyboardEventHandler, useEffect, useRef, useState} from "react";
-import {ParamsWithDelimiterViewModel, SearchParamsEntries, SetEntries} from "../../types/types";
-import {updateEntryKey, updateEntryValue} from "../../utils/searchParamsUtils";
+import React, { KeyboardEventHandler, useEffect, useRef, useState } from "react";
+import { ParamsWithDelimiterViewModel, SearchParamsEntries, SetEntries } from "../../types/types";
+import { updateEntryKey, updateEntryValue } from "../../utils/searchParamsUtils";
 import './SearchParams.scss'
-import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    IconButton,
-    InputAdornment,
-    TextField
-} from "@mui/material";
-import {Clear, ZoomIn} from "@mui/icons-material";
-import {removeItem} from "../../utils/arrayUtils";
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
+import ClearIcon from '@mui/icons-material/Clear';
+import ZoomInIcon from '@mui/icons-material/ZoomIn';
+import { removeItem } from "../../utils/arrayUtils";
 import usePrevious from "./usePrevious";
 import ParamWithDelimiterValueInput from "./ParamWithDelimiterValueInput";
 import classNames from "classnames";
@@ -25,7 +24,7 @@ type SearchParamsProps = {
     className?: string,
 }
 
-const ZoomInDialog = ({entries, setEntries, paramsWithDelimiter, itemInZoomDialog, closeDialog}: SearchParamsProps & {
+const ZoomInDialog = ({ entries, setEntries, paramsWithDelimiter, itemInZoomDialog, closeDialog }: SearchParamsProps & {
     itemInZoomDialog: number,
     closeDialog: () => void
 }) => {
@@ -54,13 +53,13 @@ const ZoomInDialog = ({entries, setEntries, paramsWithDelimiter, itemInZoomDialo
     }
 
     return <ParamWithDelimiterValueInput className="query-param-input-value" value={zoomInValue}
-                                         onChange={updateEntryValueForIndex(itemInZoomDialog)}
-                                         onTextInputKeyUp={handleRenameKey}
-                                         delimiter={paramsWithDelimiter[zoomInKey].separator} sx={{width: 'auto'}}/>
+        onChange={updateEntryValueForIndex(itemInZoomDialog)}
+        onTextInputKeyUp={handleRenameKey}
+        delimiter={paramsWithDelimiter[zoomInKey].separator} sx={{ width: 'auto' }} />
 }
 
 
-const SearchParams = ({entries, setEntries, paramsWithDelimiter, className}: SearchParamsProps) => {
+const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className }: SearchParamsProps) => {
     const shouldFocusNewParam = useRef<boolean>(false)
     const itemsRef = useRef<Array<HTMLDivElement | null>>([]);
     const [itemInZoomDialog, setItemInZoomDialog] = useState(-1)
@@ -129,15 +128,15 @@ const SearchParams = ({entries, setEntries, paramsWithDelimiter, className}: Sea
                                     }}
                                     edge="end"
                                 >
-                                    <ZoomIn/>
+                                    <ZoomInIcon />
                                 </IconButton>
                             </InputAdornment>
                         )
                     } : {}}
                 />
                 <IconButton aria-label="delete" color="primary" size="small"
-                            sx={{padding: '0', marginLeft: '10px'}} onClick={removeSearchParam}>
-                    <Clear fontSize="inherit"/>
+                    sx={{ padding: '0', marginLeft: '10px' }} onClick={removeSearchParam}>
+                    <ClearIcon fontSize="inherit" />
                 </IconButton>
             </li>
         )
@@ -165,21 +164,21 @@ const SearchParams = ({entries, setEntries, paramsWithDelimiter, className}: Sea
                 onClose={closeDialog}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
-                PaperProps={{sx: {minWidth: '80%'}}}
+                PaperProps={{ sx: { minWidth: '80%' } }}
             >
                 <DialogTitle id="alert-dialog-title">
                     {`Edit ${zoomInKey}`}
                 </DialogTitle>
                 <DialogContent>
                     {isZoomOpen && <ZoomInDialog closeDialog={closeDialog} itemInZoomDialog={itemInZoomDialog}
-                                                 paramsWithDelimiter={paramsWithDelimiter} setEntries={setEntries}
-                                                 entries={entries}/>}
+                        paramsWithDelimiter={paramsWithDelimiter} setEntries={setEntries}
+                        entries={entries} />}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={closeDialog}>Close</Button>
                 </DialogActions>
             </Dialog>
-            <Button color="secondary" sx={{marginTop: '10px'}} onClick={addNewEntry} variant="text">Add param</Button>
+            <Button color="secondary" sx={{ marginTop: '10px' }} onClick={addNewEntry} variant="text">Add param</Button>
         </div>
     )
 }

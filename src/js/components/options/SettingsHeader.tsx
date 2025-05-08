@@ -3,13 +3,21 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import {Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material";
-import {Download, Upload} from "@mui/icons-material";
-import {useState} from "react";
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import DownloadIcon from '@mui/icons-material/Download';
+import UploadIcon from '@mui/icons-material/Upload';
+import { useState } from "react";
 import ExportDialog from "./ExportDialog";
-import {EditorModel, EditorStore} from "../../types/types";
+import { EditorModel, EditorStore } from "../../types/types";
 import ImportDialog from "./ImportDialog";
-import _ from 'lodash'
+import isArray from 'lodash/isArray';
+import isUndefined from 'lodash/isUndefined';
 
 type SettingsHeaderProps = {
     packages: EditorModel
@@ -26,9 +34,9 @@ type SettingsHeaderProps = {
 const getEditorModelFromClipboard = (text: string) => {
     try {
         const clipboardJson = JSON.parse(text)
-        if (_.isArray(clipboardJson) &&
+        if (isArray(clipboardJson) &&
             ['key', 'label', 'urlPatterns', 'presets', 'paramsWithDelimiter', 'quickActions'].every(key => {
-                return !_.isUndefined(clipboardJson[0][key])
+                return !isUndefined(clipboardJson[0][key])
             })) {
             return clipboardJson as EditorModel
         } else {
@@ -39,7 +47,7 @@ const getEditorModelFromClipboard = (text: string) => {
     }
 }
 
-function SettingsHeader({packages, addPackages}: SettingsHeaderProps) {
+function SettingsHeader({ packages, addPackages }: SettingsHeaderProps) {
     const [importDialogData, setImportDialogData] = useState<EditorModel | null>(null)
     const openImportDialog = () => {
         navigator.clipboard.readText()
@@ -87,14 +95,14 @@ function SettingsHeader({packages, addPackages}: SettingsHeaderProps) {
                         {`ReParams - Settings`}
                     </Typography>
                     <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                        <Button startIcon={<Download/>} sx={{ color: '#fff' }} onClick={openImportDialog}>
+                        <Button startIcon={<DownloadIcon />} sx={{ color: '#fff' }} onClick={openImportDialog}>
                             Import
                         </Button>
-                        <ImportDialog packages={packages} packagesToImport={importDialogData} isOpen={!!importDialogData} closeDialog={closeImportDialog} addPackages={addPackages}/>
-                        <Button startIcon={<Upload/>} sx={{ color: '#fff' }} onClick={openExportDialog}>
+                        <ImportDialog packages={packages} packagesToImport={importDialogData} isOpen={!!importDialogData} closeDialog={closeImportDialog} addPackages={addPackages} />
+                        <Button startIcon={<UploadIcon />} sx={{ color: '#fff' }} onClick={openExportDialog}>
                             Export
                         </Button>
-                        <ExportDialog packages={packages} isOpen={exportDialog} closeDialog={closeExportDialog}/>
+                        <ExportDialog packages={packages} isOpen={exportDialog} closeDialog={closeExportDialog} />
                     </Box>
                 </Toolbar>
             </Container>
