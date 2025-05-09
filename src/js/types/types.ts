@@ -33,6 +33,7 @@ export type SettingsPackage = {
     label: string
     conditions: {
         urlPatterns: Array<{ id: string, value: string }>
+        filterCriteria: Array<{ id: string, path: string, condition: 'equal' | 'notEqual' | 'isUndefined' | 'isNotUndefined', value: string }>
     }
     presets: PresetsEntriesMap
     paramsWithDelimiter: ParamsWithDelimiter
@@ -66,6 +67,7 @@ export type EditorStore = {
     updatePackageQuickActions: (packageIndex: number, quickActions: SettingsPackage['quickActions']) => void
     updatePackageLabel: (packageIndex: number, label: string) => void
     updatePackageUrlPatterns: (packageIndex: number, urlPatterns: SettingsPackage['conditions']['urlPatterns']) => void
+    updatePackageFilterCriteria: (packageIndex: number, filterCriteria: SettingsPackage['conditions']['filterCriteria']) => void
     addNewPackage: (newPackageOverrides?: Partial<SettingsPackage>) => void
     addPackages: (packagesToAdd: Array<SettingsPackage>, replace: boolean) => void
     deletePackage: (packageIndex: number) => void

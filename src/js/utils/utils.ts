@@ -88,6 +88,7 @@ export const getEmptySettingsPackage = (label: string): SettingsPackage => {
         label,
         conditions: {
             urlPatterns: [{ id: uuidv4(), value: '*://*/*' }],
+            filterCriteria: []
         },
         presets: {},
         paramsWithDelimiter: [],

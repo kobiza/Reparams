@@ -120,6 +120,7 @@ export const appData: EditorModel = [{
     label: 'kobiz package',
     conditions: {
         urlPatterns: [{ id: 'p-1', value: '*://*/*' }],
+        filterCriteria: []
     },
     presets,
     paramsWithDelimiter,

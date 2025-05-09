@@ -14,14 +14,19 @@ import { SettingsPackage, EditorStore } from '../../types/types';
 import { replaceItem } from '../../utils/arrayUtils';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+
 interface ParamsEditorProps {
     packageIndex: number
     paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']
     urlPatterns: SettingsPackage['conditions']['urlPatterns']
+    filterCriteria: SettingsPackage['conditions']['filterCriteria']
     label: SettingsPackage['label']
     addNewPackage: EditorStore['addNewPackage']
     updatePackageParamsWithDelimiter: EditorStore['updatePackageParamsWithDelimiter']
     updatePackageUrlPatterns: EditorStore['updatePackageUrlPatterns']
+    updatePackageFilterCriteria: EditorStore['updatePackageFilterCriteria']
     deletePackage: EditorStore['deletePackage']
 }
 
@@ -30,9 +35,11 @@ const PackageSettingsEditor = ({
     paramsWithDelimiter,
     updatePackageParamsWithDelimiter,
     urlPatterns,
+    filterCriteria,
     label,
     addNewPackage,
     updatePackageUrlPatterns,
+    updatePackageFilterCriteria,
     deletePackage
 }: ParamsEditorProps) => {
     const paramsItems = paramsWithDelimiter.map((paramData, index) => {
@@ -125,7 +132,7 @@ const PackageSettingsEditor = ({
     }
 
     const addPackageWithSameSettings = () => {
-        addNewPackage({ paramsWithDelimiter, conditions: { urlPatterns } })
+        addNewPackage({ paramsWithDelimiter, conditions: { urlPatterns, filterCriteria: [] } })
     }
 
     const [deletePackageDialog, setDeletePackageDialog] = useState(false)
@@ -142,12 +149,73 @@ const PackageSettingsEditor = ({
         closeDeleteDialog()
     }
 
+    const filterCriteriaInput = filterCriteria.map((v, index) => {
+        const updateCurrentFilterCriteriaPath = (value: string) => {
+            const prevItem = filterCriteria[index]
+            const newItem = { ...prevItem, path: value }
+            const newFilterCriteria = replaceItem(filterCriteria, newItem, index)
+            updatePackageFilterCriteria(packageIndex, newFilterCriteria)
+        }
+        const updateCurrentFilterCriteriaCondition = (value: string) => {
+            const prevItem = filterCriteria[index]
+            const newItem = { ...prevItem, condition: value as 'equal' | 'notEqual' | 'isUndefined' | 'isNotUndefined' }
+            const newFilterCriteria = replaceItem(filterCriteria, newItem, index)
+            updatePackageFilterCriteria(packageIndex, newFilterCriteria)
+        }
+        const updateCurrentFilterCriteriaValue = (value: string) => {
+            const prevItem = filterCriteria[index]
+            const newItem = { ...prevItem, value }
+            const newFilterCriteria = replaceItem(filterCriteria, newItem, index)
+            updatePackageFilterCriteria(packageIndex, newFilterCriteria)
+        }
+        return (
+            <div key={v.id} style={{ display: 'flex', marginTop: '10px', alignItems: 'center' }}>
+                <TextField
+                    sx={{ flex: '1' }}
+                    hiddenLabel
+                    placeholder="Path"
+                    size="small"
+                    value={v.path} onChange={e => updateCurrentFilterCriteriaPath(e.target.value)}
+                />
+                <Select
+                    style={{ minWidth: 220 }}
+                    value={v.condition}
+                    onChange={e => updateCurrentFilterCriteriaCondition(e.target.value as string)}
+                    size="small"
+                    sx={{ minWidth: 120, marginLeft: '10px', marginRight: '10px' }}
+                >
+                    <MenuItem value="equal">equal</MenuItem>
+                    <MenuItem value="notEqual">notEqual</MenuItem>
+                    <MenuItem value="isUndefined">isUndefined</MenuItem>
+                    <MenuItem value="isNotUndefined">isNotUndefined</MenuItem>
+                </Select>
+                <TextField
+                    hiddenLabel
+                    placeholder="Value"
+                    size="small"
+                    value={v.value} onChange={e => updateCurrentFilterCriteriaValue(e.target.value)}
+                />
+            </div>
+        )
+    })
+
+    const addNewFilterCriteria = () => {
+        updatePackageFilterCriteria(packageIndex, [...filterCriteria, { id: uuidv4(), path: '', condition: 'equal', value: '' }])
+    }
+
     return (
         <div>
             <Typography fontWeight="bold" padding={1}>Url patterns</Typography>
             <Box>
                 {patternsInput}
                 <Button sx={{ marginTop: '10px' }} onClick={addNewUrlPattern}
+                    variant="text" startIcon={<AddIcon />}>Add</Button>
+            </Box>
+            <Divider sx={{ margin: '15px 0' }} />
+            <Typography fontWeight="bold" padding={1}>Filter criteria</Typography>
+            <Box>
+                {filterCriteriaInput}
+                <Button sx={{ marginTop: '10px' }} onClick={addNewFilterCriteria}
                     variant="text" startIcon={<AddIcon />}>Add</Button>
             </Box>
             <Divider sx={{ margin: '15px 0' }} />
