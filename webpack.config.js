@@ -95,15 +95,15 @@ module.exports = {
     devtool: process.env.NODE_ENV === 'development' ? 'source-map' : false,
     optimization: {
         minimize: process.env.NODE_ENV !== 'development',
-        splitChunks: {
-            chunks: 'all',
-            cacheGroups: {
-                vendor: {
-                    test: /[\\/]node_modules[\\/]/,
-                    name: 'vendors',
-                    chunks: 'all',
-                },
-            },
-        },
+        // splitChunks: {
+        //     chunks: (chunk) => chunk.name !== 'content',
+        //     cacheGroups: {
+        //         vendor: {
+        //             test: /[\\/]node_modules[\\/]/,
+        //             name: 'vendors',
+        //             chunks: 'all',
+        //         },
+        //     },
+        // },
     },
 };

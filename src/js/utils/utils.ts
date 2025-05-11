@@ -1,5 +1,6 @@
 import {
     EditorModel,
+    FilterCriteriaItem,
     MergedAppData,
     ParamsWithDelimiterViewModel,
     PresetsEntriesMapViewModel,
@@ -32,16 +33,33 @@ export const mergeAppDataPackages = (appData: EditorModel): MergedAppData => {
     return mergedAppData
 }
 
-export const getRelevantPackages = (editorModel: EditorModel, currentTabUrl: string, isCommonConfig: boolean): EditorModel => {
-    return editorModel.filter((settingsPackage) => {
-        const allUrlPatterns = settingsPackage.conditions.urlPatterns.map(v => v.value)
-        const matchesUrl = allUrlPatterns.some(urlPattern => matchUrl(currentTabUrl, urlPattern))
+export const getFilterCriteriaKey = (filterCriteriaItem: FilterCriteriaItem) => {
+    return `${filterCriteriaItem.path}-${filterCriteriaItem.condition}-${filterCriteriaItem.value}`
+}
 
-        if (isCommonConfig) {
-            return matchesUrl || settingsPackage.label === 'common'
+export const getRelevantPackages = (editorModel: EditorModel, currentTabUrl: string, filterCriteriaResult: Record<string, boolean>): EditorModel => {
+    return editorModel.filter((settingsPackage) => {
+        console.log('getRelevantPackages', settingsPackage.label)
+        const allUrlPatterns = settingsPackage.conditions.urlPatterns.map(v => v.value)
+        const filterCriteria = settingsPackage.conditions.filterCriteria
+        const someUrlPatternMatch = allUrlPatterns.some(urlPattern => matchUrl(currentTabUrl, urlPattern))
+
+        if (someUrlPatternMatch) {
+            console.log('someUrlPatternMatch', settingsPackage.label)
+            return true
         }
 
-        return matchesUrl
+        const someFilterCriteriaResult = filterCriteria.some(filterCriteriaItem => {
+            const filterCriteriaKey = getFilterCriteriaKey(filterCriteriaItem)
+            return filterCriteriaResult[filterCriteriaKey]
+        })
+
+        if (someFilterCriteriaResult) {
+            console.log('someFilterCriteriaResult', settingsPackage.label)
+            return true
+        }
+
+        return false
     })
 }
 

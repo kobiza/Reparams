@@ -1,26 +1,64 @@
+import type { FilterCriteriaItem, FilterCriteriaRequestMessage, FilterCriteriaResultMessage } from '../../types/types';
+
+// Custom get function similar to lodash.get
+function get(obj: any, path: string, defaultValue: any) {
+    // Convert the path to an array if it's not already.
+    const pathArray = path.split(".");
+
+    // Reduce over the path array to find the nested value.
+    const result = pathArray.reduce((acc, key) => acc && acc[key], obj);
+
+    // Return the resolved value or the default value if undefined.
+    return result === undefined ? defaultValue : result;
+}
+
+function isUndefined(value: any) {
+    return typeof value === 'undefined'
+}
+
+
 // Content script entry point
 console.log('Content script loaded');
 
-type CheckCommonConfigMessage = {
-    type: 'CHECK_COMMON_CONFIG';
-}
 
-type CommonConfigMessage = {
-    type: 'COMMON_CONFIG_STATUS';
-    isCommonConfigExist: boolean;
-}
+const checkFilterCriteria = (filterCriteriaKey: string) => {
 
+    const [path, condition, value]: [FilterCriteriaItem['path'], FilterCriteriaItem['condition'], FilterCriteriaItem['value']] = filterCriteriaKey.split('-') as [FilterCriteriaItem['path'], FilterCriteriaItem['condition'], FilterCriteriaItem['value']]
+
+    console.log('checkFilterCriteria', filterCriteriaKey, path, condition, value)
+    switch (condition) {
+        case 'eq':
+            // @ts-ignore
+            // console.log('window.commonConfig', window.commonConfig)
+            // todo - check why get(window, path, undefined) return undefined if the path is not found
+            console.log('eq', get(window, path, undefined), value)
+            return get(window, path, undefined) === value
+        case 'neq':
+            return get(window, path, undefined) !== value
+        case 'isUndefined':
+            return isUndefined(get(window, path, undefined))
+        case 'isNotUndefined':
+            return !isUndefined(get(window, path, undefined))
+    }
+
+}
 // Listen for messages from popup
-chrome.runtime.onMessage.addListener((message: CheckCommonConfigMessage) => {
-    if (message.type === 'CHECK_COMMON_CONFIG') {
+chrome.runtime.onMessage.addListener((message: FilterCriteriaRequestMessage) => {
+    console.log('onMessage', message)
+    if (message.type === 'FILTER_CRITERIA_REQUEST') {
+        console.log('FILTER_CRITERIA_REQUEST', message)
         // Check if commonConfig exists in the window object
-        const isCommonConfigExist = !!(window as any).commonConfig;
+        const filterCriteriaResult = message.filterCriteria.reduce<Record<string, boolean>>((acc, curr) => {
+            acc[curr] = checkFilterCriteria(curr)
+            return acc
+        }, {})
 
         // Send response back to popup
-        const response: CommonConfigMessage = {
-            type: 'COMMON_CONFIG_STATUS',
-            isCommonConfigExist
+        const response: FilterCriteriaResultMessage = {
+            type: 'FILTER_CRITERIA_RESULT',
+            filterCriteriaResult
         };
+        console.log('send FILTER_CRITERIA_RESULT', response)
         chrome.runtime.sendMessage(response);
     }
 });

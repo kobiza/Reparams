@@ -10,28 +10,17 @@ export const runFixer1 = () => {
         const model = JSON.parse(a) as EditorModel
         const fixed = model.map(v => {
             const {
-                key,
-                label,
-                conditions,
-                presets,
                 // @ts-ignore
-                paramsWithMultipleValues,
-                quickActions
+                urlPatterns,
+                ...rest
             } = v
 
-            const paramsWithDelimiter = Object.keys(paramsWithMultipleValues).map(v => ({
-                id: v,
-                label: paramsWithMultipleValues[v].label,
-                separator: paramsWithMultipleValues[v].separator
-            }))
-
             return {
-                key,
-                label,
-                conditions,
-                presets,
-                paramsWithDelimiter,
-                quickActions
+                ...rest,
+                conditions: {
+                    ...rest.conditions,
+                    urlPatterns: urlPatterns || [],
+                }
             }
         })
 

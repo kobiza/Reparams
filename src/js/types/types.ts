@@ -1,4 +1,3 @@
-import { PaletteColorOptions } from "@mui/material";
 
 export type SearchParamsEntries = Array<[key: string, value: string]>
 
@@ -28,12 +27,19 @@ export type ParamsWithDelimiterViewModel = {
     }
 }
 
+export type FilterCriteriaItem = {
+    id: string
+    path: string
+    condition: 'eq' | 'neq' | 'isUndefined' | 'isNotUndefined'
+    value: string
+}
+
 export type SettingsPackage = {
     key: string
     label: string
     conditions: {
         urlPatterns: Array<{ id: string, value: string }>
-        filterCriteria: Array<{ id: string, path: string, condition: 'equal' | 'notEqual' | 'isUndefined' | 'isNotUndefined', value: string }>
+        filterCriteria: Array<FilterCriteriaItem>
     }
     presets: PresetsEntriesMap
     paramsWithDelimiter: ParamsWithDelimiter
@@ -83,6 +89,15 @@ export type ViewerStore = {
     state: ViewerModel
 }
 
+export type FilterCriteriaRequestMessage = {
+    type: 'FILTER_CRITERIA_REQUEST';
+    filterCriteria: Array<string>;
+}
+
+export type FilterCriteriaResultMessage = {
+    type: 'FILTER_CRITERIA_RESULT';
+    filterCriteriaResult: Record<string, boolean>;
+}
 
 // declare module '@mui/material/styles' {
 //     interface CustomPalette {

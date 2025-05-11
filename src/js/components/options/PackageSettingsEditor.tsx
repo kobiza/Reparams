@@ -10,7 +10,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import AddIcon from '@mui/icons-material/Add';
 import { uuidv4 } from '../../utils/utils';
-import { SettingsPackage, EditorStore } from '../../types/types';
+import { SettingsPackage, EditorStore, FilterCriteriaItem } from '../../types/types';
 import { replaceItem } from '../../utils/arrayUtils';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -158,7 +158,7 @@ const PackageSettingsEditor = ({
         }
         const updateCurrentFilterCriteriaCondition = (value: string) => {
             const prevItem = filterCriteria[index]
-            const newItem = { ...prevItem, condition: value as 'equal' | 'notEqual' | 'isUndefined' | 'isNotUndefined' }
+            const newItem = { ...prevItem, condition: value as FilterCriteriaItem['condition'] }
             const newFilterCriteria = replaceItem(filterCriteria, newItem, index)
             updatePackageFilterCriteria(packageIndex, newFilterCriteria)
         }
@@ -184,10 +184,10 @@ const PackageSettingsEditor = ({
                     size="small"
                     sx={{ minWidth: 120, marginLeft: '10px', marginRight: '10px' }}
                 >
-                    <MenuItem value="equal">equal</MenuItem>
-                    <MenuItem value="notEqual">notEqual</MenuItem>
-                    <MenuItem value="isUndefined">isUndefined</MenuItem>
-                    <MenuItem value="isNotUndefined">isNotUndefined</MenuItem>
+                    <MenuItem value="eq">Equal</MenuItem>
+                    <MenuItem value="neq">Not Equal</MenuItem>
+                    <MenuItem value="isUndefined">Is Undefined</MenuItem>
+                    <MenuItem value="isNotUndefined">Is Not Undefined</MenuItem>
                 </Select>
                 <TextField
                     hiddenLabel
@@ -200,7 +200,7 @@ const PackageSettingsEditor = ({
     })
 
     const addNewFilterCriteria = () => {
-        updatePackageFilterCriteria(packageIndex, [...filterCriteria, { id: uuidv4(), path: '', condition: 'equal', value: '' }])
+        updatePackageFilterCriteria(packageIndex, [...filterCriteria, { id: uuidv4(), path: '', condition: 'eq', value: '' }])
     }
 
     return (
