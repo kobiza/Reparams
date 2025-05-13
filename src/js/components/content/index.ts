@@ -20,6 +20,29 @@ function isUndefined(value: any) {
 // Content script entry point
 console.log('Content script loaded');
 
+// Inject a script into the page context to access window.commonConfig
+const injectedScript = document.createElement('script');
+injectedScript.textContent = `
+  (function() {
+    window.postMessage({
+      source: 'reparams-extension',
+      commonConfig: window.commonConfig
+    }, '*');
+  })();
+`;
+(document.head || document.documentElement).appendChild(injectedScript);
+injectedScript.remove();
+
+let pageCommonConfig: any = undefined;
+
+// Listen for the message from the injected script
+window.addEventListener('message', (event) => {
+    if (event.source !== window) return;
+    if (event.data && event.data.source === 'reparams-extension') {
+        pageCommonConfig = event.data.commonConfig;
+        console.log('Received commonConfig from page:', pageCommonConfig);
+    }
+});
 
 const checkFilterCriteria = (filterCriteriaKey: string) => {
 
@@ -28,17 +51,15 @@ const checkFilterCriteria = (filterCriteriaKey: string) => {
     console.log('checkFilterCriteria', filterCriteriaKey, path, condition, value)
     switch (condition) {
         case 'eq':
-            // @ts-ignore
-            // console.log('window.commonConfig', window.commonConfig)
-            // todo - check why get(window, path, undefined) return undefined if the path is not found
-            console.log('eq', get(window, path, undefined), value)
-            return get(window, path, undefined) === value
+            // Use pageCommonConfig instead of window.commonConfig
+            console.log('eq', get(pageCommonConfig, path, undefined), value)
+            return get(pageCommonConfig, path, undefined) === value
         case 'neq':
-            return get(window, path, undefined) !== value
+            return get(pageCommonConfig, path, undefined) !== value
         case 'isUndefined':
-            return isUndefined(get(window, path, undefined))
+            return isUndefined(get(pageCommonConfig, path, undefined))
         case 'isNotUndefined':
-            return !isUndefined(get(window, path, undefined))
+            return !isUndefined(get(pageCommonConfig, path, undefined))
     }
 
 }
