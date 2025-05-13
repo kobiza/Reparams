@@ -47,9 +47,7 @@ const QuickActions = (props: QuickActionsProps) => {
 
     return (
         <div className={classNames('quick-actions', props.className)}>
-            <Typography>
-                <Typography variant="h6" padding={1}>Quick actions:</Typography>
-            </Typography>
+            <Typography variant="h6" padding={1}>Quick actions:</Typography>
             <div className="quick-action-buttons">
                 {quickActionButtons}
             </div>

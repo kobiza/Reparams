@@ -1,10 +1,11 @@
 import React from 'react'
 import '../common/App.scss'
-import {createRoot} from 'react-dom/client'
+import { createRoot } from 'react-dom/client'
 import Settings from "./Settings";
 import UseEditorStoreContext from "./UseEditorStoreContext";
 import getMuiTheme from "../../utils/getMuiTheme";
-import {ThemeProvider} from "@mui/material";
+import { ThemeProvider } from "@mui/material";
+// import { runFixer1 } from "./dataFixer";
 
 
 // runFixer1()
@@ -17,10 +18,10 @@ const App = () => {
         <ThemeProvider theme={getMuiTheme()}>
             <UseEditorStoreContext>
                 <div className="App" data-theme="jigglypuff">
-                    <Settings/>
+                    <Settings />
                 </div>
             </UseEditorStoreContext>
         </ThemeProvider>
     )
 }
-root.render(<App/>);
+root.render(<App />);

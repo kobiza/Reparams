@@ -1,7 +1,7 @@
-import React, {createContext, PropsWithChildren, useEffect, useState} from "react";
-import {EditorModel, EditorStore, SettingsPackage} from "../../types/types";
-import {removeItem, replaceItem, toTrueObj} from "../../utils/arrayUtils";
-import {getEmptySettingsPackage, uuidv4} from "../../utils/utils";
+import React, { createContext, PropsWithChildren, useEffect, useState } from "react";
+import { EditorModel, EditorStore, SettingsPackage } from "../../types/types";
+import { removeItem, replaceItem, toTrueObj } from "../../utils/arrayUtils";
+import { getEmptySettingsPackage, uuidv4 } from "../../utils/utils";
 import * as repl from "repl";
 
 const noop = () => {
@@ -13,6 +13,7 @@ export const EditorStoreContext = createContext<EditorStore>({
     updatePackageQuickActions: noop,
     updatePackageLabel: noop,
     updatePackageUrlPatterns: noop,
+    updatePackageFilterCriteria: noop,
     addNewPackage: noop,
     addPackages: noop,
     deletePackage: noop
@@ -70,10 +71,14 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
         _updatePackage(packageIndex, newPackage)
     }
 
-    const updatePackageUrlPatterns = (packageIndex: number, urlPatterns: SettingsPackage['urlPatterns']) => {
+    const updatePackageUrlPatterns = (packageIndex: number, urlPatterns: SettingsPackage['conditions']['urlPatterns']) => {
+        const prevPackage = appState[packageIndex]
         const newPackage = {
-            ...appState[packageIndex],
-            urlPatterns
+            ...prevPackage,
+            conditions: {
+                ...prevPackage.conditions,
+                urlPatterns
+            }
         }
         _updatePackage(packageIndex, newPackage)
     }
@@ -130,6 +135,13 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
         })
     }
 
+    const updatePackageFilterCriteria = (packageIndex: number, filterCriteria: SettingsPackage['conditions']['filterCriteria']) => {
+        const newPackage = {
+            ...appState[packageIndex],
+            conditions: { ...appState[packageIndex].conditions, filterCriteria }
+        }
+        _updatePackage(packageIndex, newPackage)
+    }
     return (
         <EditorStoreContext.Provider value={{
             state: appState,
@@ -138,6 +150,7 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
             updatePackageQuickActions,
             updatePackageLabel,
             updatePackageUrlPatterns,
+            updatePackageFilterCriteria,
             addNewPackage,
             addPackages,
             deletePackage
