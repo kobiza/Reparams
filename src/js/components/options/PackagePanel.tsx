@@ -34,7 +34,7 @@ const PackagePanel = ({ packageData, packageIndex, editorStore }: PackagePanelPr
         updatePackageQuickActions,
         updatePackageLabel,
         updatePackageUrlPatterns,
-        updatePackageFilterCriteria,
+        updatePackageDomSelectors,
         deletePackage
     } = editorStore
 
@@ -147,8 +147,8 @@ const PackagePanel = ({ packageData, packageIndex, editorStore }: PackagePanelPr
                                 addNewPackage={addNewPackage}
                                 updatePackageParamsWithDelimiter={updatePackageParamsWithDelimiter}
                                 urlPatterns={conditions.urlPatterns}
-                                filterCriteria={conditions.filterCriteria}
-                                updatePackageFilterCriteria={updatePackageFilterCriteria}
+                                domSelectors={conditions.domSelectors}
+                                updatePackageDomSelectors={updatePackageDomSelectors}
                                 updatePackageUrlPatterns={updatePackageUrlPatterns}
                                 deletePackage={deletePackage} />
                         </CustomTabPanel>

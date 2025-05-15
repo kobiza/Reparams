@@ -27,19 +27,13 @@ export type ParamsWithDelimiterViewModel = {
     }
 }
 
-export type FilterCriteriaItem = {
-    id: string
-    path: string
-    condition: 'eq' | 'neq' | 'isUndefined' | 'isNotUndefined'
-    value: string
-}
 
 export type SettingsPackage = {
     key: string
     label: string
     conditions: {
         urlPatterns: Array<{ id: string, value: string }>
-        filterCriteria: Array<FilterCriteriaItem>
+        domSelectors: Array<{ id: string, value: string }>
     }
     presets: PresetsEntriesMap
     paramsWithDelimiter: ParamsWithDelimiter
@@ -73,7 +67,7 @@ export type EditorStore = {
     updatePackageQuickActions: (packageIndex: number, quickActions: SettingsPackage['quickActions']) => void
     updatePackageLabel: (packageIndex: number, label: string) => void
     updatePackageUrlPatterns: (packageIndex: number, urlPatterns: SettingsPackage['conditions']['urlPatterns']) => void
-    updatePackageFilterCriteria: (packageIndex: number, filterCriteria: SettingsPackage['conditions']['filterCriteria']) => void
+    updatePackageDomSelectors: (packageIndex: number, domSelectors: SettingsPackage['conditions']['domSelectors']) => void
     addNewPackage: (newPackageOverrides?: Partial<SettingsPackage>) => void
     addPackages: (packagesToAdd: Array<SettingsPackage>, replace: boolean) => void
     deletePackage: (packageIndex: number) => void
@@ -89,14 +83,14 @@ export type ViewerStore = {
     state: ViewerModel
 }
 
-export type FilterCriteriaRequestMessage = {
-    type: 'FILTER_CRITERIA_REQUEST';
-    filterCriteria: Array<string>;
+export type DomSelectorRequestMessage = {
+    type: 'DOM_SELECTOR_REQUEST';
+    domSelectors: Array<string>;
 }
 
-export type FilterCriteriaResultMessage = {
-    type: 'FILTER_CRITERIA_RESULT';
-    filterCriteriaResult: Record<string, boolean>;
+export type DomSelectorResultMessage = {
+    type: 'DOM_SELECTOR_RESULT';
+    domSelectorResult: Record<string, boolean>;
 }
 
 // declare module '@mui/material/styles' {

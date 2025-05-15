@@ -13,7 +13,7 @@ export const EditorStoreContext = createContext<EditorStore>({
     updatePackageQuickActions: noop,
     updatePackageLabel: noop,
     updatePackageUrlPatterns: noop,
-    updatePackageFilterCriteria: noop,
+    updatePackageDomSelectors: noop,
     addNewPackage: noop,
     addPackages: noop,
     deletePackage: noop
@@ -135,10 +135,10 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
         })
     }
 
-    const updatePackageFilterCriteria = (packageIndex: number, filterCriteria: SettingsPackage['conditions']['filterCriteria']) => {
+    const updatePackageDomSelectors = (packageIndex: number, domSelectors: SettingsPackage['conditions']['domSelectors']) => {
         const newPackage = {
             ...appState[packageIndex],
-            conditions: { ...appState[packageIndex].conditions, filterCriteria }
+            conditions: { ...appState[packageIndex].conditions, domSelectors }
         }
         _updatePackage(packageIndex, newPackage)
     }
@@ -150,7 +150,7 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
             updatePackageQuickActions,
             updatePackageLabel,
             updatePackageUrlPatterns,
-            updatePackageFilterCriteria,
+            updatePackageDomSelectors,
             addNewPackage,
             addPackages,
             deletePackage

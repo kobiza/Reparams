@@ -1,4 +1,4 @@
-import type { FilterCriteriaItem, FilterCriteriaRequestMessage, FilterCriteriaResultMessage } from '../../types/types';
+import type { DomSelectorRequestMessage, DomSelectorResultMessage } from '../../types/types';
 
 // Custom get function similar to lodash.get
 function get(obj: any, path: string, defaultValue: any) {
@@ -20,66 +20,53 @@ function isUndefined(value: any) {
 // Content script entry point
 console.log('Content script loaded');
 
-// Inject a script into the page context to access window.commonConfig
-const injectedScript = document.createElement('script');
-injectedScript.textContent = `
-  (function() {
-    window.postMessage({
-      source: 'reparams-extension',
-      commonConfig: window.commonConfig
-    }, '*');
-  })();
-`;
-(document.head || document.documentElement).appendChild(injectedScript);
-injectedScript.remove();
+// // Inject a script into the page context to access window.commonConfig
+// const injectedScript = document.createElement('script');
+// injectedScript.textContent = `
+//   (function() {
+//     window.postMessage({
+//       source: 'reparams-extension',
+//       commonConfig: window.commonConfig
+//     }, '*');
+//   })();
+// `;
+// (document.head || document.documentElement).appendChild(injectedScript);
+// injectedScript.remove();
 
-let pageCommonConfig: any = undefined;
+// let pageCommonConfig: any = undefined;
 
-// Listen for the message from the injected script
-window.addEventListener('message', (event) => {
-    if (event.source !== window) return;
-    if (event.data && event.data.source === 'reparams-extension') {
-        pageCommonConfig = event.data.commonConfig;
-        console.log('Received commonConfig from page:', pageCommonConfig);
-    }
-});
+// // Listen for the message from the injected script
+// window.addEventListener('message', (event) => {
+//     if (event.source !== window) return;
+//     if (event.data && event.data.source === 'reparams-extension') {
+//         pageCommonConfig = event.data.commonConfig;
+//         console.log('Received commonConfig from page:', pageCommonConfig);
+//     }
+// });
 
-const checkFilterCriteria = (filterCriteriaKey: string) => {
-
-    const [path, condition, value]: [FilterCriteriaItem['path'], FilterCriteriaItem['condition'], FilterCriteriaItem['value']] = filterCriteriaKey.split('-') as [FilterCriteriaItem['path'], FilterCriteriaItem['condition'], FilterCriteriaItem['value']]
-
-    console.log('checkFilterCriteria', filterCriteriaKey, path, condition, value)
-    switch (condition) {
-        case 'eq':
-            // Use pageCommonConfig instead of window.commonConfig
-            console.log('eq', get(pageCommonConfig, path, undefined), value)
-            return get(pageCommonConfig, path, undefined) === value
-        case 'neq':
-            return get(pageCommonConfig, path, undefined) !== value
-        case 'isUndefined':
-            return isUndefined(get(pageCommonConfig, path, undefined))
-        case 'isNotUndefined':
-            return !isUndefined(get(pageCommonConfig, path, undefined))
-    }
+const checkDomSelector = (domSelector: string) => {
+    const result = !!document.querySelector(domSelector)
+    console.log('checkDomSelector', domSelector, result)
+    return result
 
 }
 // Listen for messages from popup
-chrome.runtime.onMessage.addListener((message: FilterCriteriaRequestMessage) => {
+chrome.runtime.onMessage.addListener((message: DomSelectorRequestMessage) => {
     console.log('onMessage', message)
-    if (message.type === 'FILTER_CRITERIA_REQUEST') {
-        console.log('FILTER_CRITERIA_REQUEST', message)
+    if (message.type === 'DOM_SELECTOR_REQUEST') {
+        console.log('DOM_SELECTOR_REQUEST', message)
         // Check if commonConfig exists in the window object
-        const filterCriteriaResult = message.filterCriteria.reduce<Record<string, boolean>>((acc, curr) => {
-            acc[curr] = checkFilterCriteria(curr)
+        const domSelectorResult = message.domSelectors.reduce<Record<string, boolean>>((acc, curr) => {
+            acc[curr] = checkDomSelector(curr)
             return acc
         }, {})
 
         // Send response back to popup
-        const response: FilterCriteriaResultMessage = {
-            type: 'FILTER_CRITERIA_RESULT',
-            filterCriteriaResult
+        const response: DomSelectorResultMessage = {
+            type: 'DOM_SELECTOR_RESULT',
+            domSelectorResult
         };
-        console.log('send FILTER_CRITERIA_RESULT', response)
+        console.log('send DOM_SELECTOR_RESULT', response)
         chrome.runtime.sendMessage(response);
     }
 });

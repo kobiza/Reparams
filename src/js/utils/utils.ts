@@ -1,6 +1,5 @@
 import {
     EditorModel,
-    FilterCriteriaItem,
     MergedAppData,
     ParamsWithDelimiterViewModel,
     PresetsEntriesMapViewModel,
@@ -33,15 +32,11 @@ export const mergeAppDataPackages = (appData: EditorModel): MergedAppData => {
     return mergedAppData
 }
 
-export const getFilterCriteriaKey = (filterCriteriaItem: FilterCriteriaItem) => {
-    return `${filterCriteriaItem.path}-${filterCriteriaItem.condition}-${filterCriteriaItem.value}`
-}
-
-export const getRelevantPackages = (editorModel: EditorModel, currentTabUrl: string, filterCriteriaResult: Record<string, boolean>): EditorModel => {
+export const getRelevantPackages = (editorModel: EditorModel, currentTabUrl: string, domSelectorResult: Record<string, boolean>): EditorModel => {
     return editorModel.filter((settingsPackage) => {
         console.log('getRelevantPackages', settingsPackage.label)
         const allUrlPatterns = settingsPackage.conditions.urlPatterns.map(v => v.value)
-        const filterCriteria = settingsPackage.conditions.filterCriteria
+        const domSelectors = settingsPackage.conditions.domSelectors
         const someUrlPatternMatch = allUrlPatterns.some(urlPattern => matchUrl(currentTabUrl, urlPattern))
 
         if (someUrlPatternMatch) {
@@ -49,13 +44,12 @@ export const getRelevantPackages = (editorModel: EditorModel, currentTabUrl: str
             return true
         }
 
-        const someFilterCriteriaResult = filterCriteria.some(filterCriteriaItem => {
-            const filterCriteriaKey = getFilterCriteriaKey(filterCriteriaItem)
-            return filterCriteriaResult[filterCriteriaKey]
+        const someDomSelectorResult = domSelectors.some(domSelector => {
+            return domSelectorResult[domSelector.value]
         })
 
-        if (someFilterCriteriaResult) {
-            console.log('someFilterCriteriaResult', settingsPackage.label)
+        if (someDomSelectorResult) {
+            console.log('someDomSelectorResult', settingsPackage.label)
             return true
         }
 
@@ -106,7 +100,7 @@ export const getEmptySettingsPackage = (label: string): SettingsPackage => {
         label,
         conditions: {
             urlPatterns: [{ id: uuidv4(), value: '*://*/*' }],
-            filterCriteria: []
+            domSelectors: []
         },
         presets: {},
         paramsWithDelimiter: [],

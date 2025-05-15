@@ -1,8 +1,8 @@
 /// <reference types="chrome"/>
 import React, { createContext, PropsWithChildren, useEffect, useState } from "react";
 import { EditorModel, ViewerStore } from "../../types/types";
-import { getFilterCriteriaKey, getRelevantPackages, toViewerModel } from "../../utils/utils";
-import type { FilterCriteriaResultMessage, FilterCriteriaRequestMessage } from "../../types/types";
+import { getRelevantPackages, toViewerModel } from "../../utils/utils";
+import type { DomSelectorResultMessage, DomSelectorRequestMessage } from "../../types/types";
 
 
 export const ViewerStoreContext = createContext<ViewerStore>({
@@ -29,20 +29,20 @@ const UseViewerStoreContext = (props: PropsWithChildren<{ currentTabUrl: string 
     const settings = getSettings()
 
 
-    const filterCriteria = Object.keys(settings.flatMap(setting => setting.conditions.filterCriteria).reduce<Record<string, true>>((acc, curr) => {
-        acc[getFilterCriteriaKey(curr)] = true
+    const domSelectors = Object.keys(settings.flatMap(setting => setting.conditions.domSelectors).reduce<Record<string, true>>((acc, curr) => {
+        acc[curr.value] = true
         return acc
     }, {}))
 
-    console.log('filterCriteria', filterCriteria)
+    console.log('domSelectors', domSelectors)
 
     useEffect(() => {
         const isRunInChromeExtension = chrome.tabs
-        const messageListener = (message: FilterCriteriaResultMessage) => {
-            if (message.type === 'FILTER_CRITERIA_RESULT') {
-                console.log('message.filterCriteriaResult', message.filterCriteriaResult)
-                console.log('received filterCriteriaResult', filterCriteriaResult)
-                setFilterCriteriaResult(message.filterCriteriaResult);
+        const messageListener = (message: DomSelectorResultMessage) => {
+            if (message.type === 'DOM_SELECTOR_RESULT') {
+                console.log('message.domSelectorResult', message.domSelectorResult)
+                console.log('received domSelectorResult', filterCriteriaResult)
+                setFilterCriteriaResult(message.domSelectorResult);
             }
         };
 
@@ -50,8 +50,8 @@ const UseViewerStoreContext = (props: PropsWithChildren<{ currentTabUrl: string 
             // Send message to content script to check for commonConfig
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs: chrome.tabs.Tab[]) => {
                 if (tabs[0]?.id) {
-                    const message: FilterCriteriaRequestMessage = { type: 'FILTER_CRITERIA_REQUEST', filterCriteria };
-                    console.log('send FILTER_CRITERIA_REQUEST', message)
+                    const message: DomSelectorRequestMessage = { type: 'DOM_SELECTOR_REQUEST', domSelectors };
+                    console.log('send DOM_SELECTOR_REQUEST', message)
                     chrome.tabs.sendMessage(tabs[0].id, message);
                 }
             });

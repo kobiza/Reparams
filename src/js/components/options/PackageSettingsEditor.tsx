@@ -10,7 +10,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import AddIcon from '@mui/icons-material/Add';
 import { uuidv4 } from '../../utils/utils';
-import { SettingsPackage, EditorStore, FilterCriteriaItem } from '../../types/types';
+import { SettingsPackage, EditorStore } from '../../types/types';
 import { replaceItem } from '../../utils/arrayUtils';
 import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -21,12 +21,12 @@ interface ParamsEditorProps {
     packageIndex: number
     paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']
     urlPatterns: SettingsPackage['conditions']['urlPatterns']
-    filterCriteria: SettingsPackage['conditions']['filterCriteria']
+    domSelectors: SettingsPackage['conditions']['domSelectors']
     label: SettingsPackage['label']
     addNewPackage: EditorStore['addNewPackage']
     updatePackageParamsWithDelimiter: EditorStore['updatePackageParamsWithDelimiter']
     updatePackageUrlPatterns: EditorStore['updatePackageUrlPatterns']
-    updatePackageFilterCriteria: EditorStore['updatePackageFilterCriteria']
+    updatePackageDomSelectors: EditorStore['updatePackageDomSelectors']
     deletePackage: EditorStore['deletePackage']
 }
 
@@ -35,11 +35,11 @@ const PackageSettingsEditor = ({
     paramsWithDelimiter,
     updatePackageParamsWithDelimiter,
     urlPatterns,
-    filterCriteria,
+    domSelectors,
     label,
     addNewPackage,
     updatePackageUrlPatterns,
-    updatePackageFilterCriteria,
+    updatePackageDomSelectors,
     deletePackage
 }: ParamsEditorProps) => {
     const paramsItems = paramsWithDelimiter.map((paramData, index) => {
@@ -132,7 +132,7 @@ const PackageSettingsEditor = ({
     }
 
     const addPackageWithSameSettings = () => {
-        addNewPackage({ paramsWithDelimiter, conditions: { urlPatterns, filterCriteria: [] } })
+        addNewPackage({ paramsWithDelimiter, conditions: { urlPatterns, domSelectors } })
     }
 
     const [deletePackageDialog, setDeletePackageDialog] = useState(false)
@@ -149,58 +149,41 @@ const PackageSettingsEditor = ({
         closeDeleteDialog()
     }
 
-    const filterCriteriaInput = filterCriteria.map((v, index) => {
-        const updateCurrentFilterCriteriaPath = (value: string) => {
-            const prevItem = filterCriteria[index]
+    const domSelectorsInput = domSelectors.map((v, index) => {
+        const updateCurrentDomSelectorPath = (value: string) => {
+            const prevItem = domSelectors[index]
             const newItem = { ...prevItem, path: value }
-            const newFilterCriteria = replaceItem(filterCriteria, newItem, index)
-            updatePackageFilterCriteria(packageIndex, newFilterCriteria)
+            const newDomSelectors = replaceItem(domSelectors, newItem, index)
+            updatePackageDomSelectors(packageIndex, newDomSelectors)
         }
-        const updateCurrentFilterCriteriaCondition = (value: string) => {
-            const prevItem = filterCriteria[index]
-            const newItem = { ...prevItem, condition: value as FilterCriteriaItem['condition'] }
-            const newFilterCriteria = replaceItem(filterCriteria, newItem, index)
-            updatePackageFilterCriteria(packageIndex, newFilterCriteria)
-        }
-        const updateCurrentFilterCriteriaValue = (value: string) => {
-            const prevItem = filterCriteria[index]
+        const updateCurrentDomSelectorValue = (value: string) => {
+            const prevItem = domSelectors[index]
             const newItem = { ...prevItem, value }
-            const newFilterCriteria = replaceItem(filterCriteria, newItem, index)
-            updatePackageFilterCriteria(packageIndex, newFilterCriteria)
+            const newDomSelectors = replaceItem(domSelectors, newItem, index)
+            updatePackageDomSelectors(packageIndex, newDomSelectors)
+        }
+        const removeDomSelector = () => {
+            const newDomSelectors = domSelectors.filter((_, i) => i !== index)
+            updatePackageDomSelectors(packageIndex, newDomSelectors)
         }
         return (
             <div key={v.id} style={{ display: 'flex', marginTop: '10px', alignItems: 'center' }}>
                 <TextField
                     sx={{ flex: '1' }}
                     hiddenLabel
-                    placeholder="Path"
                     size="small"
-                    value={v.path} onChange={e => updateCurrentFilterCriteriaPath(e.target.value)}
+                    value={v.value} onChange={e => updateCurrentDomSelectorValue(e.target.value)}
                 />
-                <Select
-                    style={{ minWidth: 220 }}
-                    value={v.condition}
-                    onChange={e => updateCurrentFilterCriteriaCondition(e.target.value as string)}
-                    size="small"
-                    sx={{ minWidth: 120, marginLeft: '10px', marginRight: '10px' }}
-                >
-                    <MenuItem value="eq">Equal</MenuItem>
-                    <MenuItem value="neq">Not Equal</MenuItem>
-                    <MenuItem value="isUndefined">Is Undefined</MenuItem>
-                    <MenuItem value="isNotUndefined">Is Not Undefined</MenuItem>
-                </Select>
-                <TextField
-                    hiddenLabel
-                    placeholder="Value"
-                    size="small"
-                    value={v.value} onChange={e => updateCurrentFilterCriteriaValue(e.target.value)}
-                />
+                <IconButton aria-label="delete" color="primary" size="small"
+                    sx={{ padding: '0', marginLeft: '10px' }} onClick={removeDomSelector}>
+                    <ClearIcon fontSize="inherit" />
+                </IconButton>
             </div>
         )
     })
 
-    const addNewFilterCriteria = () => {
-        updatePackageFilterCriteria(packageIndex, [...filterCriteria, { id: uuidv4(), path: '', condition: 'eq', value: '' }])
+    const addNewDomSelector = () => {
+        updatePackageDomSelectors(packageIndex, [...domSelectors, { id: uuidv4(), value: '' }])
     }
 
     return (
@@ -212,10 +195,10 @@ const PackageSettingsEditor = ({
                     variant="text" startIcon={<AddIcon />}>Add</Button>
             </Box>
             <Divider sx={{ margin: '15px 0' }} />
-            <Typography fontWeight="bold" padding={1}>Filter criteria</Typography>
+            <Typography fontWeight="bold" padding={1}>Dom selectors</Typography>
             <Box>
-                {filterCriteriaInput}
-                <Button sx={{ marginTop: '10px' }} onClick={addNewFilterCriteria}
+                {domSelectorsInput}
+                <Button sx={{ marginTop: '10px' }} onClick={addNewDomSelector}
                     variant="text" startIcon={<AddIcon />}>Add</Button>
             </Box>
             <Divider sx={{ margin: '15px 0' }} />

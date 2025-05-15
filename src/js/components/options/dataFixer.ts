@@ -12,14 +12,16 @@ export const runFixer1 = () => {
             const {
                 // @ts-ignore
                 urlPatterns,
+                // @ts-ignore
+                domSelectors,
                 ...rest
             } = v
 
             return {
                 ...rest,
                 conditions: {
-                    ...rest.conditions,
                     urlPatterns: urlPatterns || [],
+                    domSelectors: domSelectors || [],
                 }
             }
         })
