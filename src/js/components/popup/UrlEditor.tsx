@@ -2,6 +2,7 @@ import { isEmpty } from "lodash";
 import React, { MouseEventHandler, useState } from 'react';
 import SearchParams from "../common/SearchParams";
 import PresetsPicker, { PresetsPickerProps } from "./PresetsPicker";
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 
 import {
     ParamsWithDelimiterViewModel,
@@ -120,12 +121,12 @@ function UrlEditor({
                         paramsWithDelimiter={paramsWithDelimiter} quickActions={quickActions}
                         addEntriesAndNavigate={addEntriesAndNavigate} />}
             </div>
-            <Fab color="primary" onClick={applyUrl} variant="extended" sx={{
+            <Fab color="primary" onClick={applyUrl} sx={{
                 position: 'fixed',
                 bottom: 16,
                 right: 16,
             }}>
-                Apply
+                <RocketLaunchIcon />
             </Fab>
         </div>
     );
