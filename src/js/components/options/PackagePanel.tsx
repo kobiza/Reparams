@@ -127,20 +127,14 @@ const PackagePanel = ({ packageData, packageIndex, editorStore }: PackagePanelPr
                         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                             <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
                                 <Tab label="Presets" {...a11yProps(0)} disableRipple={true} />
-                                <Tab label="Quick Actions" {...a11yProps(1)} disableRipple={true} />
-                                <Tab label="Settings" {...a11yProps(2)} disableRipple={true} />
+                                <Tab label="Settings" {...a11yProps(1)} disableRipple={true} />
                             </Tabs>
                         </Box>
                         <CustomTabPanel value={value} index={0}>
                             <PresetsEditor packageIndex={packageIndex} presets={presets}
                                 updatePackagePreset={updatePackagePreset} />
                         </CustomTabPanel>
-
                         <CustomTabPanel value={value} index={1}>
-                            <QuickActionsEditor packageIndex={packageIndex} quickActions={quickActions}
-                                updatePackageQuickActions={updatePackageQuickActions} presets={presets} />
-                        </CustomTabPanel>
-                        <CustomTabPanel value={value} index={2}>
                             <PackageSettingsEditor packageIndex={packageIndex}
                                 label={label}
                                 paramsWithDelimiter={paramsWithDelimiter}

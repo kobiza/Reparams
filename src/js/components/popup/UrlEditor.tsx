@@ -115,12 +115,6 @@ function UrlEditor({
             )}
             <SearchParams className="search-params-container row3" entries={searchParamsEntries}
                 setEntries={setSearchParamsEntries} paramsWithDelimiter={paramsWithDelimiter} />
-            <div className="row4">
-                {quickActions.length > 0 &&
-                    <QuickActions entries={searchParamsEntries} setEntries={setSearchParamsEntries} presets={presets}
-                        paramsWithDelimiter={paramsWithDelimiter} quickActions={quickActions}
-                        addEntriesAndNavigate={addEntriesAndNavigate} />}
-            </div>
             <Fab color="primary" onClick={applyUrl} sx={{
                 position: 'fixed',
                 bottom: 16,
