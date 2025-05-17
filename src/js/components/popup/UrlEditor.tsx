@@ -157,10 +157,6 @@ function UrlEditor({
                         <LightModeIcon sx={{ mb: 0.5 }} />
                         Light
                     </ToggleButton>
-                    <ToggleButton value="system" sx={{ flex: 1, borderRadius: 2, p: 2, display: 'flex', flexDirection: 'column', gap: 1 }} disabled>
-                        <MenuIcon sx={{ mb: 0.5 }} />
-                        System
-                    </ToggleButton>
                     <ToggleButton value="dark" sx={{ flex: 1, borderRadius: 2, p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
                         <DarkModeIcon sx={{ mb: 0.5 }} />
                         Dark

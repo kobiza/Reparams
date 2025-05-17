@@ -12,6 +12,9 @@ ul {
   width: 700px;
   padding: 20px;
   display: grid;
+}
+
+[data-theme="dark"] .popup {
   background-color: var(--mui-background-default, #181943);
   /* fallback for dark mode */
 }
