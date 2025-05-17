@@ -26,23 +26,17 @@ function Popup({ currentTabUrl, tabId, themeMode, setThemeMode }: {
 
     return (
         <div className="popup">
-            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 8 }}>
-                <LightModeIcon fontSize="small" />
-                <Switch
-                    checked={themeMode === 'dark'}
-                    onChange={() => setThemeMode(themeMode === 'light' ? 'dark' : 'light')}
-                    color="default"
-                />
-                <DarkModeIcon fontSize="small" />
-            </div>
-            {/*<AddressBar currentUrl={currentUrl} setCurrentUrl={setCurrentUrl}/>*/}
+            {/* Removed the theme toggle from here, only in Drawer now */}
             <UrlEditor
                 currentTabUrl={currentTabUrl}
                 updateCurrentTabUrl={updateCurrentTabUrl}
                 openNewTab={openNewTab}
                 presets={state.presets}
                 paramsWithDelimiter={state.paramsWithDelimiter}
-                quickActions={state.quickActions} />
+                quickActions={state.quickActions}
+                themeMode={themeMode}
+                setThemeMode={setThemeMode}
+            />
             {/*<Settings/>*/}
         </div>
     );

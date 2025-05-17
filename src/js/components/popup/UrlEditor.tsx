@@ -3,6 +3,17 @@ import React, { MouseEventHandler, useState } from 'react';
 import SearchParams from "../common/SearchParams";
 import PresetsPicker, { PresetsPickerProps } from "./PresetsPicker";
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
+import Switch from '@mui/material/Switch';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import Drawer from '@mui/material/Drawer';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import CloseIcon from '@mui/icons-material/Close';
 
 import {
     ParamsWithDelimiterViewModel,
@@ -28,6 +39,8 @@ type UrlEditorProps = {
     paramsWithDelimiter: ParamsWithDelimiterViewModel,
     quickActions: QuickActionData
     className?: string,
+    themeMode: 'light' | 'dark',
+    setThemeMode: (mode: 'light' | 'dark') => void,
 }
 
 const addEntries = (url: string, newEntries: Array<[string, string]>) => {
@@ -46,7 +59,9 @@ function UrlEditor({
     className,
     presets,
     paramsWithDelimiter,
-    quickActions
+    quickActions,
+    themeMode,
+    setThemeMode
 }: UrlEditorProps) {
     // const urlData = new URL(url)
     const [newUrl, setNewUrl] = useState(currentTabUrl)
@@ -72,7 +87,6 @@ function UrlEditor({
         })
     }
 
-
     const applyUrl: MouseEventHandler<HTMLButtonElement> = (e) => {
         const shouldOpenNewTab = e.metaKey
 
@@ -82,6 +96,10 @@ function UrlEditor({
             updateCurrentTabUrl(newUrl)
         }
     }
+
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const handleDrawerOpen = () => setDrawerOpen(true);
+    const handleDrawerClose = () => setDrawerOpen(false);
 
     return (
         <Paper className="url-editor" elevation={3} sx={{ p: 2, bgcolor: 'background.paper' }}>
@@ -103,9 +121,52 @@ function UrlEditor({
                         >
                             ReParams
                         </Typography>
+                        <IconButton
+                            size="large"
+                            edge="end"
+                            color="inherit"
+                            aria-label="menu"
+                            onClick={handleDrawerOpen}
+                        >
+                            <MenuIcon />
+                        </IconButton>
                     </Toolbar>
                 </Container>
             </AppBar>
+            <Drawer
+                anchor="right"
+                open={drawerOpen}
+                onClose={handleDrawerClose}
+                PaperProps={{ sx: { width: 320, bgcolor: 'background.default', color: 'text.primary', p: 2 } }}
+            >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                    <Typography variant="h6">Settings</Typography>
+                    <IconButton onClick={handleDrawerClose} size="small">
+                        <CloseIcon />
+                    </IconButton>
+                </div>
+                <Typography variant="subtitle2" sx={{ mb: 1, letterSpacing: 1 }}>MODE</Typography>
+                <ToggleButtonGroup
+                    value={themeMode}
+                    exclusive
+                    onChange={(_e, value) => value && setThemeMode(value)}
+                    fullWidth
+                    sx={{ mb: 2, borderRadius: 2, background: 'rgba(255,255,255,0.02)', p: 0.5 }}
+                >
+                    <ToggleButton value="light" sx={{ flex: 1, borderRadius: 2, p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <LightModeIcon sx={{ mb: 0.5 }} />
+                        Light
+                    </ToggleButton>
+                    <ToggleButton value="system" sx={{ flex: 1, borderRadius: 2, p: 2, display: 'flex', flexDirection: 'column', gap: 1 }} disabled>
+                        <MenuIcon sx={{ mb: 0.5 }} />
+                        System
+                    </ToggleButton>
+                    <ToggleButton value="dark" sx={{ flex: 1, borderRadius: 2, p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <DarkModeIcon sx={{ mb: 0.5 }} />
+                        Dark
+                    </ToggleButton>
+                </ToggleButtonGroup>
+            </Drawer>
             {!isEmpty(presets) && (
                 <div className="presets-picker-container row2">
                     <PresetsPicker className="presets-picker" entries={searchParamsEntries}
