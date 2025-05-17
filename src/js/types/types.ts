@@ -1,4 +1,3 @@
-
 export type SearchParamsEntries = Array<[key: string, value: string]>
 
 export type SetEntries = (newSearchParamsEntries: SearchParamsEntries) => void
@@ -37,16 +36,18 @@ export type SettingsPackage = {
     }
     presets: PresetsEntriesMap
     paramsWithDelimiter: ParamsWithDelimiter
-    quickActions: QuickActionData
 }
 
 export type MergedAppData = {
     presets: PresetsEntriesMap
     paramsWithDelimiter: ParamsWithDelimiter
-    quickActions: QuickActionData
+
 }
 
-export type EditorModel = Array<SettingsPackage>
+export type EditorModel = {
+    modelVersion: string
+    packages: { [key: string]: SettingsPackage }
+}
 
 export type Option = {
     id: string,
@@ -62,15 +63,14 @@ export type QuickActionData = Array<{
 
 export type EditorStore = {
     state: EditorModel
-    updatePackagePreset: (packageIndex: number, presets: SettingsPackage['presets']) => void
-    updatePackageParamsWithDelimiter: (packageIndex: number, paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']) => void
-    updatePackageQuickActions: (packageIndex: number, quickActions: SettingsPackage['quickActions']) => void
-    updatePackageLabel: (packageIndex: number, label: string) => void
-    updatePackageUrlPatterns: (packageIndex: number, urlPatterns: SettingsPackage['conditions']['urlPatterns']) => void
-    updatePackageDomSelectors: (packageIndex: number, domSelectors: SettingsPackage['conditions']['domSelectors']) => void
+    updatePackagePreset: (packageKey: string, presets: SettingsPackage['presets']) => void
+    updatePackageParamsWithDelimiter: (packageKey: string, paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']) => void
+    updatePackageLabel: (packageKey: string, label: string) => void
+    updatePackageUrlPatterns: (packageKey: string, urlPatterns: SettingsPackage['conditions']['urlPatterns']) => void
+    updatePackageDomSelectors: (packageKey: string, domSelectors: SettingsPackage['conditions']['domSelectors']) => void
     addNewPackage: (newPackageOverrides?: Partial<SettingsPackage>) => void
-    addPackages: (packagesToAdd: Array<SettingsPackage>, replace: boolean) => void
-    deletePackage: (packageIndex: number) => void
+    addPackages: (packagesToAdd: { [key: string]: SettingsPackage }, replace: boolean) => void
+    deletePackage: (packageKey: string) => void
 }
 
 export type ViewerModel = {

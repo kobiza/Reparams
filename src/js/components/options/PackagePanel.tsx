@@ -3,7 +3,6 @@ import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -15,23 +14,21 @@ import classNames from 'classnames';
 import { EditorStore, SettingsPackage } from '../../types/types';
 import { CustomTabPanel, a11yProps } from './CustomTabPanel';
 import PresetsEditor from './PresetsEditor';
-import QuickActionsEditor from './QuickActionsEditor';
 import PackageSettingsEditor from './PackageSettingsEditor';
 
 type PackagePanelProps = {
     packageData: SettingsPackage,
-    packageIndex: number,
+    packageKey: string,
     editorStore: EditorStore
 }
 
-const PackagePanel = ({ packageData, packageIndex, editorStore }: PackagePanelProps) => {
-    const { key, label, presets, paramsWithDelimiter, quickActions, conditions } = packageData
+const PackagePanel = ({ packageData, packageKey, editorStore }: PackagePanelProps) => {
+    const { key, label, presets, paramsWithDelimiter, conditions } = packageData
     const [value, setValue] = useState(0);
     const {
         addNewPackage,
         updatePackagePreset,
         updatePackageParamsWithDelimiter,
-        updatePackageQuickActions,
         updatePackageLabel,
         updatePackageUrlPatterns,
         updatePackageDomSelectors,
@@ -48,7 +45,7 @@ const PackagePanel = ({ packageData, packageIndex, editorStore }: PackagePanelPr
     };
 
     const updateCurrentPackageLabel = (newLabel: string) => {
-        updatePackageLabel(packageIndex, newLabel)
+        updatePackageLabel(packageKey, newLabel)
     }
 
     const [isRenameActive, setIsRenameActive] = useState(false)
@@ -131,11 +128,11 @@ const PackagePanel = ({ packageData, packageIndex, editorStore }: PackagePanelPr
                             </Tabs>
                         </Box>
                         <CustomTabPanel value={value} index={0}>
-                            <PresetsEditor packageIndex={packageIndex} presets={presets}
+                            <PresetsEditor packageKey={packageKey} presets={presets}
                                 updatePackagePreset={updatePackagePreset} />
                         </CustomTabPanel>
                         <CustomTabPanel value={value} index={1}>
-                            <PackageSettingsEditor packageIndex={packageIndex}
+                            <PackageSettingsEditor packageKey={packageKey}
                                 label={label}
                                 paramsWithDelimiter={paramsWithDelimiter}
                                 addNewPackage={addNewPackage}

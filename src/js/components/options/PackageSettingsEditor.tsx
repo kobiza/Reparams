@@ -18,7 +18,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 
 interface ParamsEditorProps {
-    packageIndex: number
+    packageKey: string
     paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']
     urlPatterns: SettingsPackage['conditions']['urlPatterns']
     domSelectors: SettingsPackage['conditions']['domSelectors']
@@ -31,13 +31,13 @@ interface ParamsEditorProps {
 }
 
 const PackageSettingsEditor = ({
-    packageIndex,
+    packageKey,
     paramsWithDelimiter,
-    updatePackageParamsWithDelimiter,
     urlPatterns,
     domSelectors,
     label,
     addNewPackage,
+    updatePackageParamsWithDelimiter,
     updatePackageUrlPatterns,
     updatePackageDomSelectors,
     deletePackage
@@ -50,7 +50,7 @@ const PackageSettingsEditor = ({
             const newItem = { ...prevItem, label: newParamLabel }
             const newParamsWithDelimiter = replaceItem(paramsWithDelimiter, newItem, index)
 
-            updatePackageParamsWithDelimiter(packageIndex, newParamsWithDelimiter)
+            updateParamsWithDelimiter(newParamsWithDelimiter)
         }
 
         const updateParamSeparator = (newParamSeparator: string) => {
@@ -58,12 +58,12 @@ const PackageSettingsEditor = ({
             const newItem = { ...prevItem, separator: newParamSeparator }
             const newParamsWithDelimiter = replaceItem(paramsWithDelimiter, newItem, index)
 
-            updatePackageParamsWithDelimiter(packageIndex, newParamsWithDelimiter)
+            updateParamsWithDelimiter(newParamsWithDelimiter)
         }
 
         const removeParam = () => {
             const newParamsWithDelimiter = paramsWithDelimiter.filter((_, i) => i !== index)
-            updatePackageParamsWithDelimiter(packageIndex, newParamsWithDelimiter)
+            updateParamsWithDelimiter(newParamsWithDelimiter)
         }
 
         return (
@@ -99,17 +99,17 @@ const PackageSettingsEditor = ({
             }
         ]
 
-        updatePackageParamsWithDelimiter(packageIndex, newParamsWithDelimiter)
+        updateParamsWithDelimiter(newParamsWithDelimiter)
     }
 
     const patternsInput = urlPatterns.map((v, index) => {
         const updateCurrentPattern = (value: string) => {
             const newUrlPatterns = replaceItem(urlPatterns, { value, id: v.id }, index)
-            updatePackageUrlPatterns(packageIndex, newUrlPatterns)
+            updateUrlPatterns(newUrlPatterns)
         }
         const removePattern = () => {
             const newUrlPatterns = urlPatterns.filter((_, i) => i !== index)
-            updatePackageUrlPatterns(packageIndex, newUrlPatterns)
+            updateUrlPatterns(newUrlPatterns)
         }
         return (
             <div key={v.id} style={{ display: 'flex', marginTop: '10px', alignItems: 'center' }}>
@@ -128,7 +128,7 @@ const PackageSettingsEditor = ({
     })
 
     const addNewUrlPattern = () => {
-        updatePackageUrlPatterns(packageIndex, [...urlPatterns, { id: uuidv4(), value: '*://*/*' }])
+        updateUrlPatterns([...urlPatterns, { id: uuidv4(), value: '*://*/*' }])
     }
 
     const addPackageWithSameSettings = () => {
@@ -144,8 +144,8 @@ const PackageSettingsEditor = ({
         setDeletePackageDialog(false);
     };
 
-    const deleteCurrentPackage = () => {
-        deletePackage(packageIndex)
+    const handleDelete = () => {
+        deletePackage(packageKey)
         closeDeleteDialog()
     }
 
@@ -154,17 +154,17 @@ const PackageSettingsEditor = ({
             const prevItem = domSelectors[index]
             const newItem = { ...prevItem, path: value }
             const newDomSelectors = replaceItem(domSelectors, newItem, index)
-            updatePackageDomSelectors(packageIndex, newDomSelectors)
+            updateDomSelectors(newDomSelectors)
         }
         const updateCurrentDomSelectorValue = (value: string) => {
             const prevItem = domSelectors[index]
             const newItem = { ...prevItem, value }
             const newDomSelectors = replaceItem(domSelectors, newItem, index)
-            updatePackageDomSelectors(packageIndex, newDomSelectors)
+            updateDomSelectors(newDomSelectors)
         }
         const removeDomSelector = () => {
             const newDomSelectors = domSelectors.filter((_, i) => i !== index)
-            updatePackageDomSelectors(packageIndex, newDomSelectors)
+            updateDomSelectors(newDomSelectors)
         }
         return (
             <div key={v.id} style={{ display: 'flex', marginTop: '10px', alignItems: 'center' }}>
@@ -183,7 +183,19 @@ const PackageSettingsEditor = ({
     })
 
     const addNewDomSelector = () => {
-        updatePackageDomSelectors(packageIndex, [...domSelectors, { id: uuidv4(), value: '' }])
+        updateDomSelectors([...domSelectors, { id: uuidv4(), value: '' }])
+    }
+
+    const updateParamsWithDelimiter = (params: SettingsPackage['paramsWithDelimiter']) => {
+        updatePackageParamsWithDelimiter(packageKey, params)
+    }
+
+    const updateUrlPatterns = (patterns: SettingsPackage['conditions']['urlPatterns']) => {
+        updatePackageUrlPatterns(packageKey, patterns)
+    }
+
+    const updateDomSelectors = (selectors: SettingsPackage['conditions']['domSelectors']) => {
+        updatePackageDomSelectors(packageKey, selectors)
     }
 
     return (
@@ -228,7 +240,7 @@ const PackageSettingsEditor = ({
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={deleteCurrentPackage}>Yes</Button>
+                        <Button onClick={handleDelete}>Yes</Button>
                         <Button onClick={closeDeleteDialog} autoFocus>No</Button>
                     </DialogActions>
                 </Dialog>

@@ -8,7 +8,7 @@ import { ThemeProvider } from "@mui/material";
 import { runFixer1 } from './dataFixer';
 
 
-runFixer1()
+// runFixer1()
 // reset()
 
 const root = createRoot(document.getElementById('root')!);

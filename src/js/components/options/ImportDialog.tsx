@@ -12,7 +12,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import { replaceItem, toTrueObj } from "../../utils/arrayUtils";
-import { EditorModel, EditorStore } from "../../types/types";
+import { EditorStore, SettingsPackage } from "../../types/types";
 import { useEffect, useState } from "react";
 import * as trace_events from "trace_events";
 
@@ -61,8 +61,8 @@ function ImportDialogContent({ selectedPackages, setSelectedPackages }: ImportDi
 }
 
 type ImportDialogProps = {
-    packages: EditorModel
-    packagesToImport: EditorModel | null
+    packages: { [key: string]: SettingsPackage }
+    packagesToImport: { [key: string]: SettingsPackage } | null
     isOpen: boolean
     closeDialog: () => void
     addPackages: EditorStore['addPackages']
@@ -113,7 +113,7 @@ export default function ImportDialog({
     const [selectedPackages, setSelectedPackages] = useState<Array<PackageItem>>([])
 
     useEffect(() => {
-        setSelectedPackages((packagesToImport || []).map(v => ({
+        setSelectedPackages(Object.values(packagesToImport || {}).map(v => ({
             key: v.key,
             label: v.label,
             checked: true
@@ -123,28 +123,26 @@ export default function ImportDialog({
     const [replaceRequiredModal, setReplaceRequiredModal] = useState(false)
 
     const forceImportPackages = (replace: boolean) => () => {
-        const selectedPackagesToImport = packagesToImport!.filter((v, index) => {
+        const selectedPackagesToImport = Object.values(packagesToImport || {}).filter((v, index) => {
             return selectedPackages[index].checked
         })
-        addPackages(selectedPackagesToImport, replace)
+        const packagesObj = Object.fromEntries(selectedPackagesToImport.map(pkg => [pkg.key, pkg]))
+        addPackages(packagesObj, replace)
         closeDialog()
     }
 
     const importPackages = () => {
-        const selectedPackagesToImport = packagesToImport!.filter((v, index) => {
+        const selectedPackagesToImport = Object.values(packagesToImport || {}).filter((v, index) => {
             return selectedPackages[index].checked
         })
-
-        const packagesKeys = toTrueObj(packages, v => v.key)
-
+        const packagesKeys = Object.keys(packages)
         const isReplaceRequired = selectedPackagesToImport.some((v) => {
-            const keyAlreadyExist = packagesKeys[v.key]
-
+            const keyAlreadyExist = packagesKeys.includes(v.key)
             return keyAlreadyExist
         })
-
+        const packagesObj = Object.fromEntries(selectedPackagesToImport.map(pkg => [pkg.key, pkg]))
         if (!isReplaceRequired) {
-            addPackages(selectedPackagesToImport, false)
+            addPackages(packagesObj, false)
             closeDialog()
         } else {
             setReplaceRequiredModal(true)

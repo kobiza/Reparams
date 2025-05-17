@@ -11,7 +11,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { replaceItem } from "../../utils/arrayUtils";
-import { EditorModel } from "../../types/types";
+import { SettingsPackage } from "../../types/types";
 import { useEffect, useState } from "react";
 
 type PackageItem = { key: string, label: string, checked: boolean }
@@ -59,7 +59,7 @@ function ExportDialogContent({ selectedPackages, setSelectedPackages }: ExportDi
 }
 
 type ExportDialogProps = {
-    packages: EditorModel
+    packages: { [key: string]: SettingsPackage }
     isOpen: boolean
     closeDialog: () => void
 }
@@ -68,7 +68,7 @@ export default function ExportDialog({ packages, isOpen, closeDialog }: ExportDi
     const [selectedPackages, setSelectedPackages] = useState<Array<PackageItem>>([])
 
     useEffect(() => {
-        setSelectedPackages((packages || []).map(v => ({
+        setSelectedPackages(Object.values(packages || {}).map(v => ({
             key: v.key,
             label: v.label,
             checked: true
@@ -76,12 +76,10 @@ export default function ExportDialog({ packages, isOpen, closeDialog }: ExportDi
     }, [packages])
 
     const exportPackages = () => {
-        const packagesToExport = packages.filter((v, index) => {
+        const packagesToExport = Object.values(packages).filter((v, index) => {
             return selectedPackages[index].checked
         })
-
         navigator.clipboard.writeText(JSON.stringify(packagesToExport))
-
         closeDialog()
     }
     return (

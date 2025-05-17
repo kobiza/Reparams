@@ -7,11 +7,11 @@ import './Settings.scss';
 const Settings = () => {
     const editorStore = React.useContext(EditorStoreContext)
     const {
-        state: packages,
+        state,
     } = editorStore
     return (
         <div className="settings-pages">
-            <SettingsHeader packages={packages} addPackages={editorStore.addPackages} />
+            <SettingsHeader packages={state.packages} addPackages={editorStore.addPackages} />
             <PackagesPage />
         </div>
     )

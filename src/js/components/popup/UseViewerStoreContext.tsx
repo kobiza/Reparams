@@ -29,7 +29,7 @@ const UseViewerStoreContext = (props: PropsWithChildren<{ currentTabUrl: string 
     const settings = getSettings()
 
 
-    const domSelectors = Object.keys(settings.flatMap(setting => setting.conditions.domSelectors).reduce<Record<string, true>>((acc, curr) => {
+    const domSelectors = Object.keys(Object.values(settings.packages).flatMap(packageSettings => packageSettings.conditions.domSelectors).reduce<Record<string, true>>((acc, curr) => {
         acc[curr.value] = true
         return acc
     }, {}))

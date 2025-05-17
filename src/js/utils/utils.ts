@@ -20,20 +20,16 @@ export const mergeAppDataPackages = (appData: EditorModel): MergedAppData => {
     const mergedAppData: MergedAppData = {
         presets: {},
         paramsWithDelimiter: [],
-        quickActions: []
     }
-
-    appData.forEach((appDataPackage) => {
+    Object.values(appData.packages).forEach((appDataPackage) => {
         assign(mergedAppData.presets, appDataPackage.presets)
         assign(mergedAppData.paramsWithDelimiter, appDataPackage.paramsWithDelimiter)
-        mergedAppData.quickActions = [...mergedAppData.quickActions, ...appDataPackage.quickActions]
     })
-
     return mergedAppData
 }
 
-export const getRelevantPackages = (editorModel: EditorModel, currentTabUrl: string, domSelectorResult: Record<string, boolean>): EditorModel => {
-    return editorModel.filter((settingsPackage) => {
+export const getRelevantPackages = (editorModel: EditorModel, currentTabUrl: string, domSelectorResult: Record<string, boolean>): SettingsPackage[] => {
+    return Object.values(editorModel.packages).filter((settingsPackage) => {
         console.log('getRelevantPackages', settingsPackage.label)
         const allUrlPatterns = settingsPackage.conditions.urlPatterns.map(v => v.value)
         const domSelectors = settingsPackage.conditions.domSelectors
@@ -57,7 +53,7 @@ export const getRelevantPackages = (editorModel: EditorModel, currentTabUrl: str
     })
 }
 
-export const toViewerModel = (relevantPackages: EditorModel, currentTabUrl: string): ViewerModel => {
+export const toViewerModel = (relevantPackages: SettingsPackage[], currentTabUrl: string): ViewerModel => {
     const packagesDataToMerge = relevantPackages.map(settingsPackage => {
         const presets: PresetsEntriesMapViewModel = Object.keys(settingsPackage.presets).reduce<PresetsEntriesMapViewModel>((acc, presetKey) => {
             const { label, entries } = settingsPackage.presets[presetKey]
@@ -75,7 +71,6 @@ export const toViewerModel = (relevantPackages: EditorModel, currentTabUrl: stri
         return {
             presets,
             paramsWithDelimiter,
-            quickActions: settingsPackage.quickActions
         }
     })
 
@@ -88,7 +83,6 @@ export const toViewerModel = (relevantPackages: EditorModel, currentTabUrl: stri
     packagesDataToMerge.forEach((appDataPackage) => {
         assign(viewerModel.presets, appDataPackage.presets)
         assign(viewerModel.paramsWithDelimiter, appDataPackage.paramsWithDelimiter)
-        viewerModel.quickActions = [...viewerModel.quickActions, ...appDataPackage.quickActions]
     })
 
     return viewerModel
@@ -104,6 +98,5 @@ export const getEmptySettingsPackage = (label: string): SettingsPackage => {
         },
         presets: {},
         paramsWithDelimiter: [],
-        quickActions: []
     }
 }

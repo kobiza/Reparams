@@ -14,13 +14,14 @@ import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
 import { useState } from "react";
 import ExportDialog from "./ExportDialog";
-import { EditorModel, EditorStore } from "../../types/types";
+import { EditorModel, EditorStore, SettingsPackage } from "../../types/types";
 import ImportDialog from "./ImportDialog";
 import isArray from 'lodash/isArray';
 import isUndefined from 'lodash/isUndefined';
+import { isObject } from 'lodash';
 
 type SettingsHeaderProps = {
-    packages: EditorModel
+    packages: { [key: string]: SettingsPackage }
     addPackages: EditorStore['addPackages']
 }
 
@@ -34,10 +35,7 @@ type SettingsHeaderProps = {
 const getEditorModelFromClipboard = (text: string) => {
     try {
         const clipboardJson = JSON.parse(text)
-        if (isArray(clipboardJson) &&
-            ['key', 'label', 'conditions', 'presets', 'paramsWithDelimiter', 'quickActions'].every(key => {
-                return !isUndefined(clipboardJson[0][key])
-            })) {
+        if (isObject(clipboardJson) && !isUndefined((clipboardJson as EditorModel).packages)) {
             return clipboardJson as EditorModel
         } else {
             return null
@@ -48,12 +46,12 @@ const getEditorModelFromClipboard = (text: string) => {
 }
 
 function SettingsHeader({ packages, addPackages }: SettingsHeaderProps) {
-    const [importDialogData, setImportDialogData] = useState<EditorModel | null>(null)
+    const [importDialogData, setImportDialogData] = useState<{ [key: string]: SettingsPackage } | null>(null)
     const openImportDialog = () => {
         navigator.clipboard.readText()
             .then(text => {
                 const editorModel = getEditorModelFromClipboard(text)
-                setImportDialogData(editorModel);
+                setImportDialogData(editorModel?.packages || null);
             })
     };
 

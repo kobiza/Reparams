@@ -8,13 +8,13 @@ import { uuidv4 } from '../../utils/utils';
 import { SettingsPackage, EditorStore, SearchParamsEntries } from '../../types/types';
 import SearchParams from '../common/SearchParams';
 
-type PresetsEditorProps = {
-    packageIndex: number
+interface PresetsEditorProps {
+    packageKey: string
     presets: SettingsPackage['presets']
-    updatePackagePreset: EditorStore['updatePackagePreset']
+    updatePackagePreset: (packageKey: string, presets: SettingsPackage['presets']) => void
 }
 
-const PresetsEditor = ({ packageIndex, presets, updatePackagePreset }: PresetsEditorProps) => {
+const PresetsEditor = ({ packageKey, presets, updatePackagePreset }: PresetsEditorProps) => {
     const presetsItems = Object.entries(presets).map(([presetKey, presetData]) => {
         const presetRename = (newName: string) => {
             const newPresets: SettingsPackage['presets'] = {
@@ -24,7 +24,7 @@ const PresetsEditor = ({ packageIndex, presets, updatePackagePreset }: PresetsEd
                     label: newName
                 }
             }
-            updatePackagePreset(packageIndex, newPresets)
+            updatePackagePreset(packageKey, newPresets)
         }
 
         const updatePresetEntries = (newSearchParamsEntries: SearchParamsEntries) => {
@@ -35,7 +35,7 @@ const PresetsEditor = ({ packageIndex, presets, updatePackagePreset }: PresetsEd
                     entries: newSearchParamsEntries
                 }
             }
-            updatePackagePreset(packageIndex, newPresets)
+            updatePackagePreset(packageKey, newPresets)
         }
 
         const removePreset = () => {
@@ -43,7 +43,7 @@ const PresetsEditor = ({ packageIndex, presets, updatePackagePreset }: PresetsEd
                 ...presets
             }
             delete newPresets[presetKey]
-            updatePackagePreset(packageIndex, newPresets)
+            updatePackagePreset(packageKey, newPresets)
         }
 
         return (
@@ -72,7 +72,7 @@ const PresetsEditor = ({ packageIndex, presets, updatePackagePreset }: PresetsEd
                 label: ''
             }
         }
-        updatePackagePreset(packageIndex, newPresets)
+        updatePackagePreset(packageKey, newPresets)
     }
 
     return (
