@@ -25,6 +25,9 @@ const App = ({ currentTabUrl, tabId }: { currentTabUrl: string; tabId: number })
     useEffect(() => {
         localStorage.setItem(localStoragePreferencesKey, JSON.stringify({ themeMode }));
     }, [themeMode]);
+    useEffect(() => {
+        document.body.setAttribute('data-theme', themeMode);
+    }, [themeMode]);
     return (
         <ThemeProvider theme={getMuiTheme(themeMode)}>
             <UseViewerStoreContext currentTabUrl={currentTabUrl}>

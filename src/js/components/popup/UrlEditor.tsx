@@ -102,7 +102,7 @@ function UrlEditor({
     const handleDrawerClose = () => setDrawerOpen(false);
 
     return (
-        <Paper className="url-editor" elevation={3} sx={{ p: 2, bgcolor: 'background.paper' }}>
+        <Paper className="url-editor" sx={{ p: 2, bgcolor: 'background.paper', boxShadow: 'none' }}>
             <AppBar className="row1" position="relative" component="nav">
                 <Container maxWidth="xl">
                     <Toolbar disableGutters>
