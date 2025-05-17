@@ -14,6 +14,7 @@ import Drawer from '@mui/material/Drawer';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import CloseIcon from '@mui/icons-material/Close';
+import { useTheme } from '@mui/material/styles';
 
 import {
     ParamsWithDelimiterViewModel,
@@ -101,22 +102,28 @@ function UrlEditor({
     const handleDrawerOpen = () => setDrawerOpen(true);
     const handleDrawerClose = () => setDrawerOpen(false);
 
+    const theme = useTheme();
+
     return (
         <Paper className="url-editor" sx={{ p: 2, bgcolor: 'background.paper', boxShadow: 'none' }}>
-            <AppBar className="row1" position="relative" component="nav">
+            <AppBar className="row1" position="relative" component="nav" elevation={0} sx={{ bgcolor: 'transparent', boxShadow: 'none' }}>
                 <Container maxWidth="xl">
-                    <Toolbar disableGutters>
+                    <Toolbar disableGutters sx={{ justifyContent: 'center', position: 'relative', minHeight: 56 }}>
                         <Typography
                             variant="h6"
                             noWrap
                             sx={{
-                                mr: 2,
+                                position: 'absolute',
+                                left: 0,
+                                right: 0,
+                                margin: 'auto',
+                                textAlign: 'center',
+                                width: 'fit-content',
+                                color: theme.palette.text.primary,
                                 fontFamily: ['Leckerli One', 'monospace'].join(','),
                                 fontWeight: 700,
                                 letterSpacing: '2px',
-                                color: 'inherit',
                                 textDecoration: 'none',
-                                flexGrow: 1
                             }}
                         >
                             ReParams
@@ -124,9 +131,9 @@ function UrlEditor({
                         <IconButton
                             size="large"
                             edge="end"
-                            color="inherit"
                             aria-label="menu"
                             onClick={handleDrawerOpen}
+                            sx={{ position: 'absolute', right: 0, color: theme.palette.text.primary }}
                         >
                             <MenuIcon />
                         </IconButton>
