@@ -36,6 +36,7 @@ const UseViewerStoreContext = (props: PropsWithChildren<{ currentTabUrl: string 
 
     console.log('domSelectors', domSelectors)
 
+    // Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist.
     useEffect(() => {
         const isRunInChromeExtension = chrome.tabs
         const messageListener = (message: DomSelectorResultMessage) => {

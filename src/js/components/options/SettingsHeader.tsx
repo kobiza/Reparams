@@ -35,7 +35,7 @@ const getEditorModelFromClipboard = (text: string) => {
     try {
         const clipboardJson = JSON.parse(text)
         if (isArray(clipboardJson) &&
-            ['key', 'label', 'urlPatterns', 'presets', 'paramsWithDelimiter', 'quickActions'].every(key => {
+            ['key', 'label', 'conditions', 'presets', 'paramsWithDelimiter', 'quickActions'].every(key => {
                 return !isUndefined(clipboardJson[0][key])
             })) {
             return clipboardJson as EditorModel
