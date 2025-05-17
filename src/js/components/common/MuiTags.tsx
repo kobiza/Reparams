@@ -43,7 +43,12 @@ const Tags = ({ selected, suggestions, placeholderText, className, onAdd, onDele
     const checkedIcon = <CheckBoxIcon fontSize="small" />;
     return (
         <Autocomplete
-            sx={sx}
+            sx={{
+                backgroundColor: (theme) => theme.palette.background.paper,
+                color: (theme) => theme.palette.text.primary,
+                borderRadius: 2,
+                p: 0.5,
+            }}
             className={className}
             multiple
             disableCloseOnSelect
@@ -52,13 +57,8 @@ const Tags = ({ selected, suggestions, placeholderText, className, onAdd, onDele
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.value === value.value}
             value={selected}
-            ListboxProps={{ sx: { maxHeight: '340px' } }}
+            ListboxProps={{ sx: { maxHeight: '340px', backgroundColor: (theme) => theme.palette.background.paper, color: (theme) => theme.palette.text.primary } }}
             onChange={onChange}
-            // renderTags={(tagValue, getTagProps) => {
-            //     return tagValue.map((option, index) => (
-            //         <Chip {...getTagProps({ index })} label={option.value} color="secondary"/>
-            //     ));
-            // }}
             renderOption={(props, option, { selected }) => {
                 return (
                     <li {...props}>
@@ -73,7 +73,17 @@ const Tags = ({ selected, suggestions, placeholderText, className, onAdd, onDele
                 )
             }}
             renderInput={(params) => (
-                <TextField hiddenLabel={true} {...params} placeholder={placeholderText} autoFocus={true} />
+                <TextField
+                    hiddenLabel={true}
+                    {...params}
+                    placeholder={placeholderText}
+                    autoFocus={true}
+                    sx={{
+                        backgroundColor: (theme) => theme.palette.background.paper,
+                        color: (theme) => theme.palette.text.primary,
+                        borderRadius: 2,
+                    }}
+                />
             )}
         />
     )

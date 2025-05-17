@@ -18,6 +18,7 @@ import QuickActions from "./QuickActions";
 import './UrlEditor.scss'
 import Container from "@mui/material/Container";
 import Toolbar from "@mui/material/Toolbar";
+import Paper from '@mui/material/Paper';
 
 type UrlEditorProps = {
     currentTabUrl: string,
@@ -83,7 +84,7 @@ function UrlEditor({
     }
 
     return (
-        <div className="url-editor">
+        <Paper className="url-editor" elevation={3} sx={{ p: 2, bgcolor: 'background.paper' }}>
             <AppBar className="row1" position="relative" component="nav">
                 <Container maxWidth="xl">
                     <Toolbar disableGutters>
@@ -122,7 +123,7 @@ function UrlEditor({
             }}>
                 <RocketLaunchIcon />
             </Fab>
-        </div>
+        </Paper>
     );
 }
 
