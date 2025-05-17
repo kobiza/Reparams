@@ -1,6 +1,7 @@
 import React, { createContext, PropsWithChildren, useEffect, useState } from "react";
 import { EditorModel, EditorStore, SettingsPackage } from "../../types/types";
 import { getEmptySettingsPackage, uuidv4 } from "../../utils/utils";
+import { localStorageKey } from "../../utils/consts";
 
 
 const noop = () => {
@@ -17,7 +18,6 @@ export const EditorStoreContext = createContext<EditorStore>({
     deletePackage: noop
 });
 
-const localStorageKey = 'paparamsAppData'
 const getInitialState = (): EditorModel => {
     const appData = localStorage.getItem(localStorageKey)
     return appData ? JSON.parse(appData) : { modelVersion: '', packages: {} }

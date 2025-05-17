@@ -1,7 +1,8 @@
 import { EditorModel, SettingsPackage } from "../../types/types";
+import { localStorageKey } from "../../utils/consts";
 
 export const runFixer1 = () => {
-    const localStorageKey = 'paparamsAppData'
+
     // reset
     // localStorage.setItem(localStorageKey, '')
     // fixer
@@ -21,7 +22,6 @@ export const runFixer1 = () => {
 }
 
 export const reset = () => {
-    const localStorageKey = 'paparamsAppData'
     // reset
     localStorage.setItem(localStorageKey, '')
 }

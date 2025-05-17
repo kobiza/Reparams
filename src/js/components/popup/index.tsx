@@ -1,21 +1,40 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import '../common/App.scss'
 import { createRoot } from 'react-dom/client'
 import Popup from "./Popup";
 import UseViewerStoreContext from "./UseViewerStoreContext";
 import { ThemeProvider } from "@mui/material";
 import getMuiTheme from "../../utils/getMuiTheme";
+import { localStoragePreferencesKey } from '../../utils/consts';
+import { EditorModel } from '../../types/types';
 
 
 
 const root = createRoot(document.getElementById('root')!);
 
+const getPreferences = (): { themeMode: 'light' | 'dark' } => {
+    const appData = localStorage.getItem(localStoragePreferencesKey)
+
+    return appData ? JSON.parse(appData) : { themeMode: 'light' }
+}
+
+
+
 const App = ({ currentTabUrl, tabId }: { currentTabUrl: string; tabId: number }) => {
+    const [themeMode, setThemeMode] = useState<'light' | 'dark'>(() => getPreferences().themeMode);
+    useEffect(() => {
+        localStorage.setItem(localStoragePreferencesKey, JSON.stringify({ themeMode }));
+    }, [themeMode]);
     return (
-        <ThemeProvider theme={getMuiTheme()}>
+        <ThemeProvider theme={getMuiTheme(themeMode)}>
             <UseViewerStoreContext currentTabUrl={currentTabUrl}>
-                <div className="App" data-theme="jigglypuff">
-                    <Popup currentTabUrl={currentTabUrl} tabId={tabId} />
+                <div className="App" data-theme={themeMode}>
+                    <Popup
+                        currentTabUrl={currentTabUrl}
+                        tabId={tabId}
+                        themeMode={themeMode}
+                        setThemeMode={setThemeMode}
+                    />
                 </div>
             </UseViewerStoreContext>
         </ThemeProvider>

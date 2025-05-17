@@ -3,8 +3,9 @@ import { createTheme } from "@mui/material";
 // const { augmentColor } = palette;
 // const createColor = (mainColor: string) => augmentColor({ color: { main: mainColor } });
 
-const theme = createTheme({
+const getMuiTheme = (mode: 'light' | 'dark' = 'light') => createTheme({
     palette: {
+        mode,
         primary: {
             main: '#8c7ae6',
         },
@@ -22,7 +23,5 @@ const theme = createTheme({
         }
     }
 });
-
-const getMuiTheme = () => theme
 
 export default getMuiTheme
