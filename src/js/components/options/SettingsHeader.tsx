@@ -3,22 +3,13 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import DownloadIcon from '@mui/icons-material/Download';
-import UploadIcon from '@mui/icons-material/Upload';
+
 import { useState } from "react";
-import ExportDialog from "./ExportDialog";
 import { EditorModel, EditorStore, SettingsPackage } from "../../types/types";
-import ImportDialog from "./ImportDialog";
-import isArray from 'lodash/isArray';
 import isUndefined from 'lodash/isUndefined';
 import { isObject } from 'lodash';
+import MenuIcon from '@mui/icons-material/Menu';
+import IconButton from '@mui/material/IconButton';
 
 type SettingsHeaderProps = {
     packages: { [key: string]: SettingsPackage }
@@ -45,7 +36,7 @@ const getEditorModelFromClipboard = (text: string) => {
     }
 }
 
-function SettingsHeader({ packages, addPackages }: SettingsHeaderProps) {
+function SettingsHeader({ packages, addPackages, onMenuClick }: SettingsHeaderProps & { onMenuClick: () => void }) {
     const [importDialogData, setImportDialogData] = useState<{ [key: string]: SettingsPackage } | null>(null)
     const openImportDialog = () => {
         navigator.clipboard.readText()
@@ -92,16 +83,15 @@ function SettingsHeader({ packages, addPackages }: SettingsHeaderProps) {
                     >
                         {`ReParams - Settings`}
                     </Typography>
-                    <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                        <Button startIcon={<DownloadIcon />} sx={{ color: '#fff' }} onClick={openImportDialog}>
-                            Import
-                        </Button>
-                        <ImportDialog packages={packages} packagesToImport={importDialogData} isOpen={!!importDialogData} closeDialog={closeImportDialog} addPackages={addPackages} />
-                        <Button startIcon={<UploadIcon />} sx={{ color: '#fff' }} onClick={openExportDialog}>
-                            Export
-                        </Button>
-                        <ExportDialog packages={packages} isOpen={exportDialog} closeDialog={closeExportDialog} />
-                    </Box>
+                    <IconButton
+                        size="large"
+                        edge="end"
+                        color="inherit"
+                        aria-label="menu"
+                        onClick={onMenuClick}
+                    >
+                        <MenuIcon />
+                    </IconButton>
                 </Toolbar>
             </Container>
         </AppBar>

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import '../common/App.scss'
 import { createRoot } from 'react-dom/client'
 import Settings from "./Settings";
@@ -27,7 +27,11 @@ const getThemeMode = () => {
 const root = createRoot(document.getElementById('root')!);
 
 const App = () => {
-    const themeMode = getThemeMode();
+    const [themeMode, setThemeMode] = useState<'light' | 'dark'>(getThemeMode());
+
+    useEffect(() => {
+        localStorage.setItem(localStoragePreferencesKey, JSON.stringify({ themeMode }));
+    }, [themeMode]);
 
     useEffect(() => {
         document.body.setAttribute('data-theme', themeMode);
@@ -36,7 +40,7 @@ const App = () => {
         <ThemeProvider theme={getMuiTheme(themeMode)}>
             <UseEditorStoreContext>
                 <div className="App" data-theme="jigglypuff">
-                    <Settings />
+                    <Settings themeMode={themeMode} onThemeChange={setThemeMode} />
                 </div>
             </UseEditorStoreContext>
         </ThemeProvider>
