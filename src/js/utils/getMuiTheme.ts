@@ -3,28 +3,37 @@ import { createTheme } from "@mui/material";
 // const { augmentColor } = palette;
 // const createColor = (mainColor: string) => augmentColor({ color: { main: mainColor } });
 
+// Bluloco Dark inspired colors
+const blulocoDark = {
+    background: {
+        default: '#232841', // main background
+        paper: '#2c3152',   // card/surface
+    },
+    primary: {
+        main: '#6db3f2', // blue accent
+    },
+    secondary: {
+        main: '#f28779', // orange accent
+    },
+    warning: {
+        main: '#ffd580', // soft yellow
+    },
+    text: {
+        primary: '#eaf2fb', // almost white
+        secondary: '#a6accd', // soft blue-gray
+    },
+};
+
 const getMuiTheme = (mode: 'light' | 'dark' = 'light') => createTheme({
     palette: {
         mode,
         ...(mode === 'dark'
             ? {
-                background: {
-                    default: '#181943', // deep blue
-                    paper: '#23235b',   // slightly lighter for surfaces
-                },
-                primary: {
-                    main: '#8c7ae6', // vibrant purple
-                },
-                secondary: {
-                    main: '#18dcff', // cyan accent
-                },
-                warning: {
-                    main: '#ffaf40',
-                },
-                text: {
-                    primary: '#fff',
-                    secondary: '#b2b6d2',
-                },
+                background: blulocoDark.background,
+                primary: blulocoDark.primary,
+                secondary: blulocoDark.secondary,
+                warning: blulocoDark.warning,
+                text: blulocoDark.text,
             }
             : {
                 background: {
@@ -32,17 +41,17 @@ const getMuiTheme = (mode: 'light' | 'dark' = 'light') => createTheme({
                     paper: '#f5f6fa',
                 },
                 primary: {
-                    main: '#8c7ae6',
+                    main: '#1976d2',
                 },
                 secondary: {
-                    main: '#18dcff',
+                    main: '#f50057',
                 },
                 warning: {
                     main: '#ffaf40',
                 },
                 text: {
-                    primary: '#181943',
-                    secondary: '#23235b',
+                    primary: '#232841',
+                    secondary: '#2c3152',
                 },
             }),
     },
