@@ -24,6 +24,27 @@ const blulocoDark = {
     },
 };
 
+// Blue Light inspired colors
+const blueLight = {
+    background: {
+        default: '#eaf6fb', // soft blue background
+        paper: '#ffffff',   // card/surface
+    },
+    primary: {
+        main: '#2979ff', // blue accent
+    },
+    secondary: {
+        main: '#fbc02d', // yellow accent
+    },
+    warning: {
+        main: '#ffb300', // orange warning
+    },
+    text: {
+        primary: '#232841', // dark blue text
+        secondary: '#4b5c77', // soft blue-gray
+    },
+};
+
 const getMuiTheme = (mode: 'light' | 'dark' = 'light') => createTheme({
     palette: {
         mode,
@@ -36,23 +57,11 @@ const getMuiTheme = (mode: 'light' | 'dark' = 'light') => createTheme({
                 text: blulocoDark.text,
             }
             : {
-                background: {
-                    default: '#fff',
-                    paper: '#f5f6fa',
-                },
-                primary: {
-                    main: '#1976d2',
-                },
-                secondary: {
-                    main: '#f50057',
-                },
-                warning: {
-                    main: '#ffaf40',
-                },
-                text: {
-                    primary: '#232841',
-                    secondary: '#2c3152',
-                },
+                background: blueLight.background,
+                primary: blueLight.primary,
+                secondary: blueLight.secondary,
+                warning: blueLight.warning,
+                text: blueLight.text,
             }),
     },
     typography: {
