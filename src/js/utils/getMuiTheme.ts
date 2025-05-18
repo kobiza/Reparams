@@ -24,24 +24,24 @@ const blulocoDark = {
     },
 };
 
-// Blue Light inspired colors
-const blueLight = {
+// Dashboard-inspired light theme
+const dashboardLight = {
     background: {
-        default: '#eaf6fb', // soft blue background
-        paper: '#ffffff',   // card/surface
+        default: '#f4f6fa', // very light gray background
+        paper: '#fff',      // white card/surface
     },
     primary: {
-        main: '#2979ff', // blue accent
+        main: '#6c63ff', // blue-violet accent
     },
     secondary: {
-        main: '#fbc02d', // yellow accent
+        main: '#f50057', // pink accent (optional)
     },
     warning: {
         main: '#ffb300', // orange warning
     },
     text: {
-        primary: '#232841', // dark blue text
-        secondary: '#4b5c77', // soft blue-gray
+        primary: '#232323', // dark gray text
+        secondary: '#6b7280', // soft gray
     },
 };
 
@@ -57,11 +57,11 @@ const getMuiTheme = (mode: 'light' | 'dark' = 'light') => createTheme({
                 text: blulocoDark.text,
             }
             : {
-                background: blueLight.background,
-                primary: blueLight.primary,
-                secondary: blueLight.secondary,
-                warning: blueLight.warning,
-                text: blueLight.text,
+                background: dashboardLight.background,
+                primary: dashboardLight.primary,
+                secondary: dashboardLight.secondary,
+                warning: dashboardLight.warning,
+                text: dashboardLight.text,
             }),
     },
     typography: {
