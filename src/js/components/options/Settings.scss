@@ -2,6 +2,10 @@ body {
     overflow-y: scroll;
 }
 
+body[data-theme="dark"] {
+    background: #181943;
+}
+
 .settings-pages {
     display: flex;
     flex-direction: column;
@@ -9,7 +13,8 @@ body {
 
 }
 
-.preset-item, .package-item {
+.preset-item,
+.package-item {
     margin: 10px 0;
     padding: 20px;
 }

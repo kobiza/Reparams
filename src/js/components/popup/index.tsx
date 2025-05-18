@@ -6,7 +6,6 @@ import UseViewerStoreContext from "./UseViewerStoreContext";
 import { ThemeProvider } from "@mui/material";
 import getMuiTheme from "../../utils/getMuiTheme";
 import { localStoragePreferencesKey } from '../../utils/consts';
-import { EditorModel } from '../../types/types';
 
 
 
