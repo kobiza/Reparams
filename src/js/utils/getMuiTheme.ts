@@ -3,24 +3,24 @@ import { createTheme } from "@mui/material";
 // const { augmentColor } = palette;
 // const createColor = (mainColor: string) => augmentColor({ color: { main: mainColor } });
 
-// Bluloco Dark inspired colors
-const blulocoDark = {
+// DeviasKit-inspired dark theme
+const deviasDark = {
     background: {
-        default: '#232841', // main background
-        paper: '#2c3152',   // card/surface
+        default: '#18192a', // very dark blue background
+        paper: '#23243a',   // card/surface
     },
     primary: {
-        main: '#6db3f2', // blue accent
+        main: '#6366f1', // blue-violet accent
     },
     secondary: {
-        main: '#f28779', // orange accent
+        main: '#a78bfa', // lighter blue-violet accent
     },
     warning: {
         main: '#ffd580', // soft yellow
     },
     text: {
-        primary: '#eaf2fb', // almost white
-        secondary: '#a6accd', // soft blue-gray
+        primary: '#fff', // white text
+        secondary: '#aeb2cf', // soft blue-gray
     },
 };
 
@@ -50,11 +50,11 @@ const getMuiTheme = (mode: 'light' | 'dark' = 'light') => createTheme({
         mode,
         ...(mode === 'dark'
             ? {
-                background: blulocoDark.background,
-                primary: blulocoDark.primary,
-                secondary: blulocoDark.secondary,
-                warning: blulocoDark.warning,
-                text: blulocoDark.text,
+                background: deviasDark.background,
+                primary: deviasDark.primary,
+                secondary: deviasDark.secondary,
+                warning: deviasDark.warning,
+                text: deviasDark.text,
             }
             : {
                 background: dashboardLight.background,
