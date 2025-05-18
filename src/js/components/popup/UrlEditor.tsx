@@ -182,8 +182,8 @@ function UrlEditor({
                 setEntries={setSearchParamsEntries} paramsWithDelimiter={paramsWithDelimiter} />
             <Fab color="primary" onClick={applyUrl} sx={{
                 position: 'fixed',
-                bottom: 16,
-                right: 16,
+                bottom: 20,
+                right: 30,
             }}>
                 <RocketLaunchIcon />
             </Fab>
