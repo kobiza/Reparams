@@ -1,25 +1,41 @@
-// Content script entry point
-console.log('Content script loaded');
+import type { DomSelectorRequestMessage, DomSelectorResultMessage } from '../../types/types';
 
-type CheckCommonConfigMessage = {
-    type: 'CHECK_COMMON_CONFIG';
+// Custom get function similar to lodash.get
+function get(obj: any, path: string, defaultValue: any) {
+    // Convert the path to an array if it's not already.
+    const pathArray = path.split(".");
+
+    // Reduce over the path array to find the nested value.
+    const result = pathArray.reduce((acc, key) => acc && acc[key], obj);
+
+    // Return the resolved value or the default value if undefined.
+    return result === undefined ? defaultValue : result;
 }
 
-type CommonConfigMessage = {
-    type: 'COMMON_CONFIG_STATUS';
-    isCommonConfigExist: boolean;
+function isUndefined(value: any) {
+    return typeof value === 'undefined'
 }
 
+
+
+const checkDomSelector = (domSelector: string) => {
+    const result = !!document.querySelector(domSelector)
+    return result
+
+}
 // Listen for messages from popup
-chrome.runtime.onMessage.addListener((message: CheckCommonConfigMessage) => {
-    if (message.type === 'CHECK_COMMON_CONFIG') {
+chrome.runtime.onMessage.addListener((message: DomSelectorRequestMessage) => {
+    if (message.type === 'DOM_SELECTOR_REQUEST') {
         // Check if commonConfig exists in the window object
-        const isCommonConfigExist = !!(window as any).commonConfig;
+        const domSelectorResult = message.domSelectors.reduce<Record<string, boolean>>((acc, curr) => {
+            acc[curr] = checkDomSelector(curr)
+            return acc
+        }, {})
 
         // Send response back to popup
-        const response: CommonConfigMessage = {
-            type: 'COMMON_CONFIG_STATUS',
-            isCommonConfigExist
+        const response: DomSelectorResultMessage = {
+            type: 'DOM_SELECTOR_RESULT',
+            domSelectorResult
         };
         chrome.runtime.sendMessage(response);
     }

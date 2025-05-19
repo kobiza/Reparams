@@ -178,7 +178,7 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className }: S
                     <Button onClick={closeDialog}>Close</Button>
                 </DialogActions>
             </Dialog>
-            <Button color="secondary" sx={{ marginTop: '10px' }} onClick={addNewEntry} variant="text">Add param</Button>
+            <Button color="secondary" sx={{ marginTop: '14px', marginBottom: '10px' }} onClick={addNewEntry} variant="text">Add param</Button>
         </div>
     )
 }

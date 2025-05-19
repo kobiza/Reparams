@@ -3,24 +3,16 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import DownloadIcon from '@mui/icons-material/Download';
-import UploadIcon from '@mui/icons-material/Upload';
+
 import { useState } from "react";
-import ExportDialog from "./ExportDialog";
-import { EditorModel, EditorStore } from "../../types/types";
-import ImportDialog from "./ImportDialog";
-import isArray from 'lodash/isArray';
+import { EditorModel, EditorStore, SettingsPackage } from "../../types/types";
 import isUndefined from 'lodash/isUndefined';
+import { isObject } from 'lodash';
+import MenuIcon from '@mui/icons-material/Menu';
+import IconButton from '@mui/material/IconButton';
 
 type SettingsHeaderProps = {
-    packages: EditorModel
+    packages: { [key: string]: SettingsPackage }
     addPackages: EditorStore['addPackages']
 }
 
@@ -34,10 +26,7 @@ type SettingsHeaderProps = {
 const getEditorModelFromClipboard = (text: string) => {
     try {
         const clipboardJson = JSON.parse(text)
-        if (isArray(clipboardJson) &&
-            ['key', 'label', 'urlPatterns', 'presets', 'paramsWithDelimiter', 'quickActions'].every(key => {
-                return !isUndefined(clipboardJson[0][key])
-            })) {
+        if (isObject(clipboardJson) && !isUndefined((clipboardJson as EditorModel).packages)) {
             return clipboardJson as EditorModel
         } else {
             return null
@@ -47,34 +36,7 @@ const getEditorModelFromClipboard = (text: string) => {
     }
 }
 
-function SettingsHeader({ packages, addPackages }: SettingsHeaderProps) {
-    const [importDialogData, setImportDialogData] = useState<EditorModel | null>(null)
-    const openImportDialog = () => {
-        navigator.clipboard.readText()
-            .then(text => {
-                const editorModel = getEditorModelFromClipboard(text)
-                setImportDialogData(editorModel);
-            })
-    };
-
-    const closeImportDialog = () => {
-        setImportDialogData(null);
-    };
-
-    const importPackages = () => {
-        // import
-        closeImportDialog()
-    }
-
-    const [exportDialog, setExportDialog] = useState(false)
-    const openExportDialog = () => {
-        setExportDialog(true);
-    };
-
-    const closeExportDialog = () => {
-        setExportDialog(false);
-    };
-
+function SettingsHeader({ onMenuClick }: SettingsHeaderProps & { onMenuClick: () => void }) {
     return (
         <AppBar position="relative" component="nav">
             <Container maxWidth={false}>
@@ -94,16 +56,15 @@ function SettingsHeader({ packages, addPackages }: SettingsHeaderProps) {
                     >
                         {`ReParams - Settings`}
                     </Typography>
-                    <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                        <Button startIcon={<DownloadIcon />} sx={{ color: '#fff' }} onClick={openImportDialog}>
-                            Import
-                        </Button>
-                        <ImportDialog packages={packages} packagesToImport={importDialogData} isOpen={!!importDialogData} closeDialog={closeImportDialog} addPackages={addPackages} />
-                        <Button startIcon={<UploadIcon />} sx={{ color: '#fff' }} onClick={openExportDialog}>
-                            Export
-                        </Button>
-                        <ExportDialog packages={packages} isOpen={exportDialog} closeDialog={closeExportDialog} />
-                    </Box>
+                    <IconButton
+                        size="large"
+                        edge="end"
+                        color="inherit"
+                        aria-label="menu"
+                        onClick={onMenuClick}
+                    >
+                        <MenuIcon />
+                    </IconButton>
                 </Toolbar>
             </Container>
         </AppBar>

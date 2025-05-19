@@ -1,11 +1,14 @@
 import React from 'react'
 
-import {Autocomplete, Checkbox, Chip, TextField, Theme} from "@mui/material";
-import {toTrueObj} from "../../utils/arrayUtils";
+import Autocomplete from '@mui/material/Autocomplete';
+import Checkbox from '@mui/material/Checkbox';
+import TextField from '@mui/material/TextField';
+import type { Theme } from '@mui/material/styles';
+import { toTrueObj } from "../../utils/arrayUtils";
 
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import {SxProps} from "@mui/system";
+import type { SxProps } from "@mui/system";
 
 export type TagsItem = { value: string; label: string; }
 
@@ -19,7 +22,7 @@ export type TagsProps = {
     sx?: SxProps<Theme>
 }
 
-const Tags = ({selected, suggestions, placeholderText, className, onAdd, onDelete, sx}: TagsProps) => {
+const Tags = ({ selected, suggestions, placeholderText, className, onAdd, onDelete, sx }: TagsProps) => {
     const onChange = (e: any, newSelected: Array<{ value: string; label: string; }>) => {
         const prevTrueObj = toTrueObj(selected, (v) => v.value)
         const nextTrueObj = toTrueObj(newSelected, (v) => v.value)
@@ -28,19 +31,24 @@ const Tags = ({selected, suggestions, placeholderText, className, onAdd, onDelet
         const removed = Object.keys(prevTrueObj).filter(v => !nextTrueObj[v])
 
         if (removed.length) {
-            onDelete(removed.map(v => ({value: v, label: v})))
+            onDelete(removed.map(v => ({ value: v, label: v })))
         }
 
         if (added.length) {
-            onAdd(added.map(v => ({value: v, label: v})))
+            onAdd(added.map(v => ({ value: v, label: v })))
         }
     }
 
-    const icon = <CheckBoxOutlineBlankIcon fontSize="small"/>;
-    const checkedIcon = <CheckBoxIcon fontSize="small"/>;
+    const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+    const checkedIcon = <CheckBoxIcon fontSize="small" />;
     return (
         <Autocomplete
-            sx={sx}
+            sx={{
+                backgroundColor: (theme) => theme.palette.background.paper,
+                color: (theme) => theme.palette.text.primary,
+                borderRadius: 2,
+                p: 0.5,
+            }}
             className={className}
             multiple
             disableCloseOnSelect
@@ -49,20 +57,15 @@ const Tags = ({selected, suggestions, placeholderText, className, onAdd, onDelet
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.value === value.value}
             value={selected}
-            ListboxProps={{sx: {maxHeight: '340px'}}}
+            ListboxProps={{ sx: { maxHeight: '340px', backgroundColor: (theme) => theme.palette.background.paper, color: (theme) => theme.palette.text.primary } }}
             onChange={onChange}
-            // renderTags={(tagValue, getTagProps) => {
-            //     return tagValue.map((option, index) => (
-            //         <Chip {...getTagProps({ index })} label={option.value} color="secondary"/>
-            //     ));
-            // }}
-            renderOption={(props, option, {selected}) => {
+            renderOption={(props, option, { selected }) => {
                 return (
                     <li {...props}>
                         <Checkbox
                             icon={icon}
                             checkedIcon={checkedIcon}
-                            style={{marginRight: 8}}
+                            style={{ marginRight: 8 }}
                             checked={selected}
                         />
                         {option.label}
@@ -70,7 +73,17 @@ const Tags = ({selected, suggestions, placeholderText, className, onAdd, onDelet
                 )
             }}
             renderInput={(params) => (
-                <TextField hiddenLabel={true} {...params} placeholder={placeholderText} autoFocus={true}/>
+                <TextField
+                    hiddenLabel={true}
+                    {...params}
+                    placeholder={placeholderText}
+                    autoFocus={true}
+                    sx={{
+                        backgroundColor: (theme) => theme.palette.background.paper,
+                        color: (theme) => theme.palette.text.primary,
+                        borderRadius: 2,
+                    }}
+                />
             )}
         />
     )

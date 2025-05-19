@@ -10,7 +10,7 @@
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",
     "48": "icons/icon32.png",
-    "128": "icons/icon180.png"
+    "128": "icons/icon192.png"
   },
   "options_page": "options.html",
   "content_scripts": [

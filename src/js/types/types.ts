@@ -1,5 +1,3 @@
-import {PaletteColorOptions} from "@mui/material";
-
 export type SearchParamsEntries = Array<[key: string, value: string]>
 
 export type SetEntries = (newSearchParamsEntries: SearchParamsEntries) => void
@@ -28,22 +26,28 @@ export type ParamsWithDelimiterViewModel = {
     }
 }
 
+
 export type SettingsPackage = {
     key: string
     label: string
-    urlPatterns: Array<{ id: string, value: string }>
+    conditions: {
+        urlPatterns: Array<{ id: string, value: string }>
+        domSelectors: Array<{ id: string, value: string }>
+    }
     presets: PresetsEntriesMap
     paramsWithDelimiter: ParamsWithDelimiter
-    quickActions: QuickActionData
 }
 
 export type MergedAppData = {
     presets: PresetsEntriesMap
     paramsWithDelimiter: ParamsWithDelimiter
-    quickActions: QuickActionData
+
 }
 
-export type EditorModel = Array<SettingsPackage>
+export type EditorModel = {
+    modelVersion: string
+    packages: { [key: string]: SettingsPackage }
+}
 
 export type Option = {
     id: string,
@@ -59,14 +63,14 @@ export type QuickActionData = Array<{
 
 export type EditorStore = {
     state: EditorModel
-    updatePackagePreset: (packageIndex: number, presets: SettingsPackage['presets']) => void
-    updatePackageParamsWithDelimiter: (packageIndex: number, paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']) => void
-    updatePackageQuickActions: (packageIndex: number, quickActions: SettingsPackage['quickActions']) => void
-    updatePackageLabel: (packageIndex: number, label: string) => void
-    updatePackageUrlPatterns: (packageIndex: number, urlPatterns: SettingsPackage['urlPatterns']) => void
+    updatePackagePreset: (packageKey: string, presets: SettingsPackage['presets']) => void
+    updatePackageParamsWithDelimiter: (packageKey: string, paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']) => void
+    updatePackageLabel: (packageKey: string, label: string) => void
+    updatePackageUrlPatterns: (packageKey: string, urlPatterns: SettingsPackage['conditions']['urlPatterns']) => void
+    updatePackageDomSelectors: (packageKey: string, domSelectors: SettingsPackage['conditions']['domSelectors']) => void
     addNewPackage: (newPackageOverrides?: Partial<SettingsPackage>) => void
-    addPackages: (packagesToAdd: Array<SettingsPackage>, replace: boolean) => void
-    deletePackage: (packageIndex: number) => void
+    addPackages: (packagesToAdd: { [key: string]: SettingsPackage }, replace: boolean) => void
+    deletePackage: (packageKey: string) => void
 }
 
 export type ViewerModel = {
@@ -79,6 +83,15 @@ export type ViewerStore = {
     state: ViewerModel
 }
 
+export type DomSelectorRequestMessage = {
+    type: 'DOM_SELECTOR_REQUEST';
+    domSelectors: Array<string>;
+}
+
+export type DomSelectorResultMessage = {
+    type: 'DOM_SELECTOR_RESULT';
+    domSelectorResult: Record<string, boolean>;
+}
 
 // declare module '@mui/material/styles' {
 //     interface CustomPalette {

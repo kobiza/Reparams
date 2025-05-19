@@ -1,31 +1,42 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext } from 'react';
 import './popup.scss'
 import UrlEditor from "./UrlEditor";
-import {ViewerStoreContext} from "./UseViewerStoreContext";
+import { ViewerStoreContext } from "./UseViewerStoreContext";
+import Switch from '@mui/material/Switch';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
 
 // import Settings from "./Settings";
 
-function Popup({currentTabUrl, tabId}: { currentTabUrl: string; tabId: number }) {
-    const {state} = useContext(ViewerStoreContext)
+function Popup({ currentTabUrl, tabId, themeMode, setThemeMode }: {
+    currentTabUrl: string;
+    tabId: number;
+    themeMode: 'light' | 'dark';
+    setThemeMode: (mode: 'light' | 'dark') => void;
+}) {
+    const { state } = useContext(ViewerStoreContext)
 
     const updateCurrentTabUrl = (newUrl: string) => {
-        chrome.tabs.update(tabId, {url: newUrl}, () => window.close());
+        chrome.tabs.update(tabId, { url: newUrl }, () => window.close());
     }
 
     const openNewTab = (newUrl: string) => {
-        chrome.tabs.create({url: newUrl});
+        chrome.tabs.create({ url: newUrl });
     }
 
     return (
         <div className="popup">
-            {/*<AddressBar currentUrl={currentUrl} setCurrentUrl={setCurrentUrl}/>*/}
+            {/* Removed the theme toggle from here, only in Drawer now */}
             <UrlEditor
                 currentTabUrl={currentTabUrl}
                 updateCurrentTabUrl={updateCurrentTabUrl}
                 openNewTab={openNewTab}
                 presets={state.presets}
                 paramsWithDelimiter={state.paramsWithDelimiter}
-                quickActions={state.quickActions}/>
+                quickActions={state.quickActions}
+                themeMode={themeMode}
+                setThemeMode={setThemeMode}
+            />
             {/*<Settings/>*/}
         </div>
     );

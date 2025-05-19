@@ -20,32 +20,37 @@ export const mergeAppDataPackages = (appData: EditorModel): MergedAppData => {
     const mergedAppData: MergedAppData = {
         presets: {},
         paramsWithDelimiter: [],
-        quickActions: []
     }
-
-    appData.forEach((appDataPackage) => {
+    Object.values(appData.packages).forEach((appDataPackage) => {
         assign(mergedAppData.presets, appDataPackage.presets)
         assign(mergedAppData.paramsWithDelimiter, appDataPackage.paramsWithDelimiter)
-        mergedAppData.quickActions = [...mergedAppData.quickActions, ...appDataPackage.quickActions]
     })
-
     return mergedAppData
 }
 
-export const getRelevantPackages = (editorModel: EditorModel, currentTabUrl: string, isCommonConfig: boolean): EditorModel => {
-    return editorModel.filter((settingsPackage) => {
-        const allUrlPatterns = settingsPackage.urlPatterns.map(v => v.value)
-        const matchesUrl = allUrlPatterns.some(urlPattern => matchUrl(currentTabUrl, urlPattern))
+export const getRelevantPackages = (editorModel: EditorModel, currentTabUrl: string, domSelectorResult: Record<string, boolean>): SettingsPackage[] => {
+    return Object.values(editorModel.packages).filter((settingsPackage) => {
+        const allUrlPatterns = settingsPackage.conditions.urlPatterns.map(v => v.value)
+        const domSelectors = settingsPackage.conditions.domSelectors
+        const someUrlPatternMatch = allUrlPatterns.some(urlPattern => matchUrl(currentTabUrl, urlPattern))
 
-        if (isCommonConfig) {
-            return matchesUrl || settingsPackage.label === 'common'
+        if (someUrlPatternMatch) {
+            return true
         }
 
-        return matchesUrl
+        const someDomSelectorResult = domSelectors.some(domSelector => {
+            return domSelectorResult[domSelector.value]
+        })
+
+        if (someDomSelectorResult) {
+            return true
+        }
+
+        return false
     })
 }
 
-export const toViewerModel = (relevantPackages: EditorModel, currentTabUrl: string): ViewerModel => {
+export const toViewerModel = (relevantPackages: SettingsPackage[], currentTabUrl: string): ViewerModel => {
     const packagesDataToMerge = relevantPackages.map(settingsPackage => {
         const presets: PresetsEntriesMapViewModel = Object.keys(settingsPackage.presets).reduce<PresetsEntriesMapViewModel>((acc, presetKey) => {
             const { label, entries } = settingsPackage.presets[presetKey]
@@ -63,7 +68,6 @@ export const toViewerModel = (relevantPackages: EditorModel, currentTabUrl: stri
         return {
             presets,
             paramsWithDelimiter,
-            quickActions: settingsPackage.quickActions
         }
     })
 
@@ -76,7 +80,6 @@ export const toViewerModel = (relevantPackages: EditorModel, currentTabUrl: stri
     packagesDataToMerge.forEach((appDataPackage) => {
         assign(viewerModel.presets, appDataPackage.presets)
         assign(viewerModel.paramsWithDelimiter, appDataPackage.paramsWithDelimiter)
-        viewerModel.quickActions = [...viewerModel.quickActions, ...appDataPackage.quickActions]
     })
 
     return viewerModel
@@ -86,13 +89,11 @@ export const getEmptySettingsPackage = (label: string): SettingsPackage => {
     return {
         key: uuidv4(),
         label,
-        urlPatterns: [{ id: uuidv4(), value: '*://*/*' }],
+        conditions: {
+            urlPatterns: [{ id: uuidv4(), value: '*://*/*' }],
+            domSelectors: []
+        },
         presets: {},
-        paramsWithDelimiter: [{
-            id: uuidv4(),
-            label: '',
-            separator: ''
-        }],
-        quickActions: []
+        paramsWithDelimiter: [],
     }
 }

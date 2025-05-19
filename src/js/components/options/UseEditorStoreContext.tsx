@@ -1,28 +1,26 @@
-import React, {createContext, PropsWithChildren, useEffect, useState} from "react";
-import {EditorModel, EditorStore, SettingsPackage} from "../../types/types";
-import {removeItem, replaceItem, toTrueObj} from "../../utils/arrayUtils";
-import {getEmptySettingsPackage, uuidv4} from "../../utils/utils";
-import * as repl from "repl";
+import React, { createContext, PropsWithChildren, useEffect, useState } from "react";
+import { EditorModel, EditorStore, SettingsPackage } from "../../types/types";
+import { getEmptySettingsPackage, uuidv4 } from "../../utils/utils";
+import { localStorageKey } from "../../utils/consts";
+
 
 const noop = () => {
 }
 export const EditorStoreContext = createContext<EditorStore>({
-    state: [],
+    state: { modelVersion: '', packages: {} },
     updatePackagePreset: noop,
     updatePackageParamsWithDelimiter: noop,
-    updatePackageQuickActions: noop,
     updatePackageLabel: noop,
     updatePackageUrlPatterns: noop,
+    updatePackageDomSelectors: noop,
     addNewPackage: noop,
     addPackages: noop,
     deletePackage: noop
 });
 
-const localStorageKey = 'paparamsAppData'
 const getInitialState = (): EditorModel => {
     const appData = localStorage.getItem(localStorageKey)
-
-    return appData ? JSON.parse(appData) : []
+    return appData ? JSON.parse(appData) : { modelVersion: '', packages: {} }
 }
 
 const UseEditorStoreContext = (props: PropsWithChildren) => {
@@ -32,50 +30,52 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
         localStorage.setItem(localStorageKey, JSON.stringify(appState))
     }, [appState])
 
-    const _updatePackage = (packageIndex: number, newPackage: SettingsPackage) => {
-        const newAppState = replaceItem<SettingsPackage>(appState, newPackage, packageIndex)
-
-        setAppState(newAppState)
+    const _updatePackage = (packageKey: string, newPackage: SettingsPackage) => {
+        setAppState((prevState) => ({
+            ...prevState,
+            packages: {
+                ...prevState.packages,
+                [packageKey]: newPackage
+            }
+        }))
     }
 
-    const updatePackagePreset = (packageIndex: number, presets: SettingsPackage['presets']) => {
+    const updatePackagePreset = (packageKey: string, presets: SettingsPackage['presets']) => {
         const newPackage = {
-            ...appState[packageIndex],
+            ...appState.packages[packageKey],
             presets
         }
-        _updatePackage(packageIndex, newPackage)
+        _updatePackage(packageKey, newPackage)
     }
 
-    const updatePackageParamsWithDelimiter = (packageIndex: number, paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']) => {
+    const updatePackageParamsWithDelimiter = (packageKey: string, paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']) => {
         const newPackage = {
-            ...appState[packageIndex],
+            ...appState.packages[packageKey],
             paramsWithDelimiter
         }
-        _updatePackage(packageIndex, newPackage)
+        _updatePackage(packageKey, newPackage)
     }
 
-    const updatePackageQuickActions = (packageIndex: number, quickActions: SettingsPackage['quickActions']) => {
-        const newPackage = {
-            ...appState[packageIndex],
-            quickActions
-        }
-        _updatePackage(packageIndex, newPackage)
-    }
 
-    const updatePackageLabel = (packageIndex: number, label: string) => {
+
+    const updatePackageLabel = (packageKey: string, label: string) => {
         const newPackage = {
-            ...appState[packageIndex],
+            ...appState.packages[packageKey],
             label
         }
-        _updatePackage(packageIndex, newPackage)
+        _updatePackage(packageKey, newPackage)
     }
 
-    const updatePackageUrlPatterns = (packageIndex: number, urlPatterns: SettingsPackage['urlPatterns']) => {
+    const updatePackageUrlPatterns = (packageKey: string, urlPatterns: SettingsPackage['conditions']['urlPatterns']) => {
+        const prevPackage = appState.packages[packageKey]
         const newPackage = {
-            ...appState[packageIndex],
-            urlPatterns
+            ...prevPackage,
+            conditions: {
+                ...prevPackage.conditions,
+                urlPatterns
+            }
         }
-        _updatePackage(packageIndex, newPackage)
+        _updatePackage(packageKey, newPackage)
     }
 
     const addNewPackage: EditorStore['addNewPackage'] = (newPackageOverrides = {}) => {
@@ -83,36 +83,50 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
             ...getEmptySettingsPackage('Untitled package'),
             ...newPackageOverrides
         }
-
-        setAppState((appState) => {
-            return [...appState, newPackage]
-        })
+        setAppState((prevState) => ({
+            ...prevState,
+            packages: {
+                ...prevState.packages,
+                [newPackage.key]: newPackage
+            }
+        }))
     }
 
-    const addAndDuplicateExistingPackages = (packagesToAdd: Array<SettingsPackage>) => {
-        setAppState((appState) => {
-            const currentPackagesKeys = toTrueObj(appState, v => v.key)
-            const packagesToAddWithNewIds = packagesToAdd.map(v => {
+    const addAndDuplicateExistingPackages = (packagesToAdd: { [key: string]: SettingsPackage }) => {
+        setAppState((prevState) => {
+            const currentPackagesKeys = { ...prevState.packages }
+            const packagesToAddWithNewIds: { [key: string]: SettingsPackage } = {}
+            Object.values(packagesToAdd).forEach(v => {
                 if (!currentPackagesKeys[v.key]) {
-                    return v
-                }
-
-                return {
-                    ...v,
-                    key: uuidv4()
+                    packagesToAddWithNewIds[v.key] = v
+                } else {
+                    const newKey = uuidv4()
+                    packagesToAddWithNewIds[newKey] = { ...v, key: newKey }
                 }
             })
-
-            return [...appState, ...packagesToAddWithNewIds]
+            return {
+                ...prevState,
+                packages: {
+                    ...prevState.packages,
+                    ...packagesToAddWithNewIds
+                }
+            }
         })
     }
 
-    const addAndReplaceExistingPackages = (packagesToAdd: Array<SettingsPackage>) => {
-        setAppState((appState) => {
-            const newPackagesKey = toTrueObj(packagesToAdd, v => v.key)
-            const packagesToKeep = appState.filter(v => !newPackagesKey[v.key])
-
-            return [...packagesToKeep, ...packagesToAdd]
+    const addAndReplaceExistingPackages = (packagesToAdd: { [key: string]: SettingsPackage }) => {
+        setAppState((prevState) => {
+            const newPackagesKey = { ...packagesToAdd }
+            const packagesToKeep = Object.fromEntries(
+                Object.entries(prevState.packages).filter(([key]) => !newPackagesKey[key])
+            )
+            return {
+                ...prevState,
+                packages: {
+                    ...packagesToKeep,
+                    ...packagesToAdd
+                }
+            }
         })
     }
 
@@ -124,20 +138,31 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
         }
     }
 
-    const deletePackage = (packageIndex: number) => {
-        setAppState((appState) => {
-            return removeItem(appState, packageIndex)
+    const deletePackage = (packageKey: string) => {
+        setAppState((prevState) => {
+            const { [packageKey]: _, ...rest } = prevState.packages
+            return {
+                ...prevState,
+                packages: rest
+            }
         })
     }
 
+    const updatePackageDomSelectors = (packageKey: string, domSelectors: SettingsPackage['conditions']['domSelectors']) => {
+        const newPackage = {
+            ...appState.packages[packageKey],
+            conditions: { ...appState.packages[packageKey].conditions, domSelectors }
+        }
+        _updatePackage(packageKey, newPackage)
+    }
     return (
         <EditorStoreContext.Provider value={{
             state: appState,
             updatePackagePreset,
             updatePackageParamsWithDelimiter,
-            updatePackageQuickActions,
             updatePackageLabel,
             updatePackageUrlPatterns,
+            updatePackageDomSelectors,
             addNewPackage,
             addPackages,
             deletePackage
