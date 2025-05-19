@@ -14,7 +14,6 @@ import Typography from '@mui/material/Typography';
 import { replaceItem, toTrueObj } from "../../utils/arrayUtils";
 import { EditorStore, SettingsPackage } from "../../types/types";
 import { useEffect, useState } from "react";
-import * as trace_events from "trace_events";
 
 type PackageItem = { key: string, label: string, checked: boolean }
 type ImportDialogContentProps = {

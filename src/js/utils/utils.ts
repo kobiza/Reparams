@@ -30,13 +30,11 @@ export const mergeAppDataPackages = (appData: EditorModel): MergedAppData => {
 
 export const getRelevantPackages = (editorModel: EditorModel, currentTabUrl: string, domSelectorResult: Record<string, boolean>): SettingsPackage[] => {
     return Object.values(editorModel.packages).filter((settingsPackage) => {
-        console.log('getRelevantPackages', settingsPackage.label)
         const allUrlPatterns = settingsPackage.conditions.urlPatterns.map(v => v.value)
         const domSelectors = settingsPackage.conditions.domSelectors
         const someUrlPatternMatch = allUrlPatterns.some(urlPattern => matchUrl(currentTabUrl, urlPattern))
 
         if (someUrlPatternMatch) {
-            console.log('someUrlPatternMatch', settingsPackage.label)
             return true
         }
 
@@ -45,7 +43,6 @@ export const getRelevantPackages = (editorModel: EditorModel, currentTabUrl: str
         })
 
         if (someDomSelectorResult) {
-            console.log('someDomSelectorResult', settingsPackage.label)
             return true
         }
 

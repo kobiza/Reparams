@@ -36,34 +36,7 @@ const getEditorModelFromClipboard = (text: string) => {
     }
 }
 
-function SettingsHeader({ packages, addPackages, onMenuClick }: SettingsHeaderProps & { onMenuClick: () => void }) {
-    const [importDialogData, setImportDialogData] = useState<{ [key: string]: SettingsPackage } | null>(null)
-    const openImportDialog = () => {
-        navigator.clipboard.readText()
-            .then(text => {
-                const editorModel = getEditorModelFromClipboard(text)
-                setImportDialogData(editorModel?.packages || null);
-            })
-    };
-
-    const closeImportDialog = () => {
-        setImportDialogData(null);
-    };
-
-    const importPackages = () => {
-        // import
-        closeImportDialog()
-    }
-
-    const [exportDialog, setExportDialog] = useState(false)
-    const openExportDialog = () => {
-        setExportDialog(true);
-    };
-
-    const closeExportDialog = () => {
-        setExportDialog(false);
-    };
-
+function SettingsHeader({ onMenuClick }: SettingsHeaderProps & { onMenuClick: () => void }) {
     return (
         <AppBar position="relative" component="nav">
             <Container maxWidth={false}>

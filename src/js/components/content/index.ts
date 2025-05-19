@@ -17,44 +17,15 @@ function isUndefined(value: any) {
 }
 
 
-// Content script entry point
-console.log('Content script loaded');
-
-// // Inject a script into the page context to access window.commonConfig
-// const injectedScript = document.createElement('script');
-// injectedScript.textContent = `
-//   (function() {
-//     window.postMessage({
-//       source: 'reparams-extension',
-//       commonConfig: window.commonConfig
-//     }, '*');
-//   })();
-// `;
-// (document.head || document.documentElement).appendChild(injectedScript);
-// injectedScript.remove();
-
-// let pageCommonConfig: any = undefined;
-
-// // Listen for the message from the injected script
-// window.addEventListener('message', (event) => {
-//     if (event.source !== window) return;
-//     if (event.data && event.data.source === 'reparams-extension') {
-//         pageCommonConfig = event.data.commonConfig;
-//         console.log('Received commonConfig from page:', pageCommonConfig);
-//     }
-// });
 
 const checkDomSelector = (domSelector: string) => {
     const result = !!document.querySelector(domSelector)
-    console.log('checkDomSelector', domSelector, result)
     return result
 
 }
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((message: DomSelectorRequestMessage) => {
-    console.log('onMessage', message)
     if (message.type === 'DOM_SELECTOR_REQUEST') {
-        console.log('DOM_SELECTOR_REQUEST', message)
         // Check if commonConfig exists in the window object
         const domSelectorResult = message.domSelectors.reduce<Record<string, boolean>>((acc, curr) => {
             acc[curr] = checkDomSelector(curr)
@@ -66,7 +37,6 @@ chrome.runtime.onMessage.addListener((message: DomSelectorRequestMessage) => {
             type: 'DOM_SELECTOR_RESULT',
             domSelectorResult
         };
-        console.log('send DOM_SELECTOR_RESULT', response)
         chrome.runtime.sendMessage(response);
     }
 });
