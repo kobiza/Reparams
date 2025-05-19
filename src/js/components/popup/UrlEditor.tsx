@@ -183,7 +183,7 @@ function UrlEditor({
             <Fab color="primary" onClick={applyUrl} sx={{
                 position: 'fixed',
                 bottom: 20,
-                right: 30,
+                right: 20,
             }}>
                 <RocketLaunchIcon />
             </Fab>

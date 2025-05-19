@@ -3,7 +3,7 @@ import '../common/App.scss'
 import { createRoot } from 'react-dom/client'
 import Popup from "./Popup";
 import UseViewerStoreContext from "./UseViewerStoreContext";
-import { ThemeProvider } from "@mui/material";
+import { GlobalStyles, ThemeProvider } from "@mui/material";
 import getMuiTheme from "../../utils/getMuiTheme";
 import { localStoragePreferencesKey } from '../../utils/consts';
 
@@ -24,11 +24,11 @@ const App = ({ currentTabUrl, tabId }: { currentTabUrl: string; tabId: number })
     useEffect(() => {
         localStorage.setItem(localStoragePreferencesKey, JSON.stringify({ themeMode }));
     }, [themeMode]);
-    useEffect(() => {
-        document.body.setAttribute('data-theme', themeMode);
-    }, [themeMode]);
+
+    const theme = getMuiTheme(themeMode);
     return (
-        <ThemeProvider theme={getMuiTheme(themeMode)}>
+        <ThemeProvider theme={theme}>
+            <GlobalStyles styles={{ html: { backgroundColor: theme.palette.background.default } }} />
             <UseViewerStoreContext currentTabUrl={currentTabUrl}>
                 <div className="App" data-theme={themeMode}>
                     <Popup

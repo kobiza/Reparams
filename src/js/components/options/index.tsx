@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client'
 import Settings from "./Settings";
 import UseEditorStoreContext from "./UseEditorStoreContext";
 import getMuiTheme from "../../utils/getMuiTheme";
-import { ThemeProvider } from "@mui/material";
+import { GlobalStyles, ThemeProvider } from "@mui/material";
 import { runFixer1 } from './dataFixer';
 import { localStoragePreferencesKey } from '../../utils/consts';
 
@@ -33,11 +33,12 @@ const App = () => {
         localStorage.setItem(localStoragePreferencesKey, JSON.stringify({ themeMode }));
     }, [themeMode]);
 
-    useEffect(() => {
-        document.body.setAttribute('data-theme', themeMode);
-    }, [themeMode]);
+
+    const theme = getMuiTheme(themeMode);
+
     return (
-        <ThemeProvider theme={getMuiTheme(themeMode)}>
+        <ThemeProvider theme={theme}>
+            <GlobalStyles styles={{ html: { backgroundColor: theme.palette.background.default } }} />
             <UseEditorStoreContext>
                 <div className="App" data-theme="jigglypuff">
                     <Settings themeMode={themeMode} onThemeChange={setThemeMode} />

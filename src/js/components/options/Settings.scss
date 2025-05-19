@@ -2,10 +2,6 @@ body {
     overflow-y: scroll;
 }
 
-body[data-theme="dark"] {
-    background: #181943;
-}
-
 .settings-pages {
     display: flex;
     flex-direction: column;
