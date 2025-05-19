@@ -15,6 +15,12 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTheme } from '@mui/material/styles';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemButton from '@mui/material/ListItemButton';
+import ContrastIcon from '@mui/icons-material/Contrast';
 
 import {
     ParamsWithDelimiterViewModel,
@@ -146,29 +152,22 @@ function UrlEditor({
                 onClose={handleDrawerClose}
                 PaperProps={{ sx: { width: 320, bgcolor: 'background.default', color: 'text.primary', p: 2 } }}
             >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                    <Typography variant="h6">Settings</Typography>
-                    <IconButton onClick={handleDrawerClose} size="small">
-                        <CloseIcon />
-                    </IconButton>
-                </div>
-                <Typography variant="subtitle2" sx={{ mb: 1, letterSpacing: 1 }}>MODE</Typography>
-                <ToggleButtonGroup
-                    value={themeMode}
-                    exclusive
-                    onChange={(_e, value) => value && setThemeMode(value)}
-                    fullWidth
-                    sx={{ mb: 2, borderRadius: 2, background: 'rgba(255,255,255,0.02)', p: 0.5 }}
-                >
-                    <ToggleButton value="light" sx={{ flex: 1, borderRadius: 2, p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <LightModeIcon sx={{ mb: 0.5 }} />
-                        Light
-                    </ToggleButton>
-                    <ToggleButton value="dark" sx={{ flex: 1, borderRadius: 2, p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <DarkModeIcon sx={{ mb: 0.5 }} />
-                        Dark
-                    </ToggleButton>
-                </ToggleButtonGroup>
+                <List>
+                    <ListItem>
+                        <ListItemIcon><ContrastIcon /></ListItemIcon>
+                        <ListItemText primary="Theme" />
+                        <ToggleButtonGroup
+                            value={themeMode}
+                            exclusive
+                            onChange={(_e, value) => value && setThemeMode(value)}
+                            size="small"
+                            sx={{ ml: 2 }}
+                        >
+                            <ToggleButton value="light"><LightModeIcon /></ToggleButton>
+                            <ToggleButton value="dark"><DarkModeIcon /></ToggleButton>
+                        </ToggleButtonGroup>
+                    </ListItem>
+                </List>
             </Drawer>
             {!isEmpty(presets) && (
                 <div className="presets-picker-container row2">

@@ -3,13 +3,18 @@ import { EditorStoreContext } from "./UseEditorStoreContext";
 import SettingsHeader from "./SettingsHeader";
 import PackagesPage from "./PackagesPage";
 import './Settings.scss';
-import { Drawer, IconButton, Typography, ToggleButtonGroup, ToggleButton, Box, Button } from '@mui/material';
+import { Drawer, Typography, ToggleButtonGroup, ToggleButton, ListItemButton } from '@mui/material';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import ImportDialog from './ImportDialog';
 import ExportDialog from './ExportDialog';
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import ContrastIcon from '@mui/icons-material/Contrast';
 
 const Settings = ({ themeMode, onThemeChange }: { themeMode: 'light' | 'dark', onThemeChange: (mode: 'light' | 'dark') => void }) => {
     const editorStore = React.useContext(EditorStoreContext)
@@ -46,31 +51,34 @@ const Settings = ({ themeMode, onThemeChange }: { themeMode: 'light' | 'dark', o
                 PaperProps={{ sx: { width: 320, bgcolor: 'background.default', color: 'text.primary', p: 2 } }}
             >
                 <Typography variant="h6" sx={{ mb: 2 }}>Settings</Typography>
-                <Typography variant="subtitle2" sx={{ mb: 1, letterSpacing: 1 }}>MODE</Typography>
-                <ToggleButtonGroup
-                    value={themeMode}
-                    exclusive
-                    onChange={(_e, value) => value && onThemeChange(value)}
-                    fullWidth
-                    sx={{ mb: 2, borderRadius: 2, background: 'rgba(255,255,255,0.02)', p: 0.5 }}
-                >
-                    <ToggleButton value="light" sx={{ flex: 1, borderRadius: 2, p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <LightModeIcon sx={{ mb: 0.5 }} />
-                        Light
-                    </ToggleButton>
-                    <ToggleButton value="dark" sx={{ flex: 1, borderRadius: 2, p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <DarkModeIcon sx={{ mb: 0.5 }} />
-                        Dark
-                    </ToggleButton>
-                </ToggleButtonGroup>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
-                    <Button startIcon={<DownloadIcon />} variant="outlined" onClick={openImportDialog}>
-                        Import
-                    </Button>
-                    <Button startIcon={<UploadIcon />} variant="outlined" onClick={openExportDialog}>
-                        Export
-                    </Button>
-                </Box>
+                <List>
+                    <ListItem>
+                        <ListItemIcon><ContrastIcon /></ListItemIcon>
+                        <ListItemText primary="Theme" />
+                        <ToggleButtonGroup
+                            value={themeMode}
+                            exclusive
+                            onChange={(_e, value) => value && onThemeChange(value)}
+                            size="small"
+                            sx={{ ml: 2 }}
+                        >
+                            <ToggleButton value="light"><LightModeIcon /></ToggleButton>
+                            <ToggleButton value="dark"><DarkModeIcon /></ToggleButton>
+                        </ToggleButtonGroup>
+                    </ListItem>
+                    <ListItem disablePadding>
+                        <ListItemButton onClick={openImportDialog}>
+                            <ListItemIcon><DownloadIcon /></ListItemIcon>
+                            <ListItemText primary="Import" />
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding>
+                        <ListItemButton onClick={openExportDialog}>
+                            <ListItemIcon><UploadIcon /></ListItemIcon>
+                            <ListItemText primary="Export" />
+                        </ListItemButton>
+                    </ListItem>
+                </List>
                 <ImportDialog packages={state.packages} packagesToImport={importDialogData} isOpen={!!importDialogData} closeDialog={closeImportDialog} addPackages={addPackages} />
                 <ExportDialog packages={state.packages} isOpen={exportDialog} closeDialog={closeExportDialog} />
             </Drawer>
