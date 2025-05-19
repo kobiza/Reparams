@@ -3,17 +3,14 @@ import React, { MouseEventHandler, useState } from 'react';
 import SearchParams from "../common/SearchParams";
 import PresetsPicker, { PresetsPickerProps } from "./PresetsPicker";
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
+
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
-import Switch from '@mui/material/Switch';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import Drawer from '@mui/material/Drawer';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import CloseIcon from '@mui/icons-material/Close';
 import { useTheme } from '@mui/material/styles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -21,6 +18,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemButton from '@mui/material/ListItemButton';
 import ContrastIcon from '@mui/icons-material/Contrast';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 import {
     ParamsWithDelimiterViewModel,
@@ -28,11 +26,8 @@ import {
     QuickActionData
 } from "../../types/types";
 import AppBar from '@mui/material/AppBar';
-import Button from '@mui/material/Button';
 import Fab from '@mui/material/Fab';
 import Typography from '@mui/material/Typography';
-
-import QuickActions from "./QuickActions";
 import './UrlEditor.scss'
 import Container from "@mui/material/Container";
 import Toolbar from "@mui/material/Toolbar";
@@ -63,10 +58,8 @@ function UrlEditor({
     currentTabUrl,
     updateCurrentTabUrl,
     openNewTab,
-    className,
     presets,
     paramsWithDelimiter,
-    quickActions,
     themeMode,
     setThemeMode
 }: UrlEditorProps) {
@@ -109,6 +102,12 @@ function UrlEditor({
     const handleDrawerClose = () => setDrawerOpen(false);
 
     const theme = useTheme();
+
+    const openOptionsPage = () => {
+        if (chrome.runtime) {
+            chrome.runtime.openOptionsPage();
+        }
+    }
 
     return (
         <Paper className="url-editor" sx={{ p: 2, bgcolor: 'background.paper', boxShadow: 'none' }}>
@@ -166,6 +165,12 @@ function UrlEditor({
                             <ToggleButton value="light"><LightModeIcon /></ToggleButton>
                             <ToggleButton value="dark"><DarkModeIcon /></ToggleButton>
                         </ToggleButtonGroup>
+                    </ListItem>
+                    <ListItem disablePadding>
+                        <ListItemButton onClick={openOptionsPage}>
+                            <ListItemIcon><SettingsIcon /></ListItemIcon>
+                            <ListItemText primary="Settings" />
+                        </ListItemButton>
                     </ListItem>
                 </List>
             </Drawer>
