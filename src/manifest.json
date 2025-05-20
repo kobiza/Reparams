@@ -27,5 +27,17 @@
     "storage",
     "clipboardWrite",
     "activeTab"
-  ]
+  ],
+  "commands": {
+    "open-popup": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+P",
+        "mac": "Command+Shift+P"
+      },
+      "description": "Open the ReParams popup"
+    }
+  },
+  "background": {
+    "service_worker": "background.bundle.js"
+  }
 }
