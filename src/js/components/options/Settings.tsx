@@ -23,21 +23,11 @@ const Settings = ({ themeMode, onThemeChange }: { themeMode: 'light' | 'dark', o
         addPackages
     } = editorStore
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [importDialogData, setImportDialogData] = useState<any>(null);
+    const [importDialogOpen, setImportDialogOpen] = useState(false);
     const [exportDialog, setExportDialog] = useState(false);
 
-    const openImportDialog = () => {
-        navigator.clipboard.readText()
-            .then(text => {
-                try {
-                    const clipboardJson = JSON.parse(text);
-                    if (clipboardJson && clipboardJson.packages) {
-                        setImportDialogData(clipboardJson.packages);
-                    }
-                } catch { }
-            })
-    };
-    const closeImportDialog = () => setImportDialogData(null);
+    const openImportDialog = () => setImportDialogOpen(true);
+    const closeImportDialog = () => setImportDialogOpen(false);
     const openExportDialog = () => setExportDialog(true);
     const closeExportDialog = () => setExportDialog(false);
 
@@ -79,7 +69,7 @@ const Settings = ({ themeMode, onThemeChange }: { themeMode: 'light' | 'dark', o
                         </ListItemButton>
                     </ListItem>
                 </List>
-                <ImportDialog packages={state.packages} packagesToImport={importDialogData} isOpen={!!importDialogData} closeDialog={closeImportDialog} addPackages={addPackages} />
+                <ImportDialog packages={state.packages} isOpen={importDialogOpen} closeDialog={closeImportDialog} addPackages={addPackages} />
                 <ExportDialog packages={state.packages} isOpen={exportDialog} closeDialog={closeExportDialog} />
             </Drawer>
             <div>
