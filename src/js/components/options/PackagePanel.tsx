@@ -92,11 +92,6 @@ const PackagePanel = ({ packageData, packageKey, editorStore }: PackagePanelProp
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls="panel1a-content"
                 id="panel1a-header"
-                sx={{
-                    '&.Mui-focusVisible': {
-                        backgroundColor: '#fff'
-                    }
-                }}
             >
                 <div className="package-name-wrapper">
                     <div className={classNames("package-name-view", { 'hidden-x': isRenameActive })}>

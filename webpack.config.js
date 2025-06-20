@@ -8,6 +8,7 @@ module.exports = {
         popup: [path.join(__dirname, 'src/js/components/popup/index')],
         options: [path.join(__dirname, 'src/js/components/options/index')],
         content: [path.join(__dirname, 'src/js/components/content/index')],
+        background: [path.join(__dirname, 'src/js/background.js')],
         // hot: 'webpack/hot/dev-server.js',
         // background: [path.join(__dirname, 'src/background')],
     },
