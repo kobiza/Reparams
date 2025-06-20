@@ -2,6 +2,7 @@ import { isEmpty } from "lodash";
 import React, { MouseEventHandler, useState } from 'react';
 import SearchParams from "../common/SearchParams";
 import PresetsPicker, { PresetsPickerProps } from "./PresetsPicker";
+import useCommandEnterShortcut from "../common/useCommandEnterShortcut";
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 
 import IconButton from '@mui/material/IconButton';
@@ -102,6 +103,12 @@ function UrlEditor({
     const handleDrawerClose = () => setDrawerOpen(false);
 
     const theme = useTheme();
+
+    // Add keyboard shortcut for Command + Enter
+    useCommandEnterShortcut({
+        onCommandEnter: () => updateCurrentTabUrl(newUrl),
+        enabled: true
+    });
 
     const openOptionsPage = () => {
         if (chrome.runtime) {
