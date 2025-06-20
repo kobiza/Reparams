@@ -304,6 +304,7 @@ export default function ImportDialog({
                 aria-describedby="alert-dialog-description"
                 maxWidth="sm"
                 fullWidth
+                PaperProps={{ sx: { minHeight: '420px' } }}
             >
                 <DialogTitle id="alert-dialog-title">
                     Import packages

@@ -166,6 +166,7 @@ export default function ExportDialog({ packages, isOpen, closeDialog }: ExportDi
             aria-describedby="alert-dialog-description"
             maxWidth="sm"
             fullWidth
+            PaperProps={{ sx: { minHeight: '450px' } }}
         >
             <DialogTitle id="alert-dialog-title">
                 Export packages
