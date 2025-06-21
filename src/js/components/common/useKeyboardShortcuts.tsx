@@ -12,8 +12,9 @@ type UseKeyboardShortcutsOptions = {
 }
 
 /**
- * Generic keyboard shortcuts hook that handles multiple key combinations
- * Uses capture phase to intercept key events before other components can handle them
+ * Clean keyboard shortcuts hook using "Command mode" approach
+ * When Command is pressed, intercepts all subsequent keys to prevent conflicts
+ * with other event handlers (like autocomplete)
  *
  * Example usage:
  * useKeyboardShortcuts({
@@ -34,15 +35,15 @@ const useKeyboardShortcuts = ({ shortcuts, enabled = true }: UseKeyboardShortcut
     useEffect(() => {
         if (!enabled || shortcuts.length === 0) return;
 
+        let isCommandPressed = false;
         const pressedKeys = new Set<string>();
-        let keySequenceListeners: Map<string, (event: KeyboardEvent) => void> = new Map();
 
         const normalizeKey = (key: string): string => {
             // Normalize key names for cross-platform compatibility
             const keyMap: { [key: string]: string } = {
                 'Meta': 'Meta',
-                'Cmd': 'Meta',
                 'Command': 'Meta',
+                'Cmd': 'Meta',
                 'Control': 'Control',
                 'Ctrl': 'Control',
                 'Shift': 'Shift',
@@ -52,100 +53,57 @@ const useKeyboardShortcuts = ({ shortcuts, enabled = true }: UseKeyboardShortcut
             return keyMap[key] || key;
         };
 
-        const getShortcutKey = (keys: string[]): string => {
-            return keys.map(normalizeKey).sort().join('+');
-        };
-
         const handleKeyDown = (event: KeyboardEvent) => {
             const normalizedKey = normalizeKey(event.key);
-            pressedKeys.add(normalizedKey);
 
-            // Check if any shortcut matches the currently pressed keys
-            shortcutsRef.current.forEach(shortcut => {
-                const requiredKeys = shortcut.keys.map(normalizeKey);
-                const shortcutKey = getShortcutKey(requiredKeys);
+            // Track Command key state
+            if (normalizedKey === 'Meta' || normalizedKey === 'Control') {
+                isCommandPressed = true;
+                pressedKeys.add(normalizedKey);
+                return;
+            }
 
-                // Check if all required keys are pressed
-                const allKeysPressed = requiredKeys.every(key => pressedKeys.has(key));
+            // If Command is pressed, intercept ALL keys to prevent conflicts
+            if (isCommandPressed) {
+                event.preventDefault();
+                event.stopPropagation();
 
-                if (allKeysPressed && requiredKeys.length === pressedKeys.size) {
-                    // Set up a listener for the final key (usually Enter)
-                    const finalKey = requiredKeys[requiredKeys.length - 1];
+                // Add this key to pressed keys
+                pressedKeys.add(normalizedKey);
 
-                    if (finalKey === 'Enter' && event.key === 'Enter') {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        shortcut.callback();
-                        return;
-                    }
+                // Check if current combination matches any shortcut
+                const matchingShortcut = shortcutsRef.current.find(shortcut => {
+                    const requiredKeys = shortcut.keys.map(normalizeKey);
+                    return requiredKeys.length === pressedKeys.size &&
+                        requiredKeys.every(key => pressedKeys.has(key));
+                });
 
-                    // For non-Enter final keys, execute immediately
-                    if (finalKey !== 'Enter') {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        shortcut.callback();
-                        return;
-                    }
+                if (matchingShortcut) {
+                    matchingShortcut.callback();
                 }
-            });
-
-            // Set up Enter key listener when modifier keys are pressed
-            if ((pressedKeys.has('Meta') || pressedKeys.has('Control')) && !keySequenceListeners.has('Enter')) {
-                const enterListener = (enterEvent: KeyboardEvent) => {
-                    if (enterEvent.key === 'Enter') {
-                        const currentKeys = new Set(pressedKeys);
-                        currentKeys.add('Enter');
-
-                        // Find matching shortcut
-                        const matchingShortcut = shortcutsRef.current.find(shortcut => {
-                            const requiredKeys = shortcut.keys.map(normalizeKey);
-                            return requiredKeys.every(key => currentKeys.has(key)) &&
-                                requiredKeys.length === currentKeys.size;
-                        });
-
-                        if (matchingShortcut) {
-                            enterEvent.preventDefault();
-                            enterEvent.stopPropagation();
-                            matchingShortcut.callback();
-
-                            // Clean up enter listener
-                            document.removeEventListener('keydown', enterListener, true);
-                            keySequenceListeners.delete('Enter');
-                        }
-                    }
-                };
-
-                document.addEventListener('keydown', enterListener, true);
-                keySequenceListeners.set('Enter', enterListener);
             }
         };
 
         const handleKeyUp = (event: KeyboardEvent) => {
             const normalizedKey = normalizeKey(event.key);
-            pressedKeys.delete(normalizedKey);
 
-            // Clean up Enter listener when modifier keys are released
-            if ((normalizedKey === 'Meta' || normalizedKey === 'Control') && keySequenceListeners.has('Enter')) {
-                const enterListener = keySequenceListeners.get('Enter');
-                if (enterListener) {
-                    document.removeEventListener('keydown', enterListener, true);
-                    keySequenceListeners.delete('Enter');
-                }
+            // Reset when Command is released
+            if (normalizedKey === 'Meta' || normalizedKey === 'Control') {
+                isCommandPressed = false;
+                pressedKeys.clear();
+            } else {
+                // Remove other keys when released
+                pressedKeys.delete(normalizedKey);
             }
         };
 
-        document.addEventListener('keydown', handleKeyDown);
-        document.addEventListener('keyup', handleKeyUp);
+        // Use capture phase to intercept before other handlers
+        document.addEventListener('keydown', handleKeyDown, true);
+        document.addEventListener('keyup', handleKeyUp, true);
 
         return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-            document.removeEventListener('keyup', handleKeyUp);
-
-            // Clean up any remaining listeners
-            keySequenceListeners.forEach((listener) => {
-                document.removeEventListener('keydown', listener, true);
-            });
-            keySequenceListeners.clear();
+            document.removeEventListener('keydown', handleKeyDown, true);
+            document.removeEventListener('keyup', handleKeyUp, true);
         };
     }, [enabled, shortcuts.length]);
 };
