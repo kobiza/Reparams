@@ -2,7 +2,7 @@ import { isEmpty } from "lodash";
 import React, { MouseEventHandler, useState } from 'react';
 import SearchParams from "../common/SearchParams";
 import PresetsPicker, { PresetsPickerProps } from "./PresetsPicker";
-import useCommandEnterShortcut from "../common/useCommandEnterShortcut";
+import useKeyboardShortcuts from "../common/useKeyboardShortcuts";
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 
 import IconButton from '@mui/material/IconButton';
@@ -104,9 +104,20 @@ function UrlEditor({
 
     const theme = useTheme();
 
-    // Add keyboard shortcut for Command + Enter
-    useCommandEnterShortcut({
-        onCommandEnter: () => updateCurrentTabUrl(newUrl),
+    // Add keyboard shortcuts for Command + Enter and Command + Shift + Enter
+    useKeyboardShortcuts({
+        shortcuts: [
+            {
+                keys: ['Meta', 'Enter'],
+                callback: () => updateCurrentTabUrl(newUrl),
+                description: 'Apply URL changes'
+            },
+            {
+                keys: ['Meta', 'Shift', 'Enter'],
+                callback: () => openNewTab(newUrl),
+                description: 'Apply URL changes in new tab'
+            }
+        ],
         enabled: true
     });
 
