@@ -1,13 +1,13 @@
 import { useEffect, useRef } from 'react';
 
-type KeyboardShortcut = {
+type CommandShortcut = {
     keys: string[];
     callback: () => void;
     description?: string;
 }
 
-type UseKeyboardShortcutsOptions = {
-    shortcuts: KeyboardShortcut[];
+type UseCommandShortcutsOptions = {
+    shortcuts: CommandShortcut[];
     enabled?: boolean;
 }
 
@@ -17,14 +17,14 @@ type UseKeyboardShortcutsOptions = {
  * with other event handlers (like autocomplete)
  *
  * Example usage:
- * useKeyboardShortcuts({
+ * useCommandShortcuts({
  *   shortcuts: [
  *     { keys: ['Meta', 'Enter'], callback: () => doSomething() },
  *     { keys: ['Meta', 'Shift', 'Enter'], callback: () => doSomethingElse() }
  *   ]
  * });
  */
-const useKeyboardShortcuts = ({ shortcuts, enabled = true }: UseKeyboardShortcutsOptions) => {
+const useCommandShortcuts = ({ shortcuts, enabled = true }: UseCommandShortcutsOptions) => {
     const shortcutsRef = useRef(shortcuts);
 
     // Keep shortcuts ref up to date
@@ -63,12 +63,12 @@ const useKeyboardShortcuts = ({ shortcuts, enabled = true }: UseKeyboardShortcut
                 return;
             }
 
-            // If Command is pressed, intercept ALL keys to prevent conflicts
-            if (isCommandPressed) {
+            // Only intercept Enter when Command is pressed (to prevent autocomplete conflicts)
+            if (isCommandPressed && normalizedKey === 'Enter') {
                 event.preventDefault();
                 event.stopPropagation();
 
-                // Add this key to pressed keys
+                // Add Enter to pressed keys
                 pressedKeys.add(normalizedKey);
 
                 // Check if current combination matches any shortcut
@@ -81,6 +81,10 @@ const useKeyboardShortcuts = ({ shortcuts, enabled = true }: UseKeyboardShortcut
                 if (matchingShortcut) {
                     matchingShortcut.callback();
                 }
+            } else if (isCommandPressed) {
+                // For non-Enter keys when Command is pressed, just track them
+                // but don't prevent default (allows Cmd+C, Cmd+V, etc. to work)
+                pressedKeys.add(normalizedKey);
             }
         };
 
@@ -108,4 +112,4 @@ const useKeyboardShortcuts = ({ shortcuts, enabled = true }: UseKeyboardShortcut
     }, [enabled, shortcuts.length]);
 };
 
-export default useKeyboardShortcuts;
+export default useCommandShortcuts;
