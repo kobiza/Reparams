@@ -105,21 +105,21 @@ function UrlEditor({
     const theme = useTheme();
 
     // Add keyboard shortcuts for Command + Enter and Command + Shift + Enter
-    useKeyboardShortcuts({
-        shortcuts: [
-            {
-                keys: ['Meta', 'Enter'],
-                callback: () => updateCurrentTabUrl(newUrl),
-                description: 'Apply URL changes'
-            },
-            {
-                keys: ['Meta', 'Shift', 'Enter'],
-                callback: () => openNewTab(newUrl),
-                description: 'Apply URL changes in new tab'
-            }
-        ],
-        enabled: true
-    });
+    // useKeyboardShortcuts({
+    //     shortcuts: [
+    //         {
+    //             keys: ['Meta', 'Enter'],
+    //             callback: () => updateCurrentTabUrl(newUrl),
+    //             description: 'Apply URL changes'
+    //         },
+    //         {
+    //             keys: ['Meta', 'Shift', 'Enter'],
+    //             callback: () => openNewTab(newUrl),
+    //             description: 'Apply URL changes in new tab'
+    //         }
+    //     ],
+    //     enabled: true
+    // });
 
     const openOptionsPage = () => {
         if (chrome.runtime) {
