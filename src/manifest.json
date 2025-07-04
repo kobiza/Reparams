@@ -1,6 +1,6 @@
 {
   "name": "Reparams",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "manifest_version": 3,
   "action": {
     "default_title": "ReParams",
