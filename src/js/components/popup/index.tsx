@@ -48,8 +48,11 @@ const playgroundUrl = 'https://www.my-site.com/?name=Bar&age=25&experiments=spec
 // @ts-ignore
 if (chrome.tabs) {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        const { id, url } = tabs[0]
-        root.render(<App currentTabUrl={url!} tabId={id!} />);
+        if (tabs[0]?.url) {
+            root.render(<App currentTabUrl={tabs[0].url} tabId={tabs[0].id!} />);
+        } else {
+            root.render(<App currentTabUrl={playgroundUrl} tabId={1} />);
+        }
     })
 } else {
     root.render(<App currentTabUrl={playgroundUrl} tabId={1} />);
