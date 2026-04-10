@@ -1,4 +1,4 @@
-import {mergeEntries, removeEntries, updateEntryKey, updateEntryValue} from "../src/js/utils/searchParamsUtils";
+import {mergeEntries, parseQuickPaste, removeEntries, updateEntryKey, updateEntryValue} from "../src/js/utils/searchParamsUtils";
 import {ParamsWithDelimiterViewModel, SearchParamsEntries} from "../src/js/types/types";
 
 describe('updateEntryKey', () => {
@@ -139,5 +139,59 @@ describe('mergeEntries', () => {
 
             expect(newEntries).toEqual([['key1', 'value1'], ['users', 'Bar,Foo,Dan,Ben']])
         })
+    })
+})
+
+describe('parseQuickPaste', () => {
+    test('returns null for plain text with no = sign', () => {
+        expect(parseQuickPaste('plaintext')).toBeNull()
+    })
+
+    test('single key=value pair', () => {
+        expect(parseQuickPaste('key=value')).toEqual([['key', 'value']])
+    })
+
+    test('multiple pairs separated by &', () => {
+        expect(parseQuickPaste('key1=v1&key2=v2')).toEqual([['key1', 'v1'], ['key2', 'v2']])
+    })
+
+    test('value containing = is kept intact', () => {
+        expect(parseQuickPaste('key=v1=v2')).toEqual([['key', 'v1=v2']])
+    })
+
+    test('empty key is filtered out, returns null', () => {
+        expect(parseQuickPaste('=value')).toBeNull()
+    })
+
+    test('URL-encoded value is decoded', () => {
+        expect(parseQuickPaste('name=John%20Doe')).toEqual([['name', 'John Doe']])
+    })
+
+    test('trailing & is ignored', () => {
+        expect(parseQuickPaste('key1=v1&')).toEqual([['key1', 'v1']])
+    })
+
+    test('tokens with empty keys are skipped, valid ones are kept', () => {
+        expect(parseQuickPaste('key1=v1&=skip&key2=v2')).toEqual([['key1', 'v1'], ['key2', 'v2']])
+    })
+
+    test('leading && separators are ignored', () => {
+        expect(parseQuickPaste('&&a=1&b=2')).toEqual([['a', '1'], ['b', '2']])
+    })
+
+    test('full URL — extracts query params correctly', () => {
+        expect(parseQuickPaste('https://example.com?key1=v1&key2=v2')).toEqual([['key1', 'v1'], ['key2', 'v2']])
+    })
+
+    test('full URL with no query params returns null', () => {
+        expect(parseQuickPaste('https://example.com/path')).toBeNull()
+    })
+
+    test('hash fragment is stripped from value', () => {
+        expect(parseQuickPaste('key=value#section')).toEqual([['key', 'value']])
+    })
+
+    test('+ is decoded as space (URL query string spec)', () => {
+        expect(parseQuickPaste('name=John+Doe')).toEqual([['name', 'John Doe']])
     })
 })

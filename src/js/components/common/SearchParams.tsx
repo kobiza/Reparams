@@ -1,6 +1,6 @@
 import React, { KeyboardEventHandler, useEffect, useRef, useState } from "react";
 import { ParamsWithDelimiterViewModel, SearchParamsEntries, SetEntries } from "../../types/types";
-import { updateEntryKey, updateEntryValue } from "../../utils/searchParamsUtils";
+import { parseQuickPaste, updateEntryKey, updateEntryValue } from "../../utils/searchParamsUtils";
 import './SearchParams.scss'
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -114,6 +114,19 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className }: S
                     inputProps={{
                         onPaste: (e: React.ClipboardEvent<HTMLInputElement>) => {
                             const pasted = e.clipboardData.getData('text')
+                            if (key === '' && value === '') {
+                                const parsed = parseQuickPaste(pasted)
+                                if (parsed) {
+                                    e.preventDefault()
+                                    const newEntries = [
+                                        ...entries.slice(0, index),
+                                        ...parsed,
+                                        ...entries.slice(index + 1),
+                                    ] as SearchParamsEntries
+                                    setEntries(newEntries)
+                                    return
+                                }
+                            }
                             const decoded = decodeIfEncoded(pasted)
                             if (decoded !== pasted) {
                                 e.preventDefault()

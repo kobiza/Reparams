@@ -57,3 +57,44 @@ describe('SearchParams paste handling', () => {
         expect(document.execCommand).not.toHaveBeenCalled()
     })
 })
+
+describe('quick-paste', () => {
+    test('single key=value on empty row fills that row', () => {
+        const { setEntries, keyInput } = setup([['', '']])
+        firePaste(keyInput, 'key1=v1')
+        expect(setEntries).toHaveBeenCalledWith([['key1', 'v1']])
+    })
+
+    test('multi key=value on empty row replaces row and appends extras', () => {
+        const { setEntries, keyInput } = setup([['', '']])
+        firePaste(keyInput, 'key1=v1&key2=v2')
+        expect(setEntries).toHaveBeenCalledWith([['key1', 'v1'], ['key2', 'v2']])
+    })
+
+    test('existing rows before the empty row are preserved', () => {
+        const setEntries = jest.fn()
+        render(
+            <SearchParams
+                entries={[['existing', 'row'], ['', '']]}
+                setEntries={setEntries}
+                paramsWithDelimiter={{}}
+            />
+        )
+        const inputs = screen.getAllByRole('textbox')
+        const emptyRowKeyInput = inputs[2] // 3rd input = key of 2nd row
+        firePaste(emptyRowKeyInput, 'newkey=newval')
+        expect(setEntries).toHaveBeenCalledWith([['existing', 'row'], ['newkey', 'newval']])
+    })
+
+    test('paste on non-empty row (key present) does not trigger quick-paste', () => {
+        const { setEntries, keyInput } = setup([['existingKey', '']])
+        firePaste(keyInput, 'key1=v1')
+        expect(setEntries).not.toHaveBeenCalled()
+    })
+
+    test('paste on row where value is non-empty does not trigger quick-paste', () => {
+        const { setEntries, keyInput } = setup([['', 'existingValue']])
+        firePaste(keyInput, 'key1=v1')
+        expect(setEntries).not.toHaveBeenCalled()
+    })
+})

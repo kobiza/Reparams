@@ -126,3 +126,23 @@ export const removeEntries = (entries: SearchParamsEntries, entriesToRemove: Sea
 
     return lastEntries
 }
+
+export const parseQuickPaste = (text: string): Array<[string, string]> | null => {
+    if (!text.includes('=')) return null
+
+    let searchParams: URLSearchParams
+    try {
+        // Full URL pasted (e.g. https://example.com?key=value) — extract its query params
+        searchParams = new URL(text).searchParams
+    } catch {
+        try {
+            // Raw query string (e.g. key1=v1&key2=v2) — wrap in a dummy URL to parse
+            searchParams = new URL(`https://x.com?${text}`).searchParams
+        } catch {
+            return null
+        }
+    }
+
+    const pairs = [...searchParams.entries()].filter(([key]) => key !== '') as Array<[string, string]>
+    return pairs.length > 0 ? pairs : null
+}
