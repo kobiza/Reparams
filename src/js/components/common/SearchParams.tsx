@@ -13,6 +13,7 @@ import TextField from '@mui/material/TextField';
 import ClearIcon from '@mui/icons-material/Clear';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import { removeItem } from "../../utils/arrayUtils";
+import { decodeIfEncoded } from "../../utils/encodingUtils";
 import usePrevious from "./usePrevious";
 import ParamWithDelimiterValueInput from "./ParamWithDelimiterValueInput";
 import classNames from "classnames";
@@ -110,6 +111,16 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className }: S
                     value={key}
                     onChange={e => updateCurrentEntryKey(e.target.value)}
                     inputRef={el => itemsRef.current[index] = el}
+                    inputProps={{
+                        onPaste: (e: React.ClipboardEvent<HTMLInputElement>) => {
+                            const pasted = e.clipboardData.getData('text')
+                            const decoded = decodeIfEncoded(pasted)
+                            if (decoded !== pasted) {
+                                e.preventDefault()
+                                document.execCommand('insertText', false, decoded)
+                            }
+                        }
+                    }}
                 />
                 <TextField
                     className="query-param-input-value"
@@ -118,6 +129,16 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className }: S
                     size="small"
                     value={value}
                     onChange={e => updateCurrentEntryValue(e.target.value)}
+                    inputProps={{
+                        onPaste: (e: React.ClipboardEvent<HTMLInputElement>) => {
+                            const pasted = e.clipboardData.getData('text')
+                            const decoded = decodeIfEncoded(pasted)
+                            if (decoded !== pasted) {
+                                e.preventDefault()
+                                document.execCommand('insertText', false, decoded)
+                            }
+                        }
+                    }}
                     InputProps={isParamsWithDelimiter ? {
                         endAdornment: (
                             <InputAdornment position="end">

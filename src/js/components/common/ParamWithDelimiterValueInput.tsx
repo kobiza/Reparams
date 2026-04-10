@@ -3,6 +3,7 @@ import React, {KeyboardEventHandler} from "react";
 import {Theme} from "@mui/material";
 import {SxProps} from "@mui/system";
 import FreeSoloTags from "./FreeSoloTags";
+import { decodeIfEncoded } from "../../utils/encodingUtils";
 
 export type ParamWithDelimiterValueInputProps = {
     value: string,
@@ -17,7 +18,7 @@ export type ParamWithDelimiterValueInputProps = {
 const ParamWithDelimiterValueInput = ({value, delimiter, onChange, sx, className, limitTags, onTextInputKeyUp}: ParamWithDelimiterValueInputProps) => {
     const values = value ? value.split(delimiter) : []
     const onChangeHandler = (newValues: Array<string>) => {
-        onChange(newValues.map(v => v.trim()).join(delimiter))
+        onChange(newValues.map(v => decodeIfEncoded(v.trim())).join(delimiter))
     }
 
     return (

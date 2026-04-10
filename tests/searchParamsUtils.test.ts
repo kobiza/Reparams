@@ -67,6 +67,30 @@ describe('removeEntries', () => {
     })
 })
 
+describe('encoded string handling', () => {
+    // The utils layer receives pre-decoded strings from the UI (decode happens on paste).
+    // These tests document the contract: encoded strings are treated as opaque literals here.
+
+    test('updateEntryValue stores an encoded value as-is (no auto-decode at utils layer)', () => {
+        const entries: SearchParamsEntries = [['name', 'original']]
+        const newEntries = updateEntryValue(entries, 'John%20Doe', 0)
+        expect(newEntries).toEqual([['name', 'John%20Doe']])
+    })
+
+    test('updateEntryKey stores an encoded key as-is', () => {
+        const entries: SearchParamsEntries = [['key%3Done', 'value']]
+        const newEntries = updateEntryKey(entries, 'key%3Dtwo', 0)
+        expect(newEntries).toEqual([['key%3Dtwo', 'value']])
+    })
+
+    test('mergeEntries treats encoded value strings as opaque literals', () => {
+        const entries: SearchParamsEntries = [['name', 'Alice']]
+        const preset: SearchParamsEntries = [['name', 'John%20Doe']]
+        const newEntries = mergeEntries([entries, preset], {})
+        expect(newEntries).toEqual([['name', 'John%20Doe']])
+    })
+})
+
 describe('mergeEntries', () => {
     test('simple merge', () => {
         const entries: SearchParamsEntries = [['key1', 'value1'], ['key2', 'value2']]
