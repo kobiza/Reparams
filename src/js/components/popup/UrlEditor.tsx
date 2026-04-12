@@ -47,7 +47,7 @@ type UrlEditorProps = {
 }
 
 const addEntries = (url: string, newEntries: Array<[string, string]>) => {
-    const newSearch = new URLSearchParams(newEntries).toString()
+    const newSearch = new URLSearchParams(newEntries).toString().replace(/\+/g, '%20')
     const newUrlData = new URL(url)
 
     newUrlData.search = newSearch

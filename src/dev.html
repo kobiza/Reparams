@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ReParams — Dev Launcher</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #f5f5f5;
+        }
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            padding: 32px 40px;
+            width: 560px;
+            max-width: 90vw;
+        }
+        h2 { margin: 0 0 8px; font-size: 1.2rem; color: #333; }
+        p  { margin: 0 0 20px; font-size: 0.85rem; color: #777; }
+        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #444; }
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+        input:focus { outline: none; border-color: #1976d2; }
+        button {
+            width: 100%;
+            padding: 10px;
+            font-size: 0.95rem;
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover { background: #1565c0; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>ReParams — Dev Launcher</h2>
+        <p>Open the popup as if the active tab is the URL below.</p>
+        <label for="url-input">Tab URL to simulate</label>
+        <input
+            id="url-input"
+            type="url"
+            value="https://www.my-site.com/?name=Bar&age=25&experiments=spec1,spec2"
+            spellcheck="false"
+        />
+        <button onclick="openPopup()">Open Popup</button>
+    </div>
+    <script>
+        function openPopup() {
+            var url = document.getElementById('url-input').value.trim();
+            if (!url) return;
+            window.location.href = 'popup.html?devUrl=' + encodeURIComponent(url);
+        }
+        document.getElementById('url-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') openPopup();
+        });
+    </script>
+</body>
+</html>

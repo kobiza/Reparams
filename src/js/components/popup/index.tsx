@@ -55,6 +55,7 @@ if (chrome.tabs) {
         }
     })
 } else {
-    root.render(<App currentTabUrl={playgroundUrl} tabId={1} />);
+    const fallbackUrl = __DEV__ ? (new URLSearchParams(location.search).get('devUrl') || playgroundUrl) : playgroundUrl
+    root.render(<App currentTabUrl={fallbackUrl} tabId={1} />);
 }
 

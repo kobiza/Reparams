@@ -1,9 +1,12 @@
 const path = require("path");
-// const webpack = require("webpack")
+const webpack = require("webpack")
 const CopyWebpackPlugin = require("copy-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 
-module.exports = {
+module.exports = (env, argv) => {
+    const isDev = argv.mode === 'development';
+
+    return {
     entry: {
         popup: [path.join(__dirname, 'src/js/components/popup/index')],
         options: [path.join(__dirname, 'src/js/components/options/index')],
@@ -60,6 +63,7 @@ module.exports = {
         ]
     },
     plugins: [
+        new webpack.DefinePlugin({ '__DEV__': JSON.stringify(isDev) }),
         // new webpack.HotModuleReplacementPlugin(),
         new CopyWebpackPlugin({
             patterns: [
@@ -92,10 +96,10 @@ module.exports = {
             inject: 'body'
         }),
     ],
-    mode: process.env.NODE_ENV === 'development' ? 'development' : 'production',
-    devtool: process.env.NODE_ENV === 'development' ? 'source-map' : false,
+    mode: isDev ? 'development' : 'production',
+    devtool: isDev ? 'source-map' : false,
     optimization: {
-        minimize: process.env.NODE_ENV !== 'development',
+        minimize: !isDev,
         // splitChunks: {
         //     chunks: (chunk) => chunk.name !== 'content',
         //     cacheGroups: {
@@ -107,4 +111,5 @@ module.exports = {
         //     },
         // },
     },
-};
+    }; // end config object
+}; // end module.exports function
