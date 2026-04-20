@@ -38,3 +38,6 @@ npm-debug.log
 .idea
 .vscode
 *.iml
+
+# dev-3.0 local config
+.dev3/config.local.json
