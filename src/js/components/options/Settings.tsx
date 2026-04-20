@@ -15,6 +15,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ContrastIcon from '@mui/icons-material/Contrast';
+import DevModeIndicator from '../common/DevModeIndicator';
 
 const Settings = ({ themeMode, onThemeChange }: { themeMode: 'light' | 'dark', onThemeChange: (mode: 'light' | 'dark') => void }) => {
     const editorStore = React.useContext(EditorStoreContext)
@@ -75,6 +76,7 @@ const Settings = ({ themeMode, onThemeChange }: { themeMode: 'light' | 'dark', o
             <div>
                 <PackagesPage />
             </div>
+            <DevModeIndicator />
         </div>
     )
 }

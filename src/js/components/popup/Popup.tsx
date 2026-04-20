@@ -8,6 +8,7 @@ import DarkModeIcon from '@mui/icons-material/DarkMode';
 import Box from '@mui/material/Box';
 import InputBase from '@mui/material/InputBase';
 import HttpsIcon from '@mui/icons-material/Https';
+import DevModeIndicator from '../common/DevModeIndicator';
 
 // import Settings from "./Settings";
 
@@ -19,11 +20,11 @@ function Popup({ currentTabUrl, tabId, themeMode, setThemeMode }: {
 }) {
     const { state } = useContext(ViewerStoreContext)
 
-    const devUrl = __DEV__ ? new URLSearchParams(location.search).get('devUrl') : null
+    const isLocalDev = __DEV__ && !chrome?.tabs
     const [urlInput, setUrlInput] = useState(currentTabUrl)
 
     const updateCurrentTabUrl = (newUrl: string) => {
-        if (devUrl !== null) {
+        if (isLocalDev) {
             window.location.replace('popup.html?devUrl=' + encodeURIComponent(newUrl))
             return
         }
@@ -31,7 +32,7 @@ function Popup({ currentTabUrl, tabId, themeMode, setThemeMode }: {
     }
 
     const openNewTab = (newUrl: string) => {
-        if (devUrl !== null) {
+        if (isLocalDev) {
             window.location.replace('popup.html?devUrl=' + encodeURIComponent(newUrl))
             return
         }
@@ -40,7 +41,7 @@ function Popup({ currentTabUrl, tabId, themeMode, setThemeMode }: {
 
     return (
         <div className="popup">
-            {__DEV__ && (
+            {isLocalDev && (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px', px: 1.5, py: '5px', mb: 0.5, bgcolor: 'action.hover', borderRadius: '20px', overflow: 'hidden' }}>
                     <HttpsIcon sx={{ fontSize: 14, flexShrink: 0, opacity: 0.5 }} />
                     <InputBase
@@ -73,6 +74,7 @@ function Popup({ currentTabUrl, tabId, themeMode, setThemeMode }: {
                 setThemeMode={setThemeMode}
             />
             {/*<Settings/>*/}
+            <DevModeIndicator />
         </div>
     );
 }
