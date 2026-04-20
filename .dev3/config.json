@@ -1,0 +1,6 @@
+{
+  "clonePaths": [
+    "node_modules",
+    "build"
+  ]
+}
