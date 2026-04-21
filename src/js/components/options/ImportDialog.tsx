@@ -23,6 +23,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import { replaceItem, toTrueObj } from "../../utils/arrayUtils";
 import { EditorStore, EditorModel, SettingsPackage } from "../../types/types";
 import { useEffect, useState } from "react";
+import { migrateModel } from "../../utils/dataFixer";
 
 type PackageItem = { key: string, label: string, checked: boolean }
 
@@ -169,17 +170,21 @@ export default function ImportDialog({
     };
 
     const parseImportData = (jsonString: string): EditorModel | null => {
-        try {
-            const data = JSON.parse(jsonString);
-            if (data && data.packages) {
-                return data;
-            }
-            setError('Invalid format: JSON must contain a "packages" property');
-            return null;
-        } catch (err) {
-            setError('Invalid JSON format');
+        const result = migrateModel(jsonString);
+        if (!result.ok) {
+            const errorByReason = {
+                'parse': 'Invalid JSON format',
+                'fixer-threw': "Import couldn't be upgraded to the current model version",
+                'future-version': 'Import is from a newer extension version — please update first',
+            };
+            setError(errorByReason[result.reason]);
             return null;
         }
+        if (!result.model.packages || Object.keys(result.model.packages).length === 0) {
+            setError('Nothing to import: no packages found');
+            return null;
+        }
+        return result.model;
     };
 
     const importFromClipboard = async () => {

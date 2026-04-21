@@ -69,7 +69,7 @@ describe('mergeAppDataPackages', () => {
         const pkg2 = makePackage('p2', 'Pkg2', ['*://*/*'], [], {
             preset2: { label: 'Preset B', entries: [['b', '2']] },
         });
-        const model: EditorModel = { modelVersion: '1.0', packages: { p1: pkg1, p2: pkg2 } };
+        const model: EditorModel = { modelVersion: 1, packages: { p1: pkg1, p2: pkg2 } };
 
         const merged = mergeAppDataPackages(model);
         expect(merged.presets).toHaveProperty('preset1');
@@ -83,7 +83,7 @@ describe('mergeAppDataPackages', () => {
         const pkg2 = makePackage('p2', 'Pkg2', ['*://*/*'], [], {
             shared: { label: 'Second', entries: [] },
         });
-        const model: EditorModel = { modelVersion: '1.0', packages: { p1: pkg1, p2: pkg2 } };
+        const model: EditorModel = { modelVersion: 1, packages: { p1: pkg1, p2: pkg2 } };
 
         const merged = mergeAppDataPackages(model);
         expect(merged.presets.shared.label).toBe('Second');
@@ -96,7 +96,7 @@ describe('getRelevantPackages', () => {
     const githubPkg = makePackage('gh', 'GitHub', ['https://github.com/*']);
     const domPkg = makePackage('d', 'DOM', [], ['.my-class']);
     const model: EditorModel = {
-        modelVersion: '1.0',
+        modelVersion: 1,
         packages: { g: googlePkg, gh: githubPkg, d: domPkg },
     };
 

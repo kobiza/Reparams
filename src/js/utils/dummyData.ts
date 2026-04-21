@@ -87,7 +87,7 @@ export const paramsWithDelimiter: ParamsWithDelimiter = [{
 
 
 export const appData: EditorModel = {
-    modelVersion: '1.0.0',
+    modelVersion: 1,
     packages: {
         'kobiz-package': {
             key: 'kobiz-package',

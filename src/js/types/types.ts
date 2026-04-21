@@ -45,7 +45,7 @@ export type MergedAppData = {
 }
 
 export type EditorModel = {
-    modelVersion: string
+    modelVersion: number
     packages: { [key: string]: SettingsPackage }
 }
 

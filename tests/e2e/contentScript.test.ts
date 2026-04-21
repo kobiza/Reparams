@@ -4,7 +4,7 @@ import { EditorModel } from '../../src/js/types/types';
 const DOM_SELECTOR = '#reparams-test-element';
 
 const DOM_SELECTOR_MODEL: EditorModel = {
-    modelVersion: '1.0',
+    modelVersion: 1,
     packages: {
         'dom-pkg': {
             key: 'dom-pkg',

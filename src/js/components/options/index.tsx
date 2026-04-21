@@ -5,12 +5,9 @@ import Settings from "./Settings";
 import UseEditorStoreContext from "./UseEditorStoreContext";
 import getMuiTheme from "../../utils/getMuiTheme";
 import { GlobalStyles, ThemeProvider } from "@mui/material";
-import { runFixer1 } from './dataFixer';
 import { localStoragePreferencesKey } from '../../utils/consts';
-
-
-// runFixer1()
-// reset()
+import { useDataIssue } from '../../utils/useDataIssue';
+import DataIssueDialog from '../common/DataIssueDialog';
 
 const getThemeMode = () => {
     try {
@@ -28,6 +25,7 @@ const root = createRoot(document.getElementById('root')!);
 
 const App = () => {
     const [themeMode, setThemeMode] = useState<'light' | 'dark'>(getThemeMode());
+    const { issue, dismiss, reset } = useDataIssue();
 
     useEffect(() => {
         localStorage.setItem(localStoragePreferencesKey, JSON.stringify({ themeMode }));
@@ -44,6 +42,12 @@ const App = () => {
                     <Settings themeMode={themeMode} onThemeChange={setThemeMode} />
                 </div>
             </UseEditorStoreContext>
+            <DataIssueDialog
+                isOpen={!!issue}
+                reason={issue?.reason ?? 'parse'}
+                onDismiss={dismiss}
+                onReset={reset}
+            />
         </ThemeProvider>
     )
 }

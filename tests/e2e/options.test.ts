@@ -3,7 +3,7 @@ import { seedStorage } from './helpers/seedStorage';
 import { EditorModel } from '../../src/js/types/types';
 
 const SEEDED_MODEL: EditorModel = {
-    modelVersion: '1.0',
+    modelVersion: 1,
     packages: {
         'e2e-pkg': {
             key: 'e2e-pkg',

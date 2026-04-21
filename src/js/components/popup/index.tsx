@@ -6,6 +6,8 @@ import UseViewerStoreContext from "./UseViewerStoreContext";
 import { GlobalStyles, ThemeProvider } from "@mui/material";
 import getMuiTheme from "../../utils/getMuiTheme";
 import { localStoragePreferencesKey } from '../../utils/consts';
+import { useDataIssue } from '../../utils/useDataIssue';
+import DataIssueDialog from '../common/DataIssueDialog';
 
 
 
@@ -21,6 +23,7 @@ const getPreferences = (): { themeMode: 'light' | 'dark' } => {
 
 const App = ({ currentTabUrl, tabId }: { currentTabUrl: string; tabId: number }) => {
     const [themeMode, setThemeMode] = useState<'light' | 'dark'>(() => getPreferences().themeMode);
+    const { issue, dismiss, reset } = useDataIssue();
     useEffect(() => {
         localStorage.setItem(localStoragePreferencesKey, JSON.stringify({ themeMode }));
     }, [themeMode]);
@@ -39,6 +42,12 @@ const App = ({ currentTabUrl, tabId }: { currentTabUrl: string; tabId: number })
                     />
                 </div>
             </UseViewerStoreContext>
+            <DataIssueDialog
+                isOpen={!!issue}
+                reason={issue?.reason ?? 'parse'}
+                onDismiss={dismiss}
+                onReset={reset}
+            />
         </ThemeProvider>
     )
 }

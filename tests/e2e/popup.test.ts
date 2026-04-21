@@ -4,7 +4,7 @@ import { EditorModel } from '../../src/js/types/types';
 
 function makeModel(presetLabel: string, entries: [string, string][] = []): EditorModel {
     return {
-        modelVersion: '1.0',
+        modelVersion: 1,
         packages: {
             'popup-pkg': {
                 key: 'popup-pkg',
@@ -52,7 +52,7 @@ test('applying a preset adds params to the URL display', async ({ context, exten
 
 function makeUrlSpecificModel(pattern: string): EditorModel {
     return {
-        modelVersion: '1.0',
+        modelVersion: 1,
         packages: {
             'url-pkg': {
                 key: 'url-pkg',
