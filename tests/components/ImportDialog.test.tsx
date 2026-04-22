@@ -55,32 +55,6 @@ describe('ImportDialog — clipboard import with migrateModel', () => {
         expect(importedPackages['pkg-1'].label).toBe('Legacy Package');
     });
 
-    test('legacy array-shape import migrates to map', async () => {
-        const legacyArray = JSON.stringify([makePackage('pkg-a', 'Array Pkg')]);
-        setClipboardText(legacyArray);
-
-        const addPackages = jest.fn();
-        render(
-            <ImportDialog
-                isOpen
-                closeDialog={() => { }}
-                packages={{}}
-                addPackages={addPackages}
-            />
-        );
-
-        await userEvent.click(screen.getByRole('button', { name: /Read from Clipboard/ }));
-
-        await waitFor(() => {
-            expect(screen.getByText('Array Pkg')).toBeInTheDocument();
-        });
-
-        await userEvent.click(screen.getByRole('button', { name: /Import Selected/ }));
-
-        expect(addPackages).toHaveBeenCalledTimes(1);
-        const [importedPackages] = addPackages.mock.calls[0];
-        expect(importedPackages['pkg-a'].key).toBe('pkg-a');
-    });
 });
 
 describe('ImportDialog — error surfacing', () => {

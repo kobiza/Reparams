@@ -69,17 +69,6 @@ describe('migrateModel — error cases', () => {
 });
 
 describe('migrateModel — fixer-1 behavior', () => {
-    test('legacy array shape migrates to v1 map keyed by .key', () => {
-        const legacy: SettingsPackage[] = [makePackage('a'), makePackage('b')];
-        const result = migrateModel(JSON.stringify(legacy));
-        expect(result.ok).toBe(true);
-        if (result.ok) {
-            expect(result.model.modelVersion).toBe(1);
-            expect(Object.keys(result.model.packages).sort()).toEqual(['a', 'b']);
-            expect(result.model.packages.a.key).toBe('a');
-        }
-    });
-
     test("legacy string modelVersion '1.0' normalizes to integer 1", () => {
         const legacy = { modelVersion: '1.0', packages: { p: makePackage('p') } };
         const result = migrateModel(JSON.stringify(legacy));
@@ -126,26 +115,21 @@ describe('runMigration — pipeline chain', () => {
         const registry = {
             1: (prev: any) => {
                 order.push(1);
-                const packages = Array.isArray(prev)
-                    ? prev.reduce((acc: any, v: any) => {
-                        acc[v.key] = v;
-                        return acc;
-                    }, {})
-                    : prev?.packages ?? {};
-                return { modelVersion: 1, packages };
+                return { modelVersion: 1, packages: prev?.packages ?? {} };
             },
             2: (prev: any) => {
                 order.push(2);
                 return { ...prev, modelVersion: 2, flag: 'v2' };
             },
         };
-        const legacy: SettingsPackage[] = [makePackage('x')];
-        const result = runMigration(JSON.stringify(legacy), registry);
+        const preV1 = { packages: { x: makePackage('x') } };
+        const result = runMigration(JSON.stringify(preV1), registry);
         expect(result.ok).toBe(true);
         expect(order).toEqual([1, 2]);
         if (result.ok) {
             expect((result.model as any).modelVersion).toBe(2);
             expect((result.model as any).flag).toBe('v2');
+            expect(result.model.packages.x.key).toBe('x');
         }
     });
 });

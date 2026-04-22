@@ -7,21 +7,19 @@
 // goes through `migrateModel`. Fixers must be deterministic.
 // See CLAUDE.md § Model Evolution for the full rule.
 
-import { EditorModel, SettingsPackage } from "../types/types";
+import { EditorModel } from "../types/types";
 import { localStorageKey } from "./consts";
 
 type FixerFn = (prev: any) => any;
 
 const fixers: Record<number, FixerFn> = {
-    1: (prev: any): EditorModel => {
-        const packages: Record<string, SettingsPackage> = Array.isArray(prev)
-            ? prev.reduce<Record<string, SettingsPackage>>((acc, v: SettingsPackage) => {
-                acc[v.key] = v;
-                return acc;
-            }, {})
-            : (prev?.packages ?? {});
-        return { modelVersion: 1, packages };
-    },
+    // v1 is a no-op: the shape was stable before the runner existed — this fixer
+    // just stamps the integer `modelVersion: 1` so future fixers have a defined
+    // starting version to migrate from.
+    1: (prev: any): EditorModel => ({
+        modelVersion: 1,
+        packages: prev?.packages ?? {},
+    }),
 };
 
 const maxKey = (registry: Record<number, FixerFn>): number => {
@@ -38,8 +36,7 @@ export type MigrateResult =
     | { ok: false; reason: MigrateFailureReason };
 
 const detectStoredVersion = (parsed: unknown): number => {
-    if (Array.isArray(parsed)) return 0;
-    if (parsed == null || typeof parsed !== 'object') return 0;
+    if (parsed == null || typeof parsed !== 'object' || Array.isArray(parsed)) return 0;
     const v = (parsed as { modelVersion?: unknown }).modelVersion;
     if (typeof v === 'number' && Number.isInteger(v) && v >= 0) return v;
     return 0;
