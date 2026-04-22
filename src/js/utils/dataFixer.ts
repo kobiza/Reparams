@@ -3,6 +3,8 @@
 // need a fixer — readers handle `undefined` gracefully.
 //
 // CURRENT_MODEL_VERSION auto-derives from the registry — do not hardcode.
+// Fixers return the new shape only — the runner stamps `modelVersion` from the
+// registry key. Do NOT set `modelVersion` inside a fixer.
 // Every ingestion path (localStorage load, ImportDialog, future Gist fetch/sync)
 // goes through `migrateModel`. Fixers must be deterministic.
 // See CLAUDE.md § Model Evolution for the full rule.
@@ -14,12 +16,9 @@ type FixerFn = (prev: any) => any;
 
 const fixers: Record<number, FixerFn> = {
     // v1 is a no-op: the shape was stable before the runner existed — this fixer
-    // just stamps the integer `modelVersion: 1` so future fixers have a defined
-    // starting version to migrate from.
-    1: (prev: any): EditorModel => ({
-        modelVersion: 1,
-        packages: prev?.packages ?? {},
-    }),
+    // exists only so future fixers have a defined starting version to migrate
+    // from. The runner stamps `modelVersion: 1` automatically.
+    1: (prev: any) => ({ packages: prev?.packages ?? {} }),
 };
 
 const maxKey = (registry: Record<number, FixerFn>): number => {
@@ -85,7 +84,10 @@ export const runMigration = (
             return { ok: false, reason: 'fixer-threw' };
         }
         try {
-            current = fixer(current);
+            const transformed = fixer(current);
+            // Registry key is the source of truth for the target version —
+            // always stamp it, even if the fixer happened to set it itself.
+            current = { ...(transformed as object), modelVersion: target };
         } catch {
             return { ok: false, reason: 'fixer-threw' };
         }

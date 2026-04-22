@@ -112,14 +112,15 @@ describe('migrateModel — idempotence', () => {
 describe('runMigration — pipeline chain', () => {
     test('v0 input through v2 registry runs fixer-1 then fixer-2 in order', () => {
         let order: number[] = [];
+        // Fixers return the new shape only — runner stamps modelVersion.
         const registry = {
             1: (prev: any) => {
                 order.push(1);
-                return { modelVersion: 1, packages: prev?.packages ?? {} };
+                return { packages: prev?.packages ?? {} };
             },
             2: (prev: any) => {
                 order.push(2);
-                return { ...prev, modelVersion: 2, flag: 'v2' };
+                return { ...prev, flag: 'v2' };
             },
         };
         const preV1 = { packages: { x: makePackage('x') } };
@@ -130,6 +131,18 @@ describe('runMigration — pipeline chain', () => {
             expect((result.model as any).modelVersion).toBe(2);
             expect((result.model as any).flag).toBe('v2');
             expect(result.model.packages.x.key).toBe('x');
+        }
+    });
+
+    test('runner overrides any modelVersion the fixer mistakenly sets', () => {
+        const registry = {
+            1: (prev: any) => ({ ...prev, modelVersion: 99 }),
+        };
+        const result = runMigration('{}', registry);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+            // Registry key (1) wins, not the fixer's wrong value (99).
+            expect(result.model.modelVersion).toBe(1);
         }
     });
 });

@@ -49,6 +49,7 @@ The persisted model carries `modelVersion: number`. Migrations live in the fixer
 - **Breaking changes** to the persisted shape (rename, restructure, remove, re-semanticize a field) require adding a new fixer to the registry. `CURRENT_MODEL_VERSION` is **derived** from that registry — adding a fixer automatically bumps it. Never hardcode a version.
 - **Additive changes** (new optional field, new top-level section, wider enum) don't touch the fixer registry. Readers must handle `undefined` gracefully.
 - Every ingestion path (localStorage load, `ImportDialog`, future Gist fetch/sync) goes through `migrateModel`. No exceptions.
+- Fixers **return the new shape only — do not set `modelVersion`**. The runner stamps `modelVersion` from the registry key automatically (the key IS the target version). Setting it inside a fixer is redundant and error-prone.
 - Fixers must be **deterministic** — same input → same output. No `uuidv4()`, no `Date.now()` in a fixer. If a migration needs a new identifier, derive it stably.
 - Fixers chain like a pipeline: a stored v1 model loaded into a v3 codebase runs `fixers[2]` then `fixers[3]` in sequence. Each fixer only knows how to go from its immediate previous version to its target.
 
