@@ -112,7 +112,8 @@ describe('migrateModel — idempotence', () => {
 describe('runMigration — pipeline chain', () => {
     test('v0 input through v2 registry runs fixer-1 then fixer-2 in order', () => {
         let order: number[] = [];
-        // Fixers return the new shape only — runner stamps modelVersion.
+        // Convention: fixers return the new shape only — they do NOT set
+        // modelVersion. The runner stamps it from the registry key.
         const registry = {
             1: (prev: any) => {
                 order.push(1);
@@ -133,8 +134,21 @@ describe('runMigration — pipeline chain', () => {
             expect(result.model.packages.x.key).toBe('x');
         }
     });
+});
 
-    test('runner overrides any modelVersion the fixer mistakenly sets', () => {
+describe('runMigration — modelVersion is stamped by the runner, not the fixer', () => {
+    test('fixer returning no modelVersion → runner stamps it from the registry key', () => {
+        const registry = {
+            1: (prev: any) => ({ packages: prev?.packages ?? {} }),
+        };
+        const result = runMigration('{}', registry);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+            expect(result.model.modelVersion).toBe(1);
+        }
+    });
+
+    test('fixer returning a wrong modelVersion → runner overrides with the registry key', () => {
         const registry = {
             1: (prev: any) => ({ ...prev, modelVersion: 99 }),
         };
@@ -145,14 +159,34 @@ describe('runMigration — pipeline chain', () => {
             expect(result.model.modelVersion).toBe(1);
         }
     });
+
+    test('chain: each step is stamped with its own target version', () => {
+        const registry = {
+            1: (prev: any) => ({ ...prev, s1: true }),
+            2: (prev: any) => {
+                // Intermediate state after fixer-1 + runner stamping:
+                // prev.modelVersion must be 1 here (not 0, not 99, not missing).
+                expect(prev.modelVersion).toBe(1);
+                return { ...prev, s2: true };
+            },
+        };
+        const result = runMigration('{}', registry);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+            expect(result.model.modelVersion).toBe(2);
+            expect((result.model as any).s1).toBe(true);
+            expect((result.model as any).s2).toBe(true);
+        }
+    });
 });
 
-describe('runMigration — registry gap', () => {
-    test('missing intermediate fixer → fixer-threw reason', () => {
+describe('runMigration — error cases', () => {
+    test('missing intermediate fixer (registry gap) → fixer-threw reason', () => {
+        // Fake fixers — following the convention, they do not stamp modelVersion.
         const registry = {
-            1: (prev: any) => ({ modelVersion: 1, packages: prev?.packages ?? {} }),
+            1: (prev: any) => ({ packages: prev?.packages ?? {} }),
             // gap at 2
-            3: (prev: any) => ({ ...prev, modelVersion: 3 }),
+            3: (prev: any) => ({ ...prev, s3: true }),
         };
         const legacy = { packages: {} };
         const result = runMigration(JSON.stringify(legacy), registry);
