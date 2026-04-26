@@ -21,6 +21,7 @@ import { replaceItem } from "../../utils/arrayUtils";
 import { EditorModel, SettingsPackage } from "../../types/types";
 import { useEffect, useState } from "react";
 import { pick } from 'lodash';
+import { CURRENT_MODEL_VERSION } from "../../utils/dataFixer";
 
 type PackageItem = { key: string, label: string, checked: boolean }
 
@@ -126,7 +127,7 @@ export default function ExportDialog({ packages, isOpen, closeDialog }: ExportDi
         const packagesToExport = pick(packages, selectedPackages.filter(p => p.checked).map(v => v.key))
         return {
             packages: packagesToExport,
-            modelVersion: '1.0.0'
+            modelVersion: CURRENT_MODEL_VERSION
         }
     }
 

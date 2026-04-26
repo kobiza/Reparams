@@ -2,12 +2,13 @@ import React, { createContext, PropsWithChildren, useEffect, useState } from "re
 import { EditorModel, EditorStore, SettingsPackage } from "../../types/types";
 import { getEmptySettingsPackage, uuidv4 } from "../../utils/utils";
 import { localStorageKey } from "../../utils/consts";
+import { CURRENT_MODEL_VERSION, loadAndMigrateAppData } from "../../utils/dataFixer";
 
 
 const noop = () => {
 }
 export const EditorStoreContext = createContext<EditorStore>({
-    state: { modelVersion: '', packages: {} },
+    state: { modelVersion: CURRENT_MODEL_VERSION, packages: {} },
     updatePackagePreset: noop,
     updatePackageParamsWithDelimiter: noop,
     updatePackageLabel: noop,
@@ -19,8 +20,8 @@ export const EditorStoreContext = createContext<EditorStore>({
 });
 
 const getInitialState = (): EditorModel => {
-    const appData = localStorage.getItem(localStorageKey)
-    return appData ? JSON.parse(appData) : { modelVersion: '', packages: {} }
+    const result = loadAndMigrateAppData()
+    return result.ok ? result.model : { modelVersion: CURRENT_MODEL_VERSION, packages: {} }
 }
 
 const UseEditorStoreContext = (props: PropsWithChildren) => {

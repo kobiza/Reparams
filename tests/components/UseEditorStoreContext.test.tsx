@@ -20,7 +20,7 @@ const samplePackage: SettingsPackage = {
 };
 
 const sampleModel: EditorModel = {
-    modelVersion: '1.0',
+    modelVersion: 1,
     packages: { 'pkg-1': samplePackage },
 };
 
