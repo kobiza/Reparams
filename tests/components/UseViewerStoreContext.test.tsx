@@ -85,7 +85,7 @@ function renderViewer(currentTabUrl: string) {
 describe('UseViewerStoreContext', () => {
     test('exposes no presets when no package matches the current URL', () => {
         const pkg = makePackage('p1', 'Google', ['https://google.com/*']);
-        seedStorage({ modelVersion: '1.0', packages: { p1: pkg } });
+        seedStorage({ modelVersion: 1, packages: { p1: pkg } });
 
         renderViewer('https://other.com/');
 
@@ -94,7 +94,7 @@ describe('UseViewerStoreContext', () => {
 
     test('exposes presets when a package URL pattern matches', () => {
         const pkg = makePackage('p1', 'Google', ['https://google.com/*'], [], 'Google Preset');
-        seedStorage({ modelVersion: '1.0', packages: { p1: pkg } });
+        seedStorage({ modelVersion: 1, packages: { p1: pkg } });
 
         renderViewer('https://google.com/search?q=hello');
 
@@ -105,7 +105,7 @@ describe('UseViewerStoreContext', () => {
     test('merges presets from multiple matching packages', () => {
         const pkg1 = makePackage('p1', 'Google', ['https://google.com/*'], [], 'Preset A');
         const pkg2 = makePackage('p2', 'Also Google', ['https://google.com/*'], [], 'Preset B');
-        seedStorage({ modelVersion: '1.0', packages: { p1: pkg1, p2: pkg2 } });
+        seedStorage({ modelVersion: 1, packages: { p1: pkg1, p2: pkg2 } });
 
         renderViewer('https://google.com/');
 

@@ -42,6 +42,17 @@ LocalStorage keys are defined in `src/js/utils/consts.ts`:
 
 The main hierarchy: **Package → Preset → SearchParam**. A Package can have multiple Presets; each Preset holds a list of SearchParams (key/value pairs). Packages also hold `quickActions` (shortcuts that apply a preset in one click) and `delimiters` (for params with multiple values).
 
+### Model Evolution
+
+The persisted model carries `modelVersion: number`. Migrations live in the fixer registry in `src/js/utils/dataFixer.ts`.
+
+- **Breaking changes** to the persisted shape (rename, restructure, remove, re-semanticize a field) require adding a new fixer to the registry. `CURRENT_MODEL_VERSION` is **derived** from that registry — adding a fixer automatically bumps it. Never hardcode a version.
+- **Additive changes** (new optional field, new top-level section, wider enum) don't touch the fixer registry. Readers must handle `undefined` gracefully.
+- Every ingestion path (localStorage load, `ImportDialog`, future Gist fetch/sync) goes through `migrateModel`. No exceptions.
+- Fixers **return the new shape only — do not set `modelVersion`**. The runner stamps `modelVersion` from the registry key automatically (the key IS the target version). Setting it inside a fixer is redundant and error-prone.
+- Fixers must be **deterministic** — same input → same output. No `uuidv4()`, no `Date.now()` in a fixer. If a migration needs a new identifier, derive it stably.
+- Fixers chain like a pipeline: a stored v1 model loaded into a v3 codebase runs `fixers[2]` then `fixers[3]` in sequence. Each fixer only knows how to go from its immediate previous version to its target.
+
 ### Cross-Context Communication
 
 The popup sends a message to the content script to ask whether a CSS selector exists in the current page DOM. The content script responds synchronously. This is the only inter-context communication.

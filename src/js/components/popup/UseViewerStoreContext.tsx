@@ -3,7 +3,7 @@ import React, { createContext, PropsWithChildren, useEffect, useState } from "re
 import { EditorModel, ViewerStore } from "../../types/types";
 import { getRelevantPackages, toViewerModel } from "../../utils/utils";
 import type { DomSelectorResultMessage, DomSelectorRequestMessage } from "../../types/types";
-import { localStorageKey } from "../../utils/consts";
+import { CURRENT_MODEL_VERSION, loadAndMigrateAppData } from "../../utils/dataFixer";
 
 
 export const ViewerStoreContext = createContext<ViewerStore>({
@@ -15,9 +15,8 @@ export const ViewerStoreContext = createContext<ViewerStore>({
 });
 
 const getSettings = (): EditorModel => {
-    const appData = localStorage.getItem(localStorageKey)
-
-    return appData ? JSON.parse(appData) : { modelVersion: '', packages: {} }
+    const result = loadAndMigrateAppData()
+    return result.ok ? result.model : { modelVersion: CURRENT_MODEL_VERSION, packages: {} }
 }
 
 
