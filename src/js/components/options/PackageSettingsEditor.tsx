@@ -23,11 +23,13 @@ interface ParamsEditorProps {
     urlPatterns: SettingsPackage['conditions']['urlPatterns']
     domSelectors: SettingsPackage['conditions']['domSelectors']
     label: SettingsPackage['label']
+    paramHistoryCount: number
     addNewPackage: EditorStore['addNewPackage']
     updatePackageParamsWithDelimiter: EditorStore['updatePackageParamsWithDelimiter']
     updatePackageUrlPatterns: EditorStore['updatePackageUrlPatterns']
     updatePackageDomSelectors: EditorStore['updatePackageDomSelectors']
     deletePackage: EditorStore['deletePackage']
+    clearPackageParamHistory: EditorStore['clearPackageParamHistory']
 }
 
 const PackageSettingsEditor = ({
@@ -36,11 +38,13 @@ const PackageSettingsEditor = ({
     urlPatterns,
     domSelectors,
     label,
+    paramHistoryCount,
     addNewPackage,
     updatePackageParamsWithDelimiter,
     updatePackageUrlPatterns,
     updatePackageDomSelectors,
-    deletePackage
+    deletePackage,
+    clearPackageParamHistory
 }: ParamsEditorProps) => {
     const paramsItems = paramsWithDelimiter.map((paramData, index) => {
         const { label, separator, id } = paramData
@@ -149,6 +153,14 @@ const PackageSettingsEditor = ({
         closeDeleteDialog()
     }
 
+    const [clearHistoryDialog, setClearHistoryDialog] = useState(false)
+    const openClearHistoryDialog = () => setClearHistoryDialog(true)
+    const closeClearHistoryDialog = () => setClearHistoryDialog(false)
+    const handleClearHistory = () => {
+        clearPackageParamHistory(packageKey)
+        closeClearHistoryDialog()
+    }
+
     const domSelectorsInput = domSelectors.map((v, index) => {
         const updateCurrentDomSelectorPath = (value: string) => {
             const prevItem = domSelectors[index]
@@ -219,6 +231,38 @@ const PackageSettingsEditor = ({
                 {paramsItems}
                 <Button sx={{ marginTop: '10px' }} onClick={addNewMultiParam}
                     variant="text" startIcon={<AddIcon />}>Add</Button>
+            </Box>
+            <Divider sx={{ margin: '15px 0' }} />
+            <Typography fontWeight="bold" padding={1}>Param history</Typography>
+            <Box sx={{ paddingLeft: 1 }}>
+                <Typography variant="body2" sx={{ opacity: 0.7 }}>
+                    {paramHistoryCount === 0 ? 'No entries yet' : `${paramHistoryCount} entries`}
+                </Typography>
+                <Button
+                    color="warning"
+                    sx={{ marginTop: '10px' }}
+                    disabled={paramHistoryCount === 0}
+                    onClick={openClearHistoryDialog}
+                    variant="text"
+                >
+                    Clear param history
+                </Button>
+                <Dialog
+                    open={clearHistoryDialog}
+                    onClose={closeClearHistoryDialog}
+                    aria-labelledby="clear-history-dialog-title"
+                    aria-describedby="clear-history-dialog-description"
+                >
+                    <DialogContent>
+                        <DialogContentText id="clear-history-dialog-description">
+                            {`Clear param history for "${label}"?`}
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClearHistory}>Yes</Button>
+                        <Button onClick={closeClearHistoryDialog} autoFocus>No</Button>
+                    </DialogActions>
+                </Dialog>
             </Box>
             <Divider sx={{ margin: '15px 0' }} />
             <div>

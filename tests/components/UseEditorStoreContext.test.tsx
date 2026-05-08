@@ -181,3 +181,75 @@ describe('UseEditorStoreContext — localStorage persistence', () => {
         });
     });
 });
+
+describe('UseEditorStoreContext — clearPackageParamHistory', () => {
+    function ClearHistoryConsumer({ packageKey }: { packageKey: string }) {
+        const store = useContext(EditorStoreContext);
+        const pkg = store.state.packages[packageKey];
+        return (
+            <div>
+                <span data-testid="history-len">{pkg?.paramHistory?.length ?? 'undefined'}</span>
+                <pre data-testid="package-json">{JSON.stringify(pkg)}</pre>
+                <button onClick={() => store.clearPackageParamHistory(packageKey)}>Clear</button>
+            </div>
+        );
+    }
+
+    test('clears paramHistory on the target package without touching others', async () => {
+        const modelWithHistory: EditorModel = {
+            modelVersion: 1,
+            packages: {
+                'pkg-1': {
+                    ...samplePackage,
+                    paramHistory: [
+                        { key: 'a', value: '1' },
+                        { key: 'b', value: '2' },
+                    ],
+                },
+                'pkg-2': {
+                    ...secondPackage,
+                    paramHistory: [{ key: 'x', value: 'y' }],
+                },
+            },
+        };
+        localStorage.setItem('reparamsAppData', JSON.stringify(modelWithHistory));
+
+        renderContext(<ClearHistoryConsumer packageKey="pkg-1" />);
+
+        expect(screen.getByTestId('history-len')).toHaveTextContent('2');
+        await userEvent.click(screen.getByText('Clear'));
+        await waitFor(() => {
+            expect(screen.getByTestId('history-len')).toHaveTextContent('0');
+        });
+
+        const stored = JSON.parse(localStorage.getItem('reparamsAppData')!) as EditorModel;
+        expect(stored.packages['pkg-1'].paramHistory).toEqual([]);
+        expect(stored.packages['pkg-2'].paramHistory).toEqual([{ key: 'x', value: 'y' }]);
+    });
+
+    test('preserves other package fields (label, presets, conditions) when clearing', async () => {
+        const modelWithHistory: EditorModel = {
+            modelVersion: 1,
+            packages: {
+                'pkg-1': {
+                    ...samplePackage,
+                    presets: { p1: { label: 'P1', entries: [['k', 'v']] } },
+                    paramHistory: [{ key: 'a', value: '1' }],
+                },
+            },
+        };
+        localStorage.setItem('reparamsAppData', JSON.stringify(modelWithHistory));
+
+        renderContext(<ClearHistoryConsumer packageKey="pkg-1" />);
+        await userEvent.click(screen.getByText('Clear'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('history-len')).toHaveTextContent('0');
+        });
+        const stored = JSON.parse(localStorage.getItem('reparamsAppData')!) as EditorModel;
+        const pkg = stored.packages['pkg-1'];
+        expect(pkg.label).toBe('Sample Package');
+        expect(pkg.presets).toEqual({ p1: { label: 'P1', entries: [['k', 'v']] } });
+        expect(pkg.conditions).toEqual({ urlPatterns: [{ id: 'u1', value: '*://*/*' }], domSelectors: [] });
+    });
+});

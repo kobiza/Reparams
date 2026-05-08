@@ -16,7 +16,8 @@ export const EditorStoreContext = createContext<EditorStore>({
     updatePackageDomSelectors: noop,
     addNewPackage: noop,
     addPackages: noop,
-    deletePackage: noop
+    deletePackage: noop,
+    clearPackageParamHistory: noop
 });
 
 const getInitialState = (): EditorModel => {
@@ -156,6 +157,14 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
         }
         _updatePackage(packageKey, newPackage)
     }
+
+    const clearPackageParamHistory = (packageKey: string) => {
+        const prevPackage = appState.packages[packageKey]
+        if (!prevPackage) return
+        const newPackage = { ...prevPackage, paramHistory: [] }
+        _updatePackage(packageKey, newPackage)
+    }
+
     return (
         <EditorStoreContext.Provider value={{
             state: appState,
@@ -166,7 +175,8 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
             updatePackageDomSelectors,
             addNewPackage,
             addPackages,
-            deletePackage
+            deletePackage,
+            clearPackageParamHistory
         }}>
             {props.children}
         </EditorStoreContext.Provider>

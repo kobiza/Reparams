@@ -70,6 +70,7 @@ function Popup({ currentTabUrl, tabId, themeMode, setThemeMode }: {
                 presets={state.presets}
                 paramsWithDelimiter={state.paramsWithDelimiter}
                 quickActions={state.quickActions}
+                suggestions={state.suggestions}
                 themeMode={themeMode}
                 setThemeMode={setThemeMode}
             />

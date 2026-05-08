@@ -23,9 +23,12 @@ import SettingsIcon from '@mui/icons-material/Settings';
 
 import {
     ParamsWithDelimiterViewModel,
+    ParamSuggestions,
     PresetsEntriesMapViewModel,
-    QuickActionData
+    QuickActionData,
+    SearchParamsEntries
 } from "../../types/types";
+import { captureParamHistory } from "../../utils/paramHistoryCaptureService";
 import AppBar from '@mui/material/AppBar';
 import Fab from '@mui/material/Fab';
 import Typography from '@mui/material/Typography';
@@ -41,6 +44,7 @@ type UrlEditorProps = {
     presets: PresetsEntriesMapViewModel
     paramsWithDelimiter: ParamsWithDelimiterViewModel,
     quickActions: QuickActionData
+    suggestions: ParamSuggestions
     className?: string,
     themeMode: 'light' | 'dark',
     setThemeMode: (mode: 'light' | 'dark') => void,
@@ -61,6 +65,7 @@ function UrlEditor({
     openNewTab,
     presets,
     paramsWithDelimiter,
+    suggestions,
     themeMode,
     setThemeMode
 }: UrlEditorProps) {
@@ -74,28 +79,27 @@ function UrlEditor({
         })
     }
 
+    const navigateWith = (url: string, shouldOpenNewTab: boolean) => {
+        const entries: SearchParamsEntries = [...new URL(url).searchParams.entries()]
+        captureParamHistory(url, entries)
+
+        if (shouldOpenNewTab) {
+            openNewTab(url)
+        } else {
+            updateCurrentTabUrl(url)
+        }
+    }
+
     const addEntriesAndNavigate: PresetsPickerProps['addEntriesAndNavigate'] = (newSearchParamsEntries, shouldOpenNewTab) => {
         setNewUrl((prevUrl) => {
             const nextUrl = addEntries(prevUrl, newSearchParamsEntries)
-
-            if (shouldOpenNewTab) {
-                openNewTab(nextUrl)
-            } else {
-                updateCurrentTabUrl(nextUrl)
-            }
-
+            navigateWith(nextUrl, shouldOpenNewTab)
             return nextUrl
         })
     }
 
     const applyUrl: MouseEventHandler<HTMLButtonElement> = (e) => {
-        const shouldOpenNewTab = e.metaKey
-
-        if (shouldOpenNewTab) {
-            openNewTab(newUrl)
-        } else {
-            updateCurrentTabUrl(newUrl)
-        }
+        navigateWith(newUrl, e.metaKey)
     }
 
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -109,12 +113,12 @@ function UrlEditor({
         shortcuts: [
             {
                 keys: ['Meta', 'Enter'],
-                callback: () => updateCurrentTabUrl(newUrl),
+                callback: () => navigateWith(newUrl, false),
                 description: 'Apply URL changes'
             },
             {
                 keys: ['Meta', 'Shift', 'Enter'],
-                callback: () => openNewTab(newUrl),
+                callback: () => navigateWith(newUrl, true),
                 description: 'Apply URL changes in new tab'
             }
         ],
@@ -201,7 +205,8 @@ function UrlEditor({
                 </div>
             )}
             <SearchParams className="search-params-container row3" entries={searchParamsEntries}
-                setEntries={setSearchParamsEntries} paramsWithDelimiter={paramsWithDelimiter} />
+                setEntries={setSearchParamsEntries} paramsWithDelimiter={paramsWithDelimiter}
+                suggestions={suggestions} />
             <Fab color="primary" onClick={applyUrl} sx={{
                 position: 'fixed',
                 bottom: 20,

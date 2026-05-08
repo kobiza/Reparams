@@ -3,6 +3,10 @@
     display: flex;
     align-items: center;
     gap: 10px;
+
+    .MuiOutlinedInput-root {
+        min-height: 50px;
+    }
 }
 
 .query-param-input-key {

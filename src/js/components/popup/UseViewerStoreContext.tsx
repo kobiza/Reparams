@@ -10,7 +10,8 @@ export const ViewerStoreContext = createContext<ViewerStore>({
     state: {
         presets: {},
         paramsWithDelimiter: {},
-        quickActions: []
+        quickActions: [],
+        suggestions: { keys: [], valuesByKey: {} }
     },
 });
 
