@@ -1,21 +1,21 @@
-
-import React, {KeyboardEventHandler} from "react";
-import {Theme} from "@mui/material";
-import {SxProps} from "@mui/system";
+import React from "react";
+import { Theme } from "@mui/material";
+import { SxProps } from "@mui/system";
 import FreeSoloTags from "./FreeSoloTags";
 import { decodeIfEncoded } from "../../utils/encodingUtils";
 
 export type ParamWithDelimiterValueInputProps = {
     value: string,
-    delimiter: string
+    delimiter: string,
     onChange: (newValue: string) => void,
-    onTextInputKeyUp: KeyboardEventHandler
     className?: string,
     limitTags?: number,
-    sx?: SxProps<Theme>
+    sx?: SxProps<Theme>,
+    suggestions?: Array<string>,
+    autoFocus?: boolean,
 }
 
-const ParamWithDelimiterValueInput = ({value, delimiter, onChange, sx, className, limitTags, onTextInputKeyUp}: ParamWithDelimiterValueInputProps) => {
+const ParamWithDelimiterValueInput = ({ value, delimiter, onChange, sx, className, limitTags, suggestions, autoFocus }: ParamWithDelimiterValueInputProps) => {
     const values = value ? value.split(delimiter) : []
     const onChangeHandler = (newValues: Array<string>) => {
         onChange(newValues.map(v => decodeIfEncoded(v.trim())).join(delimiter))
@@ -27,9 +27,10 @@ const ParamWithDelimiterValueInput = ({value, delimiter, onChange, sx, className
             onChange={onChangeHandler}
             limitTags={limitTags}
             sx={sx}
-            onKeyUp={onTextInputKeyUp}
             className={className}
             placeholderText="Add value"
+            options={suggestions}
+            autoFocus={autoFocus}
         />
     )
 }

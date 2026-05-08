@@ -20,6 +20,16 @@ export type ParamsWithDelimiter = Array<{
     separator: string
 }>
 
+export type ParamHistoryEntry = {
+    key: string
+    value: string
+}
+
+export type ParamSuggestions = {
+    keys: string[]
+    valuesByKey: { [key: string]: string[] }
+}
+
 export type ParamsWithDelimiterViewModel = {
     [label: string]: {
         separator: string
@@ -36,6 +46,7 @@ export type SettingsPackage = {
     }
     presets: PresetsEntriesMap
     paramsWithDelimiter: ParamsWithDelimiter
+    paramHistory?: ParamHistoryEntry[]
 }
 
 export type MergedAppData = {
@@ -71,12 +82,14 @@ export type EditorStore = {
     addNewPackage: (newPackageOverrides?: Partial<SettingsPackage>) => void
     addPackages: (packagesToAdd: { [key: string]: SettingsPackage }, replace: boolean) => void
     deletePackage: (packageKey: string) => void
+    clearPackageParamHistory: (packageKey: string) => void
 }
 
 export type ViewerModel = {
     presets: PresetsEntriesMapViewModel
     paramsWithDelimiter: ParamsWithDelimiterViewModel
     quickActions: QuickActionData
+    suggestions: ParamSuggestions
 }
 
 export type ViewerStore = {

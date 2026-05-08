@@ -8,6 +8,7 @@ import {
 } from "../types/types";
 import { assign } from "lodash";
 import { matchUrl } from "./urlMatchChecker";
+import { buildSuggestions } from "./suggestionsCompositor";
 
 export const uuidv4 = () => {
     return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
@@ -74,7 +75,8 @@ export const toViewerModel = (relevantPackages: SettingsPackage[], currentTabUrl
     const viewerModel: ViewerModel = {
         presets: {},
         paramsWithDelimiter: {},
-        quickActions: []
+        quickActions: [],
+        suggestions: buildSuggestions(relevantPackages)
     }
 
     packagesDataToMerge.forEach((appDataPackage) => {

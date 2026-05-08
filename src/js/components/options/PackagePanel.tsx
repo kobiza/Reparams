@@ -23,7 +23,7 @@ type PackagePanelProps = {
 }
 
 const PackagePanel = ({ packageData, packageKey, editorStore }: PackagePanelProps) => {
-    const { key, label, presets, paramsWithDelimiter, conditions } = packageData
+    const { key, label, presets, paramsWithDelimiter, conditions, paramHistory } = packageData
     const [value, setValue] = useState(0);
     const {
         addNewPackage,
@@ -32,7 +32,8 @@ const PackagePanel = ({ packageData, packageKey, editorStore }: PackagePanelProp
         updatePackageLabel,
         updatePackageUrlPatterns,
         updatePackageDomSelectors,
-        deletePackage
+        deletePackage,
+        clearPackageParamHistory
     } = editorStore
 
     const [accordionOpen, setAccordionOpen] = useState(false)
@@ -130,13 +131,15 @@ const PackagePanel = ({ packageData, packageKey, editorStore }: PackagePanelProp
                             <PackageSettingsEditor packageKey={packageKey}
                                 label={label}
                                 paramsWithDelimiter={paramsWithDelimiter}
+                                paramHistoryCount={paramHistory?.length ?? 0}
                                 addNewPackage={addNewPackage}
                                 updatePackageParamsWithDelimiter={updatePackageParamsWithDelimiter}
                                 urlPatterns={conditions.urlPatterns}
                                 domSelectors={conditions.domSelectors}
                                 updatePackageDomSelectors={updatePackageDomSelectors}
                                 updatePackageUrlPatterns={updatePackageUrlPatterns}
-                                deletePackage={deletePackage} />
+                                deletePackage={deletePackage}
+                                clearPackageParamHistory={clearPackageParamHistory} />
                         </CustomTabPanel>
                     </Box>
                 ) :
