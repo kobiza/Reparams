@@ -294,8 +294,8 @@ describe('SearchParams row deletion ergonomics', () => {
             fireEvent.click(deleteButtons[0])
         })
         const remainingInputs = screen.getAllByRole('textbox') as HTMLInputElement[]
-        // After deletion, only k2/v2 remain; remainingInputs[0] is the surviving key input.
-        expect(remainingInputs).toHaveLength(2)
+        // After deletion: 1 real row (k2/v2) + 1 trailing empty row = 4 textboxes.
+        expect(remainingInputs).toHaveLength(4)
         expect(remainingInputs[0].value).toBe('k2')
         expect(document.activeElement).toBe(remainingInputs[0])
     })
@@ -307,20 +307,139 @@ describe('SearchParams row deletion ergonomics', () => {
             fireEvent.keyDown(inputs[2], { key: 'Backspace', metaKey: true })
         })
         const remainingInputs = screen.getAllByRole('textbox') as HTMLInputElement[]
-        expect(remainingInputs).toHaveLength(2)
+        // After deletion: 1 real row (k1/v1) + 1 trailing empty row = 4 textboxes.
+        expect(remainingInputs).toHaveLength(4)
         expect(remainingInputs[0].value).toBe('k1')
         expect(document.activeElement).toBe(remainingInputs[0])
     })
 
-    test('deleting the only remaining row moves focus to the Add-Param button', () => {
+    test('deleting the only remaining row moves focus to the trailing empty row key field', () => {
         render(<Harness initialEntries={[['only', 'val']]} />)
         const deleteButtons = screen.getAllByLabelText('delete')
         act(() => {
             fireEvent.click(deleteButtons[0])
         })
-        expect(screen.queryAllByRole('textbox')).toHaveLength(0)
-        const addBtn = screen.getByRole('button', { name: 'Add param' })
-        expect(document.activeElement).toBe(addBtn)
+        // Only the trailing empty row remains: 2 empty textboxes, no delete button.
+        const remainingInputs = screen.getAllByRole('textbox') as HTMLInputElement[]
+        expect(remainingInputs).toHaveLength(2)
+        expect(remainingInputs[0].value).toBe('')
+        expect(screen.queryByLabelText('delete')).not.toBeInTheDocument()
+        expect(document.activeElement).toBe(remainingInputs[0])
+    })
+})
+
+describe('SearchParams trailing-empty-row behavior', () => {
+    test('renders one trailing empty row when entries is empty', () => {
+        const setEntries = jest.fn()
+        render(
+            <SearchParams
+                entries={[]}
+                setEntries={setEntries}
+                paramsWithDelimiter={{}}
+            />
+        )
+        expect(screen.getAllByRole('textbox')).toHaveLength(2)
+        expect(screen.queryByLabelText('delete')).not.toBeInTheDocument()
+    })
+
+    test('renders entries.length + 1 rows total (real rows + trailing)', () => {
+        const setEntries = jest.fn()
+        render(
+            <SearchParams
+                entries={[['k1', 'v1'], ['k2', 'v2']]}
+                setEntries={setEntries}
+                paramsWithDelimiter={{}}
+            />
+        )
+        // 2 real rows + 1 trailing = 6 textboxes
+        expect(screen.getAllByRole('textbox')).toHaveLength(6)
+        // Only the 2 real rows have delete buttons; trailing has none.
+        expect(screen.getAllByLabelText('delete')).toHaveLength(2)
+    })
+
+    test('typing in trailing row pushes a new entry to state', () => {
+        const setEntries = jest.fn()
+        render(
+            <SearchParams
+                entries={[]}
+                setEntries={setEntries}
+                paramsWithDelimiter={{}}
+            />
+        )
+        const keyInput = screen.getAllByRole('textbox')[0] as HTMLInputElement
+        fireEvent.change(keyInput, { target: { value: 'newkey' } })
+        expect(setEntries).toHaveBeenCalledWith([['newkey', '']])
+    })
+
+    test('typing in trailing value pushes a new entry with that value', () => {
+        const setEntries = jest.fn()
+        render(
+            <SearchParams
+                entries={[]}
+                setEntries={setEntries}
+                paramsWithDelimiter={{}}
+            />
+        )
+        const valueInput = screen.getAllByRole('textbox')[1] as HTMLInputElement
+        fireEvent.change(valueInput, { target: { value: 'newval' } })
+        expect(setEntries).toHaveBeenCalledWith([['', 'newval']])
+    })
+
+    test('Cmd+Backspace on the trailing row is a no-op', () => {
+        const setEntries = jest.fn()
+        render(
+            <SearchParams
+                entries={[['k1', 'v1']]}
+                setEntries={setEntries}
+                paramsWithDelimiter={{}}
+            />
+        )
+        // The trailing row's key field is the 3rd textbox (after k1 key + value).
+        const trailingKey = screen.getAllByRole('textbox')[2] as HTMLInputElement
+        fireEvent.keyDown(trailingKey, { key: 'Backspace', metaKey: true })
+        expect(setEntries).not.toHaveBeenCalled()
+    })
+
+    test('quick-paste in the trailing row appends parsed entries', () => {
+        const setEntries = jest.fn()
+        render(
+            <SearchParams
+                entries={[['existing', 'row']]}
+                setEntries={setEntries}
+                paramsWithDelimiter={{}}
+            />
+        )
+        // Trailing row's key is at index 2.
+        const trailingKey = screen.getAllByRole('textbox')[2] as HTMLInputElement
+        const event = new Event('paste', { bubbles: true, cancelable: true })
+        Object.defineProperty(event, 'clipboardData', {
+            value: { getData: jest.fn(() => 'a=b&c=d') },
+            configurable: true,
+        })
+        fireEvent(trailingKey, event)
+        expect(setEntries).toHaveBeenCalledWith([
+            ['existing', 'row'],
+            ['a', 'b'],
+            ['c', 'd'],
+        ])
+    })
+})
+
+describe('UrlEditor.addEntries empty filtering', () => {
+    test('dropEmptyEntries filters fully-empty rows when serializing the URL', () => {
+        const { dropEmptyEntries } = require('../../src/js/utils/searchParamsUtils')
+        const filtered = dropEmptyEntries([
+            ['env', 'staging'],
+            ['', ''],
+            ['debug', ''],
+        ])
+        // Builds the same query string fragment that addEntries would emit.
+        const search = filtered
+            .map(([k, v]: [string, string]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+            .join('&')
+        expect(search).toBe('env=staging&debug=')
+        expect(search).not.toContain('=&')
+        expect(search.startsWith('=')).toBe(false)
     })
 })
 

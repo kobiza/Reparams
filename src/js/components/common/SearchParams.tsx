@@ -3,7 +3,6 @@ import { ParamsWithDelimiterViewModel, ParamSuggestions, SearchParamsEntries, Se
 import { parseQuickPaste, updateEntryKey, updateEntryValue } from "../../utils/searchParamsUtils";
 import './SearchParams.scss'
 import Autocomplete from '@mui/material/Autocomplete';
-import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
@@ -24,51 +23,48 @@ type SearchParamsProps = {
 }
 
 const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, suggestions }: SearchParamsProps) => {
-    const shouldFocusNewParam = useRef<boolean>(false)
     const itemsRef = useRef<Array<HTMLDivElement | null>>([]);
     const indexToFocusAfterDelete = useRef<number | null>(null)
-    const addParamButtonRef = useRef<HTMLButtonElement | null>(null)
+
+    const renderedRows: SearchParamsEntries = [...entries, ['', '']]
 
     useEffect(() => {
-        itemsRef.current = itemsRef.current.slice(0, entries.length);
-    }, [entries]);
+        itemsRef.current = itemsRef.current.slice(0, renderedRows.length);
+    }, [renderedRows.length]);
 
     const prevEntriesLength = usePrevious<number>(entries.length)
 
     useEffect(() => {
-        if (shouldFocusNewParam.current && prevEntriesLength === entries.length - 1) {
-            itemsRef.current[entries.length - 1]!.focus()
-
-            shouldFocusNewParam.current = false
-        }
         if (indexToFocusAfterDelete.current !== null) {
             const target = indexToFocusAfterDelete.current
-            if (target >= 0 && target < entries.length) {
-                itemsRef.current[target]!.focus()
-            } else {
-                addParamButtonRef.current?.focus()
-            }
+            itemsRef.current[target]?.focus()
             indexToFocusAfterDelete.current = null
         }
-    }, [entries.length, prevEntriesLength, shouldFocusNewParam.current])
+    }, [entries.length, prevEntriesLength])
 
-    const items = entries.map(([key, value], index) => {
+    const items = renderedRows.map(([key, value], index) => {
+        const isTrailing = index === entries.length
+
         const updateCurrentEntryValue = (newValue: string) => {
-            const newEntries = updateEntryValue(entries, newValue, index)
-
-            setEntries(newEntries)
+            if (isTrailing) {
+                setEntries([...entries, ['', newValue]])
+                return
+            }
+            setEntries(updateEntryValue(entries, newValue, index))
         }
 
         const updateCurrentEntryKey = (newKey: string) => {
-            const newEntries = updateEntryKey(entries, newKey, index)
-
-            setEntries(newEntries)
+            if (isTrailing) {
+                setEntries([...entries, [newKey, '']])
+                return
+            }
+            setEntries(updateEntryKey(entries, newKey, index))
         }
 
         const removeSearchParam = () => {
             const newLength = entries.length - 1
             if (newLength === 0) {
-                indexToFocusAfterDelete.current = -1
+                indexToFocusAfterDelete.current = 0
             } else if (index >= newLength) {
                 indexToFocusAfterDelete.current = newLength - 1
             } else {
@@ -78,6 +74,7 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
         }
 
         const handleRowKeyDown = (e: React.KeyboardEvent<HTMLLIElement>) => {
+            if (isTrailing) return
             if ((e.metaKey || e.ctrlKey) && e.key === 'Backspace') {
                 e.preventDefault()
                 e.stopPropagation()
@@ -209,35 +206,33 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
             <li className="query-param-input" key={index} onKeyDown={handleRowKeyDown}>
                 {keyInput}
                 {valueInput}
-                <Tooltip
-                    title={
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-                            Remove param <ShortcutHint keys={['Mod', 'Backspace']} />
-                        </span>
-                    }
-                    placement="top"
-                    componentsProps={{ tooltip: { sx: { fontSize: '0.85rem', p: 1 } } }}
-                >
-                    <IconButton aria-label="delete" color="primary" size="small"
-                        sx={{ padding: '0', marginLeft: '10px' }} onClick={removeSearchParam}>
-                        <ClearIcon fontSize="inherit" />
-                    </IconButton>
-                </Tooltip>
+                <span className="query-param-input-delete-slot">
+                    {!isTrailing && (
+                        <Tooltip
+                            title={
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                                    Remove param <ShortcutHint keys={['Mod', 'Backspace']} />
+                                </span>
+                            }
+                            placement="top"
+                            componentsProps={{ tooltip: { sx: { fontSize: '0.85rem', p: 1 } } }}
+                        >
+                            <IconButton aria-label="delete" color="primary" size="small"
+                                sx={{ padding: '0' }} onClick={removeSearchParam}>
+                                <ClearIcon fontSize="inherit" />
+                            </IconButton>
+                        </Tooltip>
+                    )}
+                </span>
             </li>
         )
     })
-
-    const addNewEntry = () => {
-        shouldFocusNewParam.current = true
-        setEntries([...entries, ['', '']])
-    }
 
     return (
         <div className={classNames(className)}>
             <ul>
                 {items}
             </ul>
-            <Button ref={addParamButtonRef} color="secondary" sx={{ marginTop: '14px', marginBottom: '10px' }} onClick={addNewEntry} variant="text">Add param</Button>
         </div>
     )
 }

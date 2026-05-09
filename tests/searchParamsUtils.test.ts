@@ -1,5 +1,27 @@
-import {mergeEntries, parseQuickPaste, removeEntries, updateEntryKey, updateEntryValue} from "../src/js/utils/searchParamsUtils";
+import {dropEmptyEntries, mergeEntries, parseQuickPaste, removeEntries, updateEntryKey, updateEntryValue} from "../src/js/utils/searchParamsUtils";
 import {ParamsWithDelimiterViewModel, SearchParamsEntries} from "../src/js/types/types";
+
+describe('dropEmptyEntries', () => {
+    test('removes rows where both key and value are empty', () => {
+        const entries: SearchParamsEntries = [['k', 'v'], ['', ''], ['k2', 'v2']]
+        expect(dropEmptyEntries(entries)).toEqual([['k', 'v'], ['k2', 'v2']])
+    })
+
+    test('keeps rows where key is non-empty even if value is empty', () => {
+        const entries: SearchParamsEntries = [['key', '']]
+        expect(dropEmptyEntries(entries)).toEqual([['key', '']])
+    })
+
+    test('keeps rows where value is non-empty even if key is empty', () => {
+        const entries: SearchParamsEntries = [['', 'val']]
+        expect(dropEmptyEntries(entries)).toEqual([['', 'val']])
+    })
+
+    test('returns empty array when all rows are fully empty', () => {
+        const entries: SearchParamsEntries = [['', ''], ['', '']]
+        expect(dropEmptyEntries(entries)).toEqual([])
+    })
+})
 
 describe('updateEntryKey', () => {
     test('should work', () => {

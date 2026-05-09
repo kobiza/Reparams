@@ -157,12 +157,13 @@ describe('SearchParams autocomplete mode', () => {
         const setEntries = jest.fn()
         render(
             <SearchParams
-                entries={[['', '']]}
+                entries={[]}
                 setEntries={setEntries}
                 paramsWithDelimiter={{}}
             />
         )
         expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+        // Trailing empty row contributes 2 textboxes (key + value).
         expect(screen.getAllByRole('textbox')).toHaveLength(2)
     })
 })
@@ -193,8 +194,9 @@ describe('SearchParams delimited-row chip mode', () => {
                 suggestions={{ keys: ['experiments'], valuesByKey: { experiments: ['alpha', 'beta', 'gamma'] } }}
             />
         )
+        // Comboboxes are ordered: [real key, real value (chip-mode), trailing key, trailing value].
         const comboboxes = screen.getAllByRole('combobox')
-        const valueInput = comboboxes[comboboxes.length - 1]
+        const valueInput = comboboxes[1]
         fireEvent.mouseDown(valueInput)
         // 'alpha' is already a chip, so it should NOT appear in the dropdown
         expect(screen.queryByRole('option', { name: 'alpha' })).not.toBeInTheDocument()

@@ -32,6 +32,7 @@ import {
     SearchParamsEntries
 } from "../../types/types";
 import { captureParamHistory } from "../../utils/paramHistoryCaptureService";
+import { dropEmptyEntries } from "../../utils/searchParamsUtils";
 import AppBar from '@mui/material/AppBar';
 import Fab from '@mui/material/Fab';
 import Typography from '@mui/material/Typography';
@@ -54,7 +55,8 @@ type UrlEditorProps = {
 }
 
 const addEntries = (url: string, newEntries: Array<[string, string]>) => {
-    const newSearch = newEntries.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&')
+    const filtered = dropEmptyEntries(newEntries)
+    const newSearch = filtered.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&')
     const newUrlData = new URL(url)
 
     newUrlData.search = newSearch

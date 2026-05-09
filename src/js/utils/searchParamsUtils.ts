@@ -29,6 +29,10 @@ export const updateEntryValue = (entries: SearchParamsEntries, newValue: string,
     return replaceItem(entries, newEntry, index)
 }
 
+export const dropEmptyEntries = (entries: SearchParamsEntries): SearchParamsEntries => {
+    return entries.filter(([k, v]) => !(k === '' && v === ''))
+}
+
 export const updateEntryKey = (entries: SearchParamsEntries, newKey: string, index: number): SearchParamsEntries => {
     const [, value] = entries[index]
 
