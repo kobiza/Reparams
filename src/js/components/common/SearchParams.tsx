@@ -6,11 +6,13 @@ import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 import ClearIcon from '@mui/icons-material/Clear';
 import { removeItem } from "../../utils/arrayUtils";
 import { decodeIfEncoded } from "../../utils/encodingUtils";
 import usePrevious from "./usePrevious";
 import ParamWithDelimiterValueInput from "./ParamWithDelimiterValueInput";
+import ShortcutHint from "./ShortcutHint";
 import classNames from "classnames";
 
 type SearchParamsProps = {
@@ -24,6 +26,8 @@ type SearchParamsProps = {
 const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, suggestions }: SearchParamsProps) => {
     const shouldFocusNewParam = useRef<boolean>(false)
     const itemsRef = useRef<Array<HTMLDivElement | null>>([]);
+    const indexToFocusAfterDelete = useRef<number | null>(null)
+    const addParamButtonRef = useRef<HTMLButtonElement | null>(null)
 
     useEffect(() => {
         itemsRef.current = itemsRef.current.slice(0, entries.length);
@@ -36,6 +40,15 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
             itemsRef.current[entries.length - 1]!.focus()
 
             shouldFocusNewParam.current = false
+        }
+        if (indexToFocusAfterDelete.current !== null) {
+            const target = indexToFocusAfterDelete.current
+            if (target >= 0 && target < entries.length) {
+                itemsRef.current[target]!.focus()
+            } else {
+                addParamButtonRef.current?.focus()
+            }
+            indexToFocusAfterDelete.current = null
         }
     }, [entries.length, prevEntriesLength, shouldFocusNewParam.current])
 
@@ -53,9 +66,23 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
         }
 
         const removeSearchParam = () => {
-            const newEntries = removeItem(entries, index)
+            const newLength = entries.length - 1
+            if (newLength === 0) {
+                indexToFocusAfterDelete.current = -1
+            } else if (index >= newLength) {
+                indexToFocusAfterDelete.current = newLength - 1
+            } else {
+                indexToFocusAfterDelete.current = index
+            }
+            setEntries(removeItem(entries, index))
+        }
 
-            setEntries(newEntries)
+        const handleRowKeyDown = (e: React.KeyboardEvent<HTMLLIElement>) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Backspace') {
+                e.preventDefault()
+                e.stopPropagation()
+                removeSearchParam()
+            }
         }
 
         const isParamsWithDelimiter = !!paramsWithDelimiter[key]
@@ -95,6 +122,7 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
             <Autocomplete
                 className="query-param-input-key"
                 freeSolo
+                autoSelect
                 options={suggestions.keys}
                 value={key}
                 inputValue={key}
@@ -144,6 +172,7 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
             <Autocomplete
                 className="query-param-input-value"
                 freeSolo
+                autoSelect
                 options={valueOptions}
                 value={value}
                 inputValue={value}
@@ -177,13 +206,23 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
         )
 
         return (
-            <li className="query-param-input" key={index}>
+            <li className="query-param-input" key={index} onKeyDown={handleRowKeyDown}>
                 {keyInput}
                 {valueInput}
-                <IconButton aria-label="delete" color="primary" size="small"
-                    sx={{ padding: '0', marginLeft: '10px' }} onClick={removeSearchParam}>
-                    <ClearIcon fontSize="inherit" />
-                </IconButton>
+                <Tooltip
+                    title={
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                            Remove param <ShortcutHint keys={['Mod', 'Backspace']} />
+                        </span>
+                    }
+                    placement="top"
+                    componentsProps={{ tooltip: { sx: { fontSize: '0.85rem', p: 1 } } }}
+                >
+                    <IconButton aria-label="delete" color="primary" size="small"
+                        sx={{ padding: '0', marginLeft: '10px' }} onClick={removeSearchParam}>
+                        <ClearIcon fontSize="inherit" />
+                    </IconButton>
+                </Tooltip>
             </li>
         )
     })
@@ -198,7 +237,7 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
             <ul>
                 {items}
             </ul>
-            <Button color="secondary" sx={{ marginTop: '14px', marginBottom: '10px' }} onClick={addNewEntry} variant="text">Add param</Button>
+            <Button ref={addParamButtonRef} color="secondary" sx={{ marginTop: '14px', marginBottom: '10px' }} onClick={addNewEntry} variant="text">Add param</Button>
         </div>
     )
 }

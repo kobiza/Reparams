@@ -4,6 +4,9 @@ import SearchParams from "../common/SearchParams";
 import PresetsPicker, { PresetsPickerProps } from "./PresetsPicker";
 import useCommandShortcuts from "../common/useCommandShortcuts";
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import Tooltip from '@mui/material/Tooltip';
+import Box from '@mui/material/Box';
+import ShortcutHint from "../common/ShortcutHint";
 
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -207,13 +210,26 @@ function UrlEditor({
             <SearchParams className="search-params-container row3" entries={searchParamsEntries}
                 setEntries={setSearchParamsEntries} paramsWithDelimiter={paramsWithDelimiter}
                 suggestions={suggestions} />
-            <Fab color="primary" onClick={applyUrl} sx={{
-                position: 'fixed',
-                bottom: 20,
-                right: 20,
-            }}>
-                <RocketLaunchIcon />
-            </Fab>
+            <Tooltip
+                title={
+                    <Box sx={{ display: 'grid', gridTemplateColumns: 'auto auto', columnGap: 1.5, rowGap: 0.75, alignItems: 'center' }}>
+                        <span>Apply</span>
+                        <ShortcutHint keys={['Mod', 'Enter']} />
+                        <span>New tab</span>
+                        <ShortcutHint keys={['Mod', 'Shift', 'Enter']} />
+                    </Box>
+                }
+                placement="left"
+                componentsProps={{ tooltip: { sx: { fontSize: '0.85rem', p: 1.25 } } }}
+            >
+                <Fab aria-label="apply url" color="primary" onClick={applyUrl} sx={{
+                    position: 'fixed',
+                    bottom: 20,
+                    right: 20,
+                }}>
+                    <RocketLaunchIcon />
+                </Fab>
+            </Tooltip>
         </Paper>
     );
 }

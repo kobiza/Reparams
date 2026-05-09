@@ -29,6 +29,7 @@ const FreeSoloTags = ({ values, onChange, sx, className, placeholderText, limitT
             limitTags={limitTags}
             disableCloseOnSelect
             filterSelectedOptions
+            autoSelect
             id="multiple-limit-tags"
             options={options}
             freeSolo={true}
