@@ -52,6 +52,7 @@ const Tags = ({ selected, suggestions, placeholderText, className, onAdd, onDele
             className={className}
             multiple
             disableCloseOnSelect
+            autoSelect
             id="multiple-limit-tags"
             options={suggestions}
             getOptionLabel={(option) => option.label}
