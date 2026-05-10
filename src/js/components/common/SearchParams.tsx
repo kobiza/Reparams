@@ -115,6 +115,8 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
             }
         }
 
+        const keyPlaceholder = isTrailing ? 'Add param' : 'Key'
+
         const keyInput = suggestions ? (
             <Autocomplete
                 className="query-param-input-key"
@@ -129,7 +131,7 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
                     <TextField
                         {...params}
                         hiddenLabel
-                        placeholder="Key"
+                        placeholder={keyPlaceholder}
                         size="small"
                         inputRef={el => itemsRef.current[index] = el}
                         inputProps={{
@@ -143,7 +145,7 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
             <TextField
                 className="query-param-input-key"
                 hiddenLabel
-                placeholder="Key"
+                placeholder={keyPlaceholder}
                 size="small"
                 value={key}
                 onChange={e => updateCurrentEntryKey(e.target.value)}
