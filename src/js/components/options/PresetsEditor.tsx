@@ -91,7 +91,7 @@ const PresetsEditor = ({ packageKey, presets, updatePackagePreset }: PresetsEdit
     return (
         <div>
             <Typography variant="body2" sx={{ opacity: 0.7, paddingBottom: 1 }}>
-                A preset is a named bundle of URL params. Apply it from the popup to set all params in one click. Type into the empty row at the bottom of a preset to add a new param.
+                A preset is a named bundle of URL params. Apply it from the popup to set all params in one click.
             </Typography>
             {presetsItems}
             <Button sx={{ marginTop: '10px' }} onClick={addNewPreset}

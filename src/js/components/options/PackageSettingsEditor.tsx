@@ -219,20 +219,24 @@ const PackageSettingsEditor = ({
             </Typography>
 
             <Box sx={{ paddingLeft: 1 }}>
-                <Typography variant="subtitle2" sx={{ opacity: 0.85, paddingTop: 1 }}>Url patterns</Typography>
-                <Typography variant="body2" sx={{ opacity: 0.7 }}>
-                    Match-pattern syntax (e.g. https://example.com/*).
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, flexWrap: 'wrap', paddingTop: 1 }}>
+                    <Typography variant="subtitle2" sx={{ opacity: 0.85 }}>Url patterns</Typography>
+                    <Typography variant="body2" sx={{ opacity: 0.7 }}>
+                        Match-pattern syntax (e.g. https://example.com/*).
+                    </Typography>
+                </Box>
                 <Box>
                     {patternsInput}
                     <Button sx={{ marginTop: '8px' }} onClick={addNewUrlPattern}
                         variant="text" startIcon={<AddIcon />}>Add</Button>
                 </Box>
 
-                <Typography variant="subtitle2" sx={{ opacity: 0.85, paddingTop: 1.5 }}>Dom selectors</Typography>
-                <Typography variant="body2" sx={{ opacity: 0.7 }}>
-                    Optional. The package also activates if any of these selectors is present on the page.
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, flexWrap: 'wrap', paddingTop: 1.5 }}>
+                    <Typography variant="subtitle2" sx={{ opacity: 0.85 }}>Dom selectors</Typography>
+                    <Typography variant="body2" sx={{ opacity: 0.7 }}>
+                        Optional. Activates the package if any selector matches.
+                    </Typography>
+                </Box>
                 <Box>
                     {domSelectorsInput}
                     <Button sx={{ marginTop: '8px' }} onClick={addNewDomSelector}
