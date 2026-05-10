@@ -215,7 +215,7 @@ const PackageSettingsEditor = ({
         <div>
             <Typography fontWeight="bold" sx={{ paddingY: 0.5 }}>Activation conditions</Typography>
             <Typography variant="body2" sx={{ opacity: 0.7, paddingBottom: 1 }}>
-                Where this package&apos;s presets are available. A package activates when any URL pattern matches and all DOM selectors are present.
+                Where this package&apos;s presets are available. The package activates when any URL pattern matches, or when any DOM selector is present on the page.
             </Typography>
 
             <Box sx={{ paddingLeft: 1 }}>
@@ -231,7 +231,7 @@ const PackageSettingsEditor = ({
 
                 <Typography variant="subtitle2" sx={{ opacity: 0.85, paddingTop: 1.5 }}>Dom selectors</Typography>
                 <Typography variant="body2" sx={{ opacity: 0.7 }}>
-                    Optional. CSS selectors that must exist on the page for the package to activate.
+                    Optional. The package also activates if any of these selectors is present on the page.
                 </Typography>
                 <Box>
                     {domSelectorsInput}
