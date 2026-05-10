@@ -34,7 +34,6 @@ const UseViewerStoreContext = (props: PropsWithChildren<{ currentTabUrl: string 
         return acc
     }, {}))
 
-    // Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist.
     useEffect(() => {
         const isRunInChromeExtension = chrome.tabs
         const messageListener = (message: DomSelectorResultMessage) => {
@@ -48,7 +47,8 @@ const UseViewerStoreContext = (props: PropsWithChildren<{ currentTabUrl: string 
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs: chrome.tabs.Tab[]) => {
                 if (tabs[0]?.id) {
                     const message: DomSelectorRequestMessage = { type: 'DOM_SELECTOR_REQUEST', domSelectors };
-                    chrome.tabs.sendMessage(tabs[0].id, message);
+                    // No content script in tabs that predate the extension load, or on chrome:// URLs.
+                    chrome.tabs.sendMessage(tabs[0].id, message).catch(() => { });
                 }
             });
 
