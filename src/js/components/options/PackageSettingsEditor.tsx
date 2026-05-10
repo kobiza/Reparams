@@ -71,7 +71,7 @@ const PackageSettingsEditor = ({
         }
 
         return (
-            <div key={id} className="multi-param-input-row" style={{ display: 'flex', alignItems: 'center' }}>
+            <Box key={id} className="multi-param-input-row" sx={{ display: 'flex', alignItems: 'center' }}>
                 <TextField
                     sx={{ marginRight: '10px', flex: 1 }}
                     hiddenLabel
@@ -80,8 +80,9 @@ const PackageSettingsEditor = ({
                     value={label} onChange={e => updateParamLabel(e.target.value)}
                 />
                 <TextField
+                    sx={{ width: 72 }}
                     hiddenLabel
-                    placeholder="Delimeter"
+                    placeholder="e.g. ,"
                     size="small"
                     value={separator} onChange={e => updateParamSeparator(e.target.value)}
                 />
@@ -89,7 +90,7 @@ const PackageSettingsEditor = ({
                     sx={{ padding: '0', marginLeft: '10px' }} onClick={removeParam}>
                     <ClearIcon fontSize="inherit" />
                 </IconButton>
-            </div>
+            </Box>
         )
     })
 
@@ -116,7 +117,7 @@ const PackageSettingsEditor = ({
             updateUrlPatterns(newUrlPatterns)
         }
         return (
-            <div key={v.id} style={{ display: 'flex', marginTop: '10px', alignItems: 'center' }}>
+            <Box key={v.id} sx={{ display: 'flex', marginTop: '8px', alignItems: 'center' }}>
                 <TextField
                     sx={{ flex: '1' }}
                     hiddenLabel
@@ -127,7 +128,7 @@ const PackageSettingsEditor = ({
                     sx={{ padding: '0', marginLeft: '10px' }} onClick={removePattern}>
                     <ClearIcon fontSize="inherit" />
                 </IconButton>
-            </div>
+            </Box>
         )
     })
 
@@ -179,7 +180,7 @@ const PackageSettingsEditor = ({
             updateDomSelectors(newDomSelectors)
         }
         return (
-            <div key={v.id} style={{ display: 'flex', marginTop: '10px', alignItems: 'center' }}>
+            <Box key={v.id} sx={{ display: 'flex', marginTop: '8px', alignItems: 'center' }}>
                 <TextField
                     sx={{ flex: '1' }}
                     hiddenLabel
@@ -190,7 +191,7 @@ const PackageSettingsEditor = ({
                     sx={{ padding: '0', marginLeft: '10px' }} onClick={removeDomSelector}>
                     <ClearIcon fontSize="inherit" />
                 </IconButton>
-            </div>
+            </Box>
         )
     })
 
@@ -212,35 +213,59 @@ const PackageSettingsEditor = ({
 
     return (
         <div>
-            <Typography fontWeight="bold" padding={1}>Url patterns</Typography>
-            <Box>
-                {patternsInput}
-                <Button sx={{ marginTop: '10px' }} onClick={addNewUrlPattern}
-                    variant="text" startIcon={<AddIcon />}>Add</Button>
+            <Typography fontWeight="bold" sx={{ paddingY: 0.5 }}>Activation conditions</Typography>
+            <Typography variant="body2" sx={{ opacity: 0.7, paddingBottom: 1 }}>
+                Where this package&apos;s presets are available. A package activates when any URL pattern matches and all DOM selectors are present.
+            </Typography>
+
+            <Box sx={{ paddingLeft: 1 }}>
+                <Typography variant="subtitle2" sx={{ opacity: 0.85, paddingTop: 1 }}>Url patterns</Typography>
+                <Typography variant="body2" sx={{ opacity: 0.7 }}>
+                    Match-pattern syntax (e.g. https://example.com/*).
+                </Typography>
+                <Box>
+                    {patternsInput}
+                    <Button sx={{ marginTop: '8px' }} onClick={addNewUrlPattern}
+                        variant="text" startIcon={<AddIcon />}>Add</Button>
+                </Box>
+
+                <Typography variant="subtitle2" sx={{ opacity: 0.85, paddingTop: 1.5 }}>Dom selectors</Typography>
+                <Typography variant="body2" sx={{ opacity: 0.7 }}>
+                    Optional. CSS selectors that must exist on the page for the package to activate.
+                </Typography>
+                <Box>
+                    {domSelectorsInput}
+                    <Button sx={{ marginTop: '8px' }} onClick={addNewDomSelector}
+                        variant="text" startIcon={<AddIcon />}>Add</Button>
+                </Box>
             </Box>
-            <Divider sx={{ margin: '15px 0' }} />
-            <Typography fontWeight="bold" padding={1}>Dom selectors</Typography>
+
+            <Divider sx={{ margin: '12px 0' }} />
+            <Typography fontWeight="bold" sx={{ paddingY: 0.5 }}>Params with delimiter</Typography>
+            <Typography variant="body2" sx={{ opacity: 0.7, paddingBottom: 1 }}>
+                Params whose values should be treated as multi-value (e.g. comma-separated tags).
+            </Typography>
             <Box>
-                {domSelectorsInput}
-                <Button sx={{ marginTop: '10px' }} onClick={addNewDomSelector}
-                    variant="text" startIcon={<AddIcon />}>Add</Button>
-            </Box>
-            <Divider sx={{ margin: '15px 0' }} />
-            <Typography fontWeight="bold" padding={1}>Params with delimiter</Typography>
-            <Box>
+                {paramsWithDelimiter.length > 0 && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', paddingTop: '4px' }}>
+                        <Typography variant="caption" sx={{ flex: 1, marginRight: '10px', opacity: 0.7 }}>Param key</Typography>
+                        <Typography variant="caption" sx={{ width: 72, opacity: 0.7 }}>Delimiter</Typography>
+                        <Box sx={{ width: 24, marginLeft: '10px' }} />
+                    </Box>
+                )}
                 {paramsItems}
-                <Button sx={{ marginTop: '10px' }} onClick={addNewMultiParam}
+                <Button sx={{ marginTop: '8px' }} onClick={addNewMultiParam}
                     variant="text" startIcon={<AddIcon />}>Add</Button>
             </Box>
-            <Divider sx={{ margin: '15px 0' }} />
-            <Typography fontWeight="bold" padding={1}>Param history</Typography>
+            <Divider sx={{ margin: '12px 0' }} />
+            <Typography fontWeight="bold" sx={{ paddingY: 0.5 }}>Param history</Typography>
             <Box sx={{ paddingLeft: 1 }}>
                 <Typography variant="body2" sx={{ opacity: 0.7 }}>
                     {paramHistoryCount === 0 ? 'No entries yet' : `${paramHistoryCount} entries`}
                 </Typography>
                 <Button
                     color="warning"
-                    sx={{ marginTop: '10px' }}
+                    sx={{ marginTop: '8px' }}
                     disabled={paramHistoryCount === 0}
                     onClick={openClearHistoryDialog}
                     variant="text"
@@ -264,7 +289,7 @@ const PackageSettingsEditor = ({
                     </DialogActions>
                 </Dialog>
             </Box>
-            <Divider sx={{ margin: '15px 0' }} />
+            <Divider sx={{ margin: '12px 0' }} />
             <div>
                 <Button sx={{ marginTop: '10px' }} onClick={() => addPackageWithSameSettings()}
                     variant="text">Add package with same settings</Button>

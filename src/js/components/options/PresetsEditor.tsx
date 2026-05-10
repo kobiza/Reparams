@@ -1,8 +1,10 @@
 import React from 'react';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { uuidv4 } from '../../utils/utils';
 import { SettingsPackage, EditorStore, SearchParamsEntries } from '../../types/types';
@@ -46,6 +48,8 @@ const PresetsEditor = ({ packageKey, presets, updatePackagePreset }: PresetsEdit
             updatePackagePreset(packageKey, newPresets)
         }
 
+        const hasEntries = presetData.entries.length > 0
+
         return (
             <Paper key={presetKey} elevation={2} className="preset-item">
                 <div className="preset-name-wrapper">
@@ -59,7 +63,16 @@ const PresetsEditor = ({ packageKey, presets, updatePackagePreset }: PresetsEdit
                         <DeleteIcon fontSize="inherit" />
                     </IconButton>
                 </div>
-                <SearchParams entries={presetData.entries} setEntries={updatePresetEntries} paramsWithDelimiter={{}} />
+                <Box>
+                    {hasEntries && (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <Typography variant="caption" sx={{ flex: 1, opacity: 0.7 }}>Param key</Typography>
+                            <Typography variant="caption" sx={{ flex: 2, opacity: 0.7 }}>Value</Typography>
+                            <Box sx={{ flex: '0 0 28px' }} />
+                        </Box>
+                    )}
+                    <SearchParams entries={presetData.entries} setEntries={updatePresetEntries} paramsWithDelimiter={{}} />
+                </Box>
             </Paper>
         )
     })
@@ -77,6 +90,9 @@ const PresetsEditor = ({ packageKey, presets, updatePackagePreset }: PresetsEdit
 
     return (
         <div>
+            <Typography variant="body2" sx={{ opacity: 0.7, paddingBottom: 1 }}>
+                A preset is a named bundle of URL params. Apply it from the popup to set all params in one click. Type into the empty row at the bottom of a preset to add a new param.
+            </Typography>
             {presetsItems}
             <Button sx={{ marginTop: '10px' }} onClick={addNewPreset}
                 variant="text">Add Preset</Button>
