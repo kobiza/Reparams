@@ -100,3 +100,84 @@ describe('ImportDialog — error surfacing', () => {
         expect(addPackages).not.toHaveBeenCalled();
     });
 });
+
+const mockGistFetch = (init: { ok: boolean; status?: number; body?: unknown }) => {
+    const response = {
+        ok: init.ok,
+        status: init.status ?? (init.ok ? 200 : 500),
+        json: async () => init.body,
+    } as unknown as Response;
+    (global as any).fetch = jest.fn().mockResolvedValue(response);
+};
+
+describe('ImportDialog — Gist tab', () => {
+    afterEach(() => {
+        delete (global as any).fetch;
+    });
+
+    test('Gist import stamps gistId and gistRevision on imported packages', async () => {
+        const gistId = 'a'.repeat(32);
+        const gistBody = {
+            files: {
+                'data.json': {
+                    content: JSON.stringify({
+                        modelVersion: 1,
+                        packages: { 'pkg-gist': makePackage('pkg-gist', 'From Gist') },
+                    }),
+                },
+            },
+            history: [{ version: 'sha-abc' }],
+        };
+        mockGistFetch({ ok: true, body: gistBody });
+
+        const addPackages = jest.fn();
+        render(
+            <ImportDialog
+                isOpen
+                closeDialog={() => { }}
+                packages={{}}
+                addPackages={addPackages}
+            />
+        );
+
+        await userEvent.click(screen.getByRole('tab', { name: /GitHub Gist/ }));
+        await userEvent.type(screen.getByLabelText(/Gist URL or ID/), gistId);
+        await userEvent.click(screen.getByRole('button', { name: /Fetch from Gist/ }));
+
+        await waitFor(() => {
+            expect(screen.getByText('From Gist')).toBeInTheDocument();
+        });
+
+        await userEvent.click(screen.getByRole('button', { name: /Import Selected/ }));
+
+        expect(addPackages).toHaveBeenCalledTimes(1);
+        const [importedPackages, replace] = addPackages.mock.calls[0];
+        expect(replace).toBe(false);
+        expect(importedPackages['pkg-gist'].gistId).toBe(gistId);
+        expect(importedPackages['pkg-gist'].gistRevision).toBe('sha-abc');
+    });
+
+    test('Gist fetch 404 surfaces error and does not call addPackages', async () => {
+        const gistId = 'b'.repeat(32);
+        mockGistFetch({ ok: false, status: 404 });
+
+        const addPackages = jest.fn();
+        render(
+            <ImportDialog
+                isOpen
+                closeDialog={() => { }}
+                packages={{}}
+                addPackages={addPackages}
+            />
+        );
+
+        await userEvent.click(screen.getByRole('tab', { name: /GitHub Gist/ }));
+        await userEvent.type(screen.getByLabelText(/Gist URL or ID/), gistId);
+        await userEvent.click(screen.getByRole('button', { name: /Fetch from Gist/ }));
+
+        await waitFor(() => {
+            expect(screen.getByText(/Couldn't reach the Gist/)).toBeInTheDocument();
+        });
+        expect(addPackages).not.toHaveBeenCalled();
+    });
+});

@@ -7,14 +7,18 @@ import IconButton from '@mui/material/IconButton';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditIcon from '@mui/icons-material/Edit';
+import LockIcon from '@mui/icons-material/Lock';
 import classNames from 'classnames';
 import { EditorStore, SettingsPackage } from '../../types/types';
 import { CustomTabPanel, a11yProps } from './CustomTabPanel';
 import PresetsEditor from './PresetsEditor';
 import PackageSettingsEditor from './PackageSettingsEditor';
+import PackageGistLinkActions from './PackageGistLinkActions';
+import { isPackageLocked } from '../../utils/utils';
 
 type PackagePanelProps = {
     packageData: SettingsPackage,
@@ -24,16 +28,19 @@ type PackagePanelProps = {
 
 const PackagePanel = ({ packageData, packageKey, editorStore }: PackagePanelProps) => {
     const { key, label, presets, paramsWithDelimiter, conditions, paramHistory } = packageData
+    const isLocked = isPackageLocked(packageData)
     const [value, setValue] = useState(0);
     const {
         addNewPackage,
+        addPackages,
         updatePackagePreset,
         updatePackageParamsWithDelimiter,
         updatePackageLabel,
         updatePackageUrlPatterns,
         updatePackageDomSelectors,
         deletePackage,
-        clearPackageParamHistory
+        clearPackageParamHistory,
+        unlinkPackage
     } = editorStore
 
     const [accordionOpen, setAccordionOpen] = useState(false)
@@ -97,10 +104,18 @@ const PackagePanel = ({ packageData, packageKey, editorStore }: PackagePanelProp
                 <div className="package-name-wrapper">
                     <div className={classNames("package-name-view", { 'hidden-x': isRenameActive })}>
                         <Typography sx={{ paddingLeft: '6px' }}>{label}</Typography>
-                        <IconButton aria-label="delete" color="primary" size="small"
-                            sx={{ padding: '0', marginLeft: '10px' }} onClick={startRenameMode}>
-                            <EditIcon fontSize="inherit" />
-                        </IconButton>
+                        {isLocked && (
+                            <Tooltip title="Linked to a GitHub Gist — read-only. Use Sync or Unlink to manage.">
+                                <LockIcon aria-label="locked" color="primary" fontSize="small"
+                                    sx={{ marginLeft: '8px' }} />
+                            </Tooltip>
+                        )}
+                        {!isLocked && (
+                            <IconButton aria-label="rename" color="primary" size="small"
+                                sx={{ padding: '0', marginLeft: '10px' }} onClick={startRenameMode}>
+                                <EditIcon fontSize="inherit" />
+                            </IconButton>
+                        )}
                     </div>
                     <div className={classNames("package-name-edit", { 'hidden-x': !isRenameActive })}>
                         <TextField inputRef={packageNameInputRef} type="text" value={label}
@@ -125,11 +140,13 @@ const PackagePanel = ({ packageData, packageKey, editorStore }: PackagePanelProp
                         </Box>
                         <CustomTabPanel value={value} index={0}>
                             <PresetsEditor packageKey={packageKey} presets={presets}
+                                isLocked={isLocked}
                                 updatePackagePreset={updatePackagePreset} />
                         </CustomTabPanel>
                         <CustomTabPanel value={value} index={1}>
                             <PackageSettingsEditor packageKey={packageKey}
                                 label={label}
+                                isLocked={isLocked}
                                 paramsWithDelimiter={paramsWithDelimiter}
                                 paramHistoryCount={paramHistory?.length ?? 0}
                                 addNewPackage={addNewPackage}
@@ -139,7 +156,15 @@ const PackagePanel = ({ packageData, packageKey, editorStore }: PackagePanelProp
                                 updatePackageDomSelectors={updatePackageDomSelectors}
                                 updatePackageUrlPatterns={updatePackageUrlPatterns}
                                 deletePackage={deletePackage}
-                                clearPackageParamHistory={clearPackageParamHistory} />
+                                clearPackageParamHistory={clearPackageParamHistory}
+                                gistLinkActions={isLocked ? (
+                                    <PackageGistLinkActions
+                                        packageData={packageData}
+                                        addPackages={addPackages}
+                                        unlinkPackage={unlinkPackage}
+                                    />
+                                ) : undefined}
+                            />
                         </CustomTabPanel>
                     </Box>
                 ) :

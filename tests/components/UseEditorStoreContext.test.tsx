@@ -227,6 +227,29 @@ describe('UseEditorStoreContext — clearPackageParamHistory', () => {
         expect(stored.packages['pkg-2'].paramHistory).toEqual([{ key: 'x', value: 'y' }]);
     });
 
+    test('does not clear paramHistory on a locked (gistId) package', async () => {
+        const modelWithLockedHistory: EditorModel = {
+            modelVersion: 1,
+            packages: {
+                'pkg-1': {
+                    ...samplePackage,
+                    gistId: 'some-gist',
+                    gistRevision: 'sha-abc',
+                    paramHistory: [{ key: 'a', value: '1' }],
+                },
+            },
+        };
+        localStorage.setItem('reparamsAppData', JSON.stringify(modelWithLockedHistory));
+
+        renderContext(<ClearHistoryConsumer packageKey="pkg-1" />);
+
+        expect(screen.getByTestId('history-len')).toHaveTextContent('1');
+        await userEvent.click(screen.getByText('Clear'));
+        // No mutation — history length remains 1
+        await new Promise(r => setTimeout(r, 50));
+        expect(screen.getByTestId('history-len')).toHaveTextContent('1');
+    });
+
     test('preserves other package fields (label, presets, conditions) when clearing', async () => {
         const modelWithHistory: EditorModel = {
             modelVersion: 1,
@@ -251,5 +274,68 @@ describe('UseEditorStoreContext — clearPackageParamHistory', () => {
         expect(pkg.label).toBe('Sample Package');
         expect(pkg.presets).toEqual({ p1: { label: 'P1', entries: [['k', 'v']] } });
         expect(pkg.conditions).toEqual({ urlPatterns: [{ id: 'u1', value: '*://*/*' }], domSelectors: [] });
+    });
+});
+
+describe('UseEditorStoreContext — locked (gistId) packages', () => {
+    const lockedPackage: SettingsPackage = {
+        ...samplePackage,
+        gistId: 'gist-abc',
+        gistRevision: 'sha-1',
+    };
+    const lockedModel: EditorModel = {
+        modelVersion: 1,
+        packages: { 'pkg-1': lockedPackage },
+    };
+
+    function MutationConsumer() {
+        const store = useContext(EditorStoreContext);
+        return (
+            <div>
+                <span data-testid="label">{store.state.packages['pkg-1']?.label ?? 'missing'}</span>
+                <span data-testid="presets">{JSON.stringify(store.state.packages['pkg-1']?.presets ?? {})}</span>
+                <span data-testid="pkg-count">{Object.keys(store.state.packages).length}</span>
+                <button onClick={() => store.updatePackageLabel('pkg-1', 'Renamed')}>Rename</button>
+                <button onClick={() => store.deletePackage('pkg-1')}>Delete</button>
+                <button onClick={() => store.updatePackagePreset('pkg-1', { p1: { label: 'P1', entries: [] } })}>SetPreset</button>
+                <button onClick={() => store.updatePackageUrlPatterns('pkg-1', [{ id: 'x', value: 'https://foo/*' }])}>SetUrl</button>
+            </div>
+        );
+    }
+
+    test('updatePackageLabel is a no-op for locked package', async () => {
+        localStorage.setItem('reparamsAppData', JSON.stringify(lockedModel));
+        renderContext(<MutationConsumer />);
+        expect(screen.getByTestId('label')).toHaveTextContent('Sample Package');
+        await userEvent.click(screen.getByText('Rename'));
+        await new Promise(r => setTimeout(r, 50));
+        expect(screen.getByTestId('label')).toHaveTextContent('Sample Package');
+    });
+
+    test('deletePackage is a no-op for locked package', async () => {
+        localStorage.setItem('reparamsAppData', JSON.stringify(lockedModel));
+        renderContext(<MutationConsumer />);
+        expect(screen.getByTestId('pkg-count')).toHaveTextContent('1');
+        await userEvent.click(screen.getByText('Delete'));
+        await new Promise(r => setTimeout(r, 50));
+        expect(screen.getByTestId('pkg-count')).toHaveTextContent('1');
+    });
+
+    test('updatePackagePreset is a no-op for locked package', async () => {
+        localStorage.setItem('reparamsAppData', JSON.stringify(lockedModel));
+        renderContext(<MutationConsumer />);
+        expect(screen.getByTestId('presets')).toHaveTextContent('{}');
+        await userEvent.click(screen.getByText('SetPreset'));
+        await new Promise(r => setTimeout(r, 50));
+        expect(screen.getByTestId('presets')).toHaveTextContent('{}');
+    });
+
+    test('unlocked package is still mutable (sanity check)', async () => {
+        localStorage.setItem('reparamsAppData', JSON.stringify(sampleModel));
+        renderContext(<MutationConsumer />);
+        await userEvent.click(screen.getByText('Rename'));
+        await waitFor(() => {
+            expect(screen.getByTestId('label')).toHaveTextContent('Renamed');
+        });
     });
 });

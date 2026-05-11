@@ -21,9 +21,10 @@ type SearchParamsProps = {
     paramsWithDelimiter: ParamsWithDelimiterViewModel
     className?: string,
     suggestions?: ParamSuggestions
+    readOnly?: boolean
 }
 
-const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, suggestions }: SearchParamsProps) => {
+const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, suggestions, readOnly }: SearchParamsProps) => {
     const itemsRef = useRef<Array<HTMLDivElement | null>>([]);
     const indexToFocusAfterDelete = useRef<number | null>(null)
     // Tracks the option currently highlighted in whichever Autocomplete is focused.
@@ -126,6 +127,7 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
             <Autocomplete
                 className="query-param-input-key"
                 freeSolo
+                disabled={readOnly}
                 options={suggestions.keys}
                 value={key}
                 inputValue={key}
@@ -162,6 +164,7 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
                 hiddenLabel
                 placeholder={keyPlaceholder}
                 size="small"
+                disabled={readOnly}
                 value={key}
                 onChange={e => updateCurrentEntryKey(e.target.value)}
                 inputRef={el => itemsRef.current[index] = el}
@@ -181,11 +184,13 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
                 onChange={updateCurrentEntryValue}
                 suggestions={valueOptions}
                 autoFocus={false}
+                disabled={readOnly}
             />
         ) : suggestions ? (
             <Autocomplete
                 className="query-param-input-value"
                 freeSolo
+                disabled={readOnly}
                 options={valueOptions}
                 value={value}
                 inputValue={value}
@@ -221,6 +226,7 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
                 hiddenLabel
                 placeholder="Value"
                 size="small"
+                disabled={readOnly}
                 value={value}
                 onChange={e => updateCurrentEntryValue(e.target.value)}
                 inputProps={{
@@ -245,6 +251,7 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
                             componentsProps={{ tooltip: { sx: { fontSize: '0.85rem', p: 1 } } }}
                         >
                             <IconButton aria-label="delete" color="primary" size="small"
+                                disabled={readOnly}
                                 sx={{ padding: '0' }} onClick={removeSearchParam}>
                                 <ClearIcon fontSize="inherit" />
                             </IconButton>

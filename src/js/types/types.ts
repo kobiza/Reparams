@@ -47,6 +47,8 @@ export type SettingsPackage = {
     presets: PresetsEntriesMap
     paramsWithDelimiter: ParamsWithDelimiter
     paramHistory?: ParamHistoryEntry[]
+    gistId?: string
+    gistRevision?: string
 }
 
 export type MergedAppData = {
@@ -83,6 +85,7 @@ export type EditorStore = {
     addPackages: (packagesToAdd: { [key: string]: SettingsPackage }, replace: boolean) => void
     deletePackage: (packageKey: string) => void
     clearPackageParamHistory: (packageKey: string) => void
+    unlinkPackage: (packageKey: string) => void
 }
 
 export type ViewerModel = {
