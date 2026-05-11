@@ -20,10 +20,12 @@ import CircularProgress from '@mui/material/CircularProgress';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import LinkIcon from '@mui/icons-material/Link';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import { replaceItem, toTrueObj } from "../../utils/arrayUtils";
 import { EditorStore, EditorModel, SettingsPackage } from "../../types/types";
 import { useEffect, useState } from "react";
 import { migrateModel } from "../../utils/dataFixer";
+import { fetchGist, GistFetchFailureReason, parseGistInput } from "../../utils/gist";
 
 type PackageItem = { key: string, label: string, checked: boolean }
 
@@ -148,6 +150,9 @@ export default function ImportDialog({
     const [tabValue, setTabValue] = useState(0);
     const [packagesToImport, setPackagesToImport] = useState<{ [key: string]: SettingsPackage } | null>(null);
     const [importUrl, setImportUrl] = useState('');
+    const [gistInput, setGistInput] = useState('');
+    const [pendingGistId, setPendingGistId] = useState<string | null>(null);
+    const [pendingGistRevision, setPendingGistRevision] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [replaceRequiredModal, setReplaceRequiredModal] = useState(false);
@@ -167,6 +172,8 @@ export default function ImportDialog({
         setError(null);
         setPackagesToImport(null);
         setSelectedPackages([]);
+        setPendingGistId(null);
+        setPendingGistRevision(null);
     };
 
     const parseImportData = (jsonString: string): EditorModel | null => {
@@ -248,13 +255,49 @@ export default function ImportDialog({
         setLoading(false);
     };
 
+    const gistErrorMessages: Record<GistFetchFailureReason, string> = {
+        'invalid-input': "Couldn't recognize that as a Gist URL or ID.",
+        'fetch-failed': "Couldn't reach the Gist (network or 4xx/5xx).",
+        'no-json-file': "That Gist doesn't contain a .json file.",
+        'parse': "The Gist's JSON file couldn't be parsed.",
+        'fixer-threw': "Couldn't upgrade the Gist's data to the current model version.",
+        'future-version': "Gist is from a newer extension version — please update first.",
+    };
+
+    const importFromGist = async () => {
+        const trimmed = gistInput.trim();
+        if (!trimmed) {
+            setError('Please enter a Gist URL or ID');
+            return;
+        }
+
+        setLoading(true);
+        setError(null);
+        const result = await fetchGist(trimmed);
+        if (!result.ok) {
+            setError(gistErrorMessages[result.reason]);
+        } else if (!result.model.packages || Object.keys(result.model.packages).length === 0) {
+            setError('Nothing to import: no packages found in the Gist');
+        } else {
+            setPendingGistId(parseGistInput(trimmed));
+            setPendingGistRevision(result.revision);
+            setPackagesToImport(result.model.packages);
+        }
+        setLoading(false);
+    };
+
+    const stampWithGistLink = (pkg: SettingsPackage): SettingsPackage =>
+        pendingGistId && pendingGistRevision
+            ? { ...pkg, gistId: pendingGistId, gistRevision: pendingGistRevision }
+            : pkg;
+
     const forceImportPackages = (replace: boolean) => () => {
         if (!packagesToImport) return;
 
         const selectedPackagesToImport = Object.values(packagesToImport).filter((v, index) => {
             return selectedPackages[index]?.checked;
         });
-        const packagesObj = Object.fromEntries(selectedPackagesToImport.map(pkg => [pkg.key, pkg]));
+        const packagesObj = Object.fromEntries(selectedPackagesToImport.map(pkg => [pkg.key, stampWithGistLink(pkg)]));
         addPackages(packagesObj, replace);
         closeDialog();
         resetState();
@@ -265,6 +308,9 @@ export default function ImportDialog({
         setSelectedPackages([]);
         setError(null);
         setImportUrl('');
+        setGistInput('');
+        setPendingGistId(null);
+        setPendingGistRevision(null);
         setTabValue(0);
     };
 
@@ -280,7 +326,7 @@ export default function ImportDialog({
         });
 
         if (!isReplaceRequired) {
-            const packagesObj = Object.fromEntries(selectedPackagesToImport.map(pkg => [pkg.key, pkg]));
+            const packagesObj = Object.fromEntries(selectedPackagesToImport.map(pkg => [pkg.key, stampWithGistLink(pkg)]));
             addPackages(packagesObj, false);
             closeDialog();
             resetState();
@@ -321,6 +367,7 @@ export default function ImportDialog({
                                 <Tab icon={<ContentPasteIcon />} label="Clipboard" {...a11yProps(0)} />
                                 <Tab icon={<UploadFileIcon />} label="Local File" {...a11yProps(1)} />
                                 <Tab icon={<LinkIcon />} label="From URL" {...a11yProps(2)} />
+                                <Tab icon={<GitHubIcon />} label="GitHub Gist" {...a11yProps(3)} />
                             </Tabs>
                         </Box>
                         <TabPanel value={tabValue} index={0}>
@@ -381,6 +428,29 @@ export default function ImportDialog({
                                 sx={{ mb: 2 }}
                             >
                                 {loading ? <CircularProgress size={20} /> : 'Fetch from URL'}
+                            </Button>
+                        </TabPanel>
+                        <TabPanel value={tabValue} index={3}>
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                Import packages from a public GitHub Gist. Imported packages are linked to the Gist and become read-only.
+                            </Typography>
+                            <TextField
+                                fullWidth
+                                label="Gist URL or ID"
+                                value={gistInput}
+                                onChange={(e) => setGistInput(e.target.value)}
+                                placeholder="https://gist.github.com/user/abc123... or gist ID"
+                                sx={{ mb: 2 }}
+                                size="small"
+                            />
+                            <Button
+                                variant="outlined"
+                                onClick={importFromGist}
+                                disabled={loading || !gistInput.trim()}
+                                fullWidth
+                                sx={{ mb: 2 }}
+                            >
+                                {loading ? <CircularProgress size={20} /> : 'Fetch from Gist'}
                             </Button>
                         </TabPanel>
 
