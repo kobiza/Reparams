@@ -26,6 +26,10 @@ type SearchParamsProps = {
 const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, suggestions }: SearchParamsProps) => {
     const itemsRef = useRef<Array<HTMLDivElement | null>>([]);
     const indexToFocusAfterDelete = useRef<number | null>(null)
+    // Tracks the option currently highlighted in whichever Autocomplete is focused.
+    // Read on Tab keydown to commit that option; replaces MUI's autoSelect, which
+    // also fired on mouse-click blur (clicking another input committed a hovered option).
+    const highlightedOptionRef = useRef<string | null>(null)
 
     const renderedRows: SearchParamsEntries = [...entries, ['', '']]
 
@@ -122,26 +126,35 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
             <Autocomplete
                 className="query-param-input-key"
                 freeSolo
-                autoSelect
                 options={suggestions.keys}
                 value={key}
                 inputValue={key}
                 onInputChange={(_e, newInputValue) => updateCurrentEntryKey(newInputValue)}
                 onChange={(_e, newValue) => updateCurrentEntryKey(newValue ?? '')}
+                onHighlightChange={(_e, option) => { highlightedOptionRef.current = option }}
                 ListboxProps={{ sx: autocompleteListboxSx }}
-                renderInput={(params) => (
-                    <TextField
-                        {...params}
-                        hiddenLabel
-                        placeholder={keyPlaceholder}
-                        size="small"
-                        inputRef={el => itemsRef.current[index] = el}
-                        inputProps={{
-                            ...params.inputProps,
-                            onPaste: handleKeyPaste,
-                        }}
-                    />
-                )}
+                renderInput={(params) => {
+                    const muiKeyDown = (params.inputProps as any).onKeyDown
+                    return (
+                        <TextField
+                            {...params}
+                            hiddenLabel
+                            placeholder={keyPlaceholder}
+                            size="small"
+                            inputRef={el => itemsRef.current[index] = el}
+                            inputProps={{
+                                ...params.inputProps,
+                                onPaste: handleKeyPaste,
+                                onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => {
+                                    if (e.key === 'Tab' && highlightedOptionRef.current) {
+                                        updateCurrentEntryKey(highlightedOptionRef.current)
+                                    }
+                                    muiKeyDown?.(e)
+                                },
+                            }}
+                        />
+                    )
+                }}
             />
         ) : (
             <TextField
@@ -173,25 +186,34 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
             <Autocomplete
                 className="query-param-input-value"
                 freeSolo
-                autoSelect
                 options={valueOptions}
                 value={value}
                 inputValue={value}
                 onInputChange={(_e, newInputValue) => updateCurrentEntryValue(newInputValue)}
                 onChange={(_e, newValue) => updateCurrentEntryValue(newValue ?? '')}
+                onHighlightChange={(_e, option) => { highlightedOptionRef.current = option }}
                 ListboxProps={{ sx: autocompleteListboxSx }}
-                renderInput={(params) => (
-                    <TextField
-                        {...params}
-                        hiddenLabel
-                        placeholder="Value"
-                        size="small"
-                        inputProps={{
-                            ...params.inputProps,
-                            onPaste: handleValuePaste,
-                        }}
-                    />
-                )}
+                renderInput={(params) => {
+                    const muiKeyDown = (params.inputProps as any).onKeyDown
+                    return (
+                        <TextField
+                            {...params}
+                            hiddenLabel
+                            placeholder="Value"
+                            size="small"
+                            inputProps={{
+                                ...params.inputProps,
+                                onPaste: handleValuePaste,
+                                onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => {
+                                    if (e.key === 'Tab' && highlightedOptionRef.current) {
+                                        updateCurrentEntryValue(highlightedOptionRef.current)
+                                    }
+                                    muiKeyDown?.(e)
+                                },
+                            }}
+                        />
+                    )
+                }}
             />
         ) : (
             <TextField

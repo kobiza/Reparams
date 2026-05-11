@@ -46,7 +46,32 @@ describe('MuiTags keyboard behavior (preset picker)', () => {
         expect(onDelete).not.toHaveBeenCalled()
     })
 
-    test('Blur (Tab) with a highlighted suggestion calls onAdd (autoSelect)', () => {
+    test('Tab with a highlighted suggestion calls onAdd', () => {
+        const onAdd = jest.fn()
+        const onDelete = jest.fn()
+        const suggestions = [
+            { value: 'preset-a', label: 'Preset A' },
+            { value: 'preset-b', label: 'Preset B' },
+        ]
+        render(
+            <Tags
+                selected={[]}
+                suggestions={suggestions}
+                placeholderText="Add preset"
+                onAdd={onAdd}
+                onDelete={onDelete}
+            />
+        )
+        const input = screen.getByRole('combobox') as HTMLInputElement
+        fireEvent.mouseDown(input)
+        fireEvent.keyDown(input, { key: 'ArrowDown' })
+        fireEvent.keyDown(input, { key: 'Tab' })
+        expect(onAdd).toHaveBeenCalledTimes(1)
+        const added = onAdd.mock.calls[0][0]
+        expect(added[0].value).toBe('preset-a')
+    })
+
+    test('Plain blur (mouse click away) with a hovered suggestion does NOT call onAdd', () => {
         const onAdd = jest.fn()
         const onDelete = jest.fn()
         const suggestions = [
@@ -66,9 +91,7 @@ describe('MuiTags keyboard behavior (preset picker)', () => {
         fireEvent.mouseDown(input)
         fireEvent.keyDown(input, { key: 'ArrowDown' })
         fireEvent.blur(input)
-        expect(onAdd).toHaveBeenCalledTimes(1)
-        const added = onAdd.mock.calls[0][0]
-        expect(added[0].value).toBe('preset-a')
+        expect(onAdd).not.toHaveBeenCalled()
     })
 
     test('Backspace on empty input removes the last selected chip via onDelete', () => {
@@ -120,7 +143,24 @@ describe('FreeSoloTags keyboard behavior', () => {
         expect(onChange).toHaveBeenCalledWith(['alpha'])
     })
 
-    test('Blur (Tab) with a highlighted suggestion commits that suggestion (autoSelect)', () => {
+    test('Tab with a highlighted suggestion commits that suggestion', () => {
+        const onChange = jest.fn()
+        render(
+            <FreeSoloTags
+                values={[]}
+                onChange={onChange}
+                placeholderText="Add value"
+                options={['alpha', 'beta']}
+            />
+        )
+        const input = screen.getByRole('combobox') as HTMLInputElement
+        fireEvent.mouseDown(input)
+        fireEvent.keyDown(input, { key: 'ArrowDown' })
+        fireEvent.keyDown(input, { key: 'Tab' })
+        expect(onChange).toHaveBeenCalledWith(['alpha'])
+    })
+
+    test('Plain blur (mouse click away) with a hovered suggestion does NOT commit', () => {
         const onChange = jest.fn()
         render(
             <FreeSoloTags
@@ -134,7 +174,7 @@ describe('FreeSoloTags keyboard behavior', () => {
         fireEvent.mouseDown(input)
         fireEvent.keyDown(input, { key: 'ArrowDown' })
         fireEvent.blur(input)
-        expect(onChange).toHaveBeenCalledWith(['alpha'])
+        expect(onChange).not.toHaveBeenCalled()
     })
 })
 
@@ -190,7 +230,7 @@ describe('SearchParams Autocomplete keyboard behavior', () => {
         expect(lastCall).toEqual([['lang', 'en']])
     })
 
-    test('key Autocomplete: blur (Tab) with highlighted suggestion commits via autoSelect', () => {
+    test('key Autocomplete: Tab with highlighted suggestion commits the highlighted option', () => {
         const { setEntries } = renderWithSuggestions(
             [['', '']],
             { keys: ['foo', 'bar'], valuesByKey: {} }
@@ -198,12 +238,40 @@ describe('SearchParams Autocomplete keyboard behavior', () => {
         const keyInput = screen.getAllByRole('combobox')[0] as HTMLInputElement
         fireEvent.change(keyInput, { target: { value: 'fo' } })
         fireEvent.keyDown(keyInput, { key: 'ArrowDown' })
-        fireEvent.blur(keyInput)
+        fireEvent.keyDown(keyInput, { key: 'Tab' })
         const lastCall = setEntries.mock.calls.at(-1)![0]
         expect(lastCall).toEqual([['foo', '']])
     })
 
-    test('value Autocomplete: blur (Tab) with highlighted suggestion commits via autoSelect', () => {
+    test('value Autocomplete: Tab with highlighted suggestion commits the highlighted option', () => {
+        const { setEntries } = renderWithSuggestions(
+            [['lang', '']],
+            { keys: ['lang'], valuesByKey: { lang: ['en', 'fr'] } }
+        )
+        const valueInput = screen.getAllByRole('combobox')[1] as HTMLInputElement
+        fireEvent.mouseDown(valueInput)
+        fireEvent.keyDown(valueInput, { key: 'ArrowDown' })
+        fireEvent.keyDown(valueInput, { key: 'Tab' })
+        const lastCall = setEntries.mock.calls.at(-1)![0]
+        expect(lastCall).toEqual([['lang', 'en']])
+    })
+
+    test('key Autocomplete: plain blur (mouse click away) with hovered suggestion does NOT commit', () => {
+        const { setEntries } = renderWithSuggestions(
+            [['', '']],
+            { keys: ['foo', 'bar'], valuesByKey: {} }
+        )
+        const keyInput = screen.getAllByRole('combobox')[0] as HTMLInputElement
+        fireEvent.change(keyInput, { target: { value: 'fo' } })
+        setEntries.mockClear()
+        fireEvent.keyDown(keyInput, { key: 'ArrowDown' })
+        fireEvent.blur(keyInput)
+        // No Tab means the highlighted "foo" should not be committed by the blur alone.
+        const calls = setEntries.mock.calls.map(c => c[0])
+        expect(calls).not.toContainEqual([['foo', '']])
+    })
+
+    test('value Autocomplete: plain blur (mouse click away) with hovered suggestion does NOT commit', () => {
         const { setEntries } = renderWithSuggestions(
             [['lang', '']],
             { keys: ['lang'], valuesByKey: { lang: ['en', 'fr'] } }
@@ -212,8 +280,8 @@ describe('SearchParams Autocomplete keyboard behavior', () => {
         fireEvent.mouseDown(valueInput)
         fireEvent.keyDown(valueInput, { key: 'ArrowDown' })
         fireEvent.blur(valueInput)
-        const lastCall = setEntries.mock.calls.at(-1)![0]
-        expect(lastCall).toEqual([['lang', 'en']])
+        const calls = setEntries.mock.calls.map(c => c[0])
+        expect(calls).not.toContainEqual([['lang', 'en']])
     })
 })
 
