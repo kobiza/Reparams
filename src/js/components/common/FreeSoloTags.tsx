@@ -3,6 +3,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import type { Theme } from '@mui/material/styles';
 import type { SxProps } from "@mui/system";
+import { autocompleteListboxSx } from "./autocompleteListboxSx";
 
 export type FreeSoloTagsProps = {
     values: Array<string>,
@@ -37,7 +38,7 @@ const FreeSoloTags = ({ values, onChange, sx, className, placeholderText, limitT
             onChange={onChangeHandler}
             getOptionLabel={(option) => option}
             isOptionEqualToValue={(option, value) => option === value}
-            ListboxProps={{ sx: { maxHeight: '340px' } }}
+            ListboxProps={{ sx: autocompleteListboxSx }}
 
             renderInput={(params) => (
                 <TextField hiddenLabel={true} {...params} size="small" placeholder={placeholderText} autoFocus={autoFocus} onKeyUp={onKeyUp} />
