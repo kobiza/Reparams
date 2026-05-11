@@ -13,6 +13,7 @@ import usePrevious from "./usePrevious";
 import ParamWithDelimiterValueInput from "./ParamWithDelimiterValueInput";
 import ShortcutHint from "./ShortcutHint";
 import classNames from "classnames";
+import { autocompleteListboxSx } from "./autocompleteListboxSx";
 
 type SearchParamsProps = {
     entries: SearchParamsEntries
@@ -127,6 +128,7 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
                 inputValue={key}
                 onInputChange={(_e, newInputValue) => updateCurrentEntryKey(newInputValue)}
                 onChange={(_e, newValue) => updateCurrentEntryKey(newValue ?? '')}
+                ListboxProps={{ sx: autocompleteListboxSx }}
                 renderInput={(params) => (
                     <TextField
                         {...params}
@@ -177,6 +179,7 @@ const SearchParams = ({ entries, setEntries, paramsWithDelimiter, className, sug
                 inputValue={value}
                 onInputChange={(_e, newInputValue) => updateCurrentEntryValue(newInputValue)}
                 onChange={(_e, newValue) => updateCurrentEntryValue(newValue ?? '')}
+                ListboxProps={{ sx: autocompleteListboxSx }}
                 renderInput={(params) => (
                     <TextField
                         {...params}

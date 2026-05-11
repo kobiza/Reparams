@@ -9,6 +9,7 @@ import { toTrueObj } from "../../utils/arrayUtils";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import type { SxProps } from "@mui/system";
+import { autocompleteListboxSx } from "./autocompleteListboxSx";
 
 export type TagsItem = { value: string; label: string; }
 
@@ -58,7 +59,7 @@ const Tags = ({ selected, suggestions, placeholderText, className, onAdd, onDele
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => option.value === value.value}
             value={selected}
-            ListboxProps={{ sx: { maxHeight: '340px', backgroundColor: (theme) => theme.palette.background.paper, color: (theme) => theme.palette.text.primary } }}
+            ListboxProps={{ sx: autocompleteListboxSx }}
             onChange={onChange}
             renderOption={(props, option, { selected }) => {
                 return (
