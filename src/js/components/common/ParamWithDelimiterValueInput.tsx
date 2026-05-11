@@ -13,9 +13,10 @@ export type ParamWithDelimiterValueInputProps = {
     sx?: SxProps<Theme>,
     suggestions?: Array<string>,
     autoFocus?: boolean,
+    disabled?: boolean,
 }
 
-const ParamWithDelimiterValueInput = ({ value, delimiter, onChange, sx, className, limitTags, suggestions, autoFocus }: ParamWithDelimiterValueInputProps) => {
+const ParamWithDelimiterValueInput = ({ value, delimiter, onChange, sx, className, limitTags, suggestions, autoFocus, disabled }: ParamWithDelimiterValueInputProps) => {
     const values = value ? value.split(delimiter) : []
     const onChangeHandler = (newValues: Array<string>) => {
         onChange(newValues.map(v => decodeIfEncoded(v.trim())).join(delimiter))
@@ -31,6 +32,7 @@ const ParamWithDelimiterValueInput = ({ value, delimiter, onChange, sx, classNam
             placeholderText="Add value"
             options={suggestions}
             autoFocus={autoFocus}
+            disabled={disabled}
         />
     )
 }

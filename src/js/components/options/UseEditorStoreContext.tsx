@@ -17,7 +17,8 @@ export const EditorStoreContext = createContext<EditorStore>({
     addNewPackage: noop,
     addPackages: noop,
     deletePackage: noop,
-    clearPackageParamHistory: noop
+    clearPackageParamHistory: noop,
+    unlinkPackage: noop
 });
 
 const getInitialState = (): EditorModel => {
@@ -42,7 +43,12 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
         }))
     }
 
+    // Linked-to-Gist packages are read-only. Sync (Phase 3) replaces the whole
+    // package via `addPackages`, which is intentionally NOT guarded.
+    const isLocked = (packageKey: string) => !!appState.packages[packageKey]?.gistId;
+
     const updatePackagePreset = (packageKey: string, presets: SettingsPackage['presets']) => {
+        if (isLocked(packageKey)) return;
         const newPackage = {
             ...appState.packages[packageKey],
             presets
@@ -51,6 +57,7 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
     }
 
     const updatePackageParamsWithDelimiter = (packageKey: string, paramsWithDelimiter: SettingsPackage['paramsWithDelimiter']) => {
+        if (isLocked(packageKey)) return;
         const newPackage = {
             ...appState.packages[packageKey],
             paramsWithDelimiter
@@ -61,6 +68,7 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
 
 
     const updatePackageLabel = (packageKey: string, label: string) => {
+        if (isLocked(packageKey)) return;
         const newPackage = {
             ...appState.packages[packageKey],
             label
@@ -69,6 +77,7 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
     }
 
     const updatePackageUrlPatterns = (packageKey: string, urlPatterns: SettingsPackage['conditions']['urlPatterns']) => {
+        if (isLocked(packageKey)) return;
         const prevPackage = appState.packages[packageKey]
         const newPackage = {
             ...prevPackage,
@@ -141,6 +150,7 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
     }
 
     const deletePackage = (packageKey: string) => {
+        if (isLocked(packageKey)) return;
         setAppState((prevState) => {
             const { [packageKey]: _, ...rest } = prevState.packages
             return {
@@ -151,6 +161,7 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
     }
 
     const updatePackageDomSelectors = (packageKey: string, domSelectors: SettingsPackage['conditions']['domSelectors']) => {
+        if (isLocked(packageKey)) return;
         const newPackage = {
             ...appState.packages[packageKey],
             conditions: { ...appState.packages[packageKey].conditions, domSelectors }
@@ -159,10 +170,19 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
     }
 
     const clearPackageParamHistory = (packageKey: string) => {
+        if (isLocked(packageKey)) return;
         const prevPackage = appState.packages[packageKey]
         if (!prevPackage) return
         const newPackage = { ...prevPackage, paramHistory: [] }
         _updatePackage(packageKey, newPackage)
+    }
+
+    // The lock is *driven by* gistId, so unlink must bypass the lock guard.
+    const unlinkPackage = (packageKey: string) => {
+        const prevPackage = appState.packages[packageKey]
+        if (!prevPackage) return
+        const { gistId, gistRevision, ...rest } = prevPackage
+        _updatePackage(packageKey, rest as SettingsPackage)
     }
 
     return (
@@ -176,7 +196,8 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
             addNewPackage,
             addPackages,
             deletePackage,
-            clearPackageParamHistory
+            clearPackageParamHistory,
+            unlinkPackage
         }}>
             {props.children}
         </EditorStoreContext.Provider>

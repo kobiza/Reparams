@@ -99,3 +99,6 @@ export const getEmptySettingsPackage = (label: string): SettingsPackage => {
         paramsWithDelimiter: [],
     }
 }
+
+export const isPackageLocked = (pkg: SettingsPackage | undefined | null): boolean =>
+    !!pkg?.gistId;
