@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 
 import Autocomplete from '@mui/material/Autocomplete';
 import Checkbox from '@mui/material/Checkbox';
@@ -24,6 +24,8 @@ export type TagsProps = {
 }
 
 const Tags = ({ selected, suggestions, placeholderText, className, onAdd, onDelete, sx }: TagsProps) => {
+    const highlightedRef = useRef<TagsItem | null>(null)
+
     const onChange = (e: any, newSelected: Array<{ value: string; label: string; }>) => {
         const prevTrueObj = toTrueObj(selected, (v) => v.value)
         const nextTrueObj = toTrueObj(newSelected, (v) => v.value)
@@ -53,7 +55,6 @@ const Tags = ({ selected, suggestions, placeholderText, className, onAdd, onDele
             className={className}
             multiple
             disableCloseOnSelect
-            autoSelect
             id="multiple-limit-tags"
             options={suggestions}
             getOptionLabel={(option) => option.label}
@@ -61,6 +62,7 @@ const Tags = ({ selected, suggestions, placeholderText, className, onAdd, onDele
             value={selected}
             ListboxProps={{ sx: autocompleteListboxSx }}
             onChange={onChange}
+            onHighlightChange={(_e, option) => { highlightedRef.current = option }}
             renderOption={(props, option, { selected }) => {
                 return (
                     <li {...props}>
@@ -74,19 +76,34 @@ const Tags = ({ selected, suggestions, placeholderText, className, onAdd, onDele
                     </li>
                 )
             }}
-            renderInput={(params) => (
-                <TextField
-                    hiddenLabel={true}
-                    {...params}
-                    placeholder={placeholderText}
-                    autoFocus={true}
-                    sx={{
-                        backgroundColor: (theme) => theme.palette.background.paper,
-                        color: (theme) => theme.palette.text.primary,
-                        borderRadius: 2,
-                    }}
-                />
-            )}
+            renderInput={(params) => {
+                const muiKeyDown = (params.inputProps as any).onKeyDown
+                return (
+                    <TextField
+                        hiddenLabel={true}
+                        {...params}
+                        placeholder={placeholderText}
+                        autoFocus={true}
+                        sx={{
+                            backgroundColor: (theme) => theme.palette.background.paper,
+                            color: (theme) => theme.palette.text.primary,
+                            borderRadius: 2,
+                        }}
+                        inputProps={{
+                            ...params.inputProps,
+                            onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => {
+                                if (e.key === 'Tab') {
+                                    const highlighted = highlightedRef.current
+                                    if (highlighted && !selected.some(s => s.value === highlighted.value)) {
+                                        onChange(e, [...selected, highlighted])
+                                    }
+                                }
+                                muiKeyDown?.(e)
+                            },
+                        }}
+                    />
+                )
+            }}
         />
     )
 }
