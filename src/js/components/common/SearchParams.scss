@@ -7,6 +7,20 @@
     .MuiOutlinedInput-root {
         min-height: 50px;
     }
+
+    // Push all horizontal padding off the <input> element onto its wrapper.
+    // MUI's Autocomplete splits the left padding between the inputRoot (6px)
+    // and the input (8px); Chrome renders the text caret at the input's
+    // border-left rather than its content-area-start, leaving the caret
+    // visibly left of the value/placeholder. Collapsing the input's own
+    // padding-left to 0 puts the input's border-left at the same x as where
+    // text renders, so the caret and text line up.
+    .MuiAutocomplete-inputRoot {
+        padding-left: 14px !important;
+    }
+    .MuiAutocomplete-inputRoot .MuiAutocomplete-input {
+        padding-left: 0 !important;
+    }
 }
 
 .query-param-input-key {
