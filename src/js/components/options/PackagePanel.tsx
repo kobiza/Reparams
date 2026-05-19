@@ -11,14 +11,14 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditIcon from '@mui/icons-material/Edit';
-import LockIcon from '@mui/icons-material/Lock';
+import LinkIcon from '@mui/icons-material/Link';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
 import classNames from 'classnames';
 import { EditorStore, SettingsPackage } from '../../types/types';
 import { CustomTabPanel, a11yProps } from './CustomTabPanel';
 import PresetsEditor from './PresetsEditor';
 import PackageSettingsEditor from './PackageSettingsEditor';
-import PackageGistLinkActions from './PackageGistLinkActions';
-import { isPackageLocked } from '../../utils/utils';
+import ConnectedPackageActions from './ConnectedPackageActions';
 
 type PackagePanelProps = {
     packageData: SettingsPackage,
@@ -27,8 +27,8 @@ type PackagePanelProps = {
 }
 
 const PackagePanel = ({ packageData, packageKey, editorStore }: PackagePanelProps) => {
-    const { key, label, presets, paramsWithDelimiter, conditions, paramHistory } = packageData
-    const isLocked = isPackageLocked(packageData)
+    const { key, label, presets, paramsWithDelimiter, conditions, paramHistory, sourceUrl, isOverride } = packageData
+    const isConnected = !!sourceUrl
     const [value, setValue] = useState(0);
     const {
         addNewPackage,
@@ -40,7 +40,8 @@ const PackagePanel = ({ packageData, packageKey, editorStore }: PackagePanelProp
         updatePackageDomSelectors,
         deletePackage,
         clearPackageParamHistory,
-        unlinkPackage
+        disconnectPackage,
+        showNotification
     } = editorStore
 
     const [accordionOpen, setAccordionOpen] = useState(false)
@@ -94,6 +95,24 @@ const PackagePanel = ({ packageData, packageKey, editorStore }: PackagePanelProp
         }
     }
 
+    const connectedIndicator = (() => {
+        if (!isConnected) return null
+        if (isOverride) {
+            return (
+                <Tooltip title={`Connected (overridden) — local edits won't be replaced by updates unless you choose Pull. Source: ${sourceUrl}`}>
+                    <LinkOffIcon aria-label="connected-overridden" color="warning" fontSize="small"
+                        sx={{ marginLeft: '8px' }} />
+                </Tooltip>
+            )
+        }
+        return (
+            <Tooltip title={`Connected to ${sourceUrl}`}>
+                <LinkIcon aria-label="connected" color="primary" fontSize="small"
+                    sx={{ marginLeft: '8px' }} />
+            </Tooltip>
+        )
+    })()
+
     return (
         <Accordion key={key} expanded={accordionOpen} onChange={handleAccordionChange}>
             <AccordionSummary
@@ -104,18 +123,11 @@ const PackagePanel = ({ packageData, packageKey, editorStore }: PackagePanelProp
                 <div className="package-name-wrapper">
                     <div className={classNames("package-name-view", { 'hidden-x': isRenameActive })}>
                         <Typography sx={{ paddingLeft: '6px' }}>{label}</Typography>
-                        {isLocked && (
-                            <Tooltip title="Linked to a GitHub Gist — read-only. Use Sync or Unlink to manage.">
-                                <LockIcon aria-label="locked" color="primary" fontSize="small"
-                                    sx={{ marginLeft: '8px' }} />
-                            </Tooltip>
-                        )}
-                        {!isLocked && (
-                            <IconButton aria-label="rename" color="primary" size="small"
-                                sx={{ padding: '0', marginLeft: '10px' }} onClick={startRenameMode}>
-                                <EditIcon fontSize="inherit" />
-                            </IconButton>
-                        )}
+                        {connectedIndicator}
+                        <IconButton aria-label="rename" color="primary" size="small"
+                            sx={{ padding: '0', marginLeft: '10px' }} onClick={startRenameMode}>
+                            <EditIcon fontSize="inherit" />
+                        </IconButton>
                     </div>
                     <div className={classNames("package-name-edit", { 'hidden-x': !isRenameActive })}>
                         <TextField inputRef={packageNameInputRef} type="text" value={label}
@@ -140,13 +152,11 @@ const PackagePanel = ({ packageData, packageKey, editorStore }: PackagePanelProp
                         </Box>
                         <CustomTabPanel value={value} index={0}>
                             <PresetsEditor packageKey={packageKey} presets={presets}
-                                isLocked={isLocked}
                                 updatePackagePreset={updatePackagePreset} />
                         </CustomTabPanel>
                         <CustomTabPanel value={value} index={1}>
                             <PackageSettingsEditor packageKey={packageKey}
                                 label={label}
-                                isLocked={isLocked}
                                 paramsWithDelimiter={paramsWithDelimiter}
                                 paramHistoryCount={paramHistory?.length ?? 0}
                                 addNewPackage={addNewPackage}
@@ -157,11 +167,12 @@ const PackagePanel = ({ packageData, packageKey, editorStore }: PackagePanelProp
                                 updatePackageUrlPatterns={updatePackageUrlPatterns}
                                 deletePackage={deletePackage}
                                 clearPackageParamHistory={clearPackageParamHistory}
-                                gistLinkActions={isLocked ? (
-                                    <PackageGistLinkActions
+                                connectedActions={isConnected ? (
+                                    <ConnectedPackageActions
                                         packageData={packageData}
                                         addPackages={addPackages}
-                                        unlinkPackage={unlinkPackage}
+                                        disconnectPackage={disconnectPackage}
+                                        showNotification={showNotification}
                                     />
                                 ) : undefined}
                             />

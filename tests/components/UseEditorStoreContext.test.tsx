@@ -133,14 +133,12 @@ describe('UseEditorStoreContext — mutations', () => {
 describe('UseEditorStoreContext — addPackages', () => {
     test('replace=false duplicates key when it already exists', async () => {
         localStorage.setItem('reparamsAppData', JSON.stringify(sampleModel));
-        // Import a package with the same key as samplePackage
         const incoming = { 'pkg-1': { ...samplePackage, label: 'Duplicate' } };
         renderContext(<AddPackagesConsumer packages={incoming} replace={false} />);
         await userEvent.click(screen.getByText('Import'));
         await waitFor(() => {
             const stored = JSON.parse(screen.getByTestId('packages').textContent!);
             const keys = Object.keys(stored);
-            // Original 'pkg-1' still present, incoming got a new key
             expect(keys).toContain('pkg-1');
             expect(keys.length).toBe(2);
         });
@@ -148,7 +146,6 @@ describe('UseEditorStoreContext — addPackages', () => {
 
     test('replace=false adds new-key package without conflict', async () => {
         localStorage.setItem('reparamsAppData', JSON.stringify(sampleModel));
-        // secondPackage.key = 'pkg-2' which doesn't exist in state — added as-is
         const incoming = { 'pkg-2': secondPackage };
         renderContext(<AddPackagesConsumer packages={incoming} replace={false} />);
         await userEvent.click(screen.getByText('Import'));
@@ -227,27 +224,26 @@ describe('UseEditorStoreContext — clearPackageParamHistory', () => {
         expect(stored.packages['pkg-2'].paramHistory).toEqual([{ key: 'x', value: 'y' }]);
     });
 
-    test('does not clear paramHistory on a locked (gistId) package', async () => {
-        const modelWithLockedHistory: EditorModel = {
+    test('clears paramHistory on a connected package without first-edit prompt (structural mutation bypasses guard)', async () => {
+        const modelWithConnectedHistory: EditorModel = {
             modelVersion: 1,
             packages: {
                 'pkg-1': {
                     ...samplePackage,
-                    gistId: 'some-gist',
-                    gistRevision: 'sha-abc',
+                    sourceUrl: 'https://example.com/pkgs.json',
                     paramHistory: [{ key: 'a', value: '1' }],
                 },
             },
         };
-        localStorage.setItem('reparamsAppData', JSON.stringify(modelWithLockedHistory));
+        localStorage.setItem('reparamsAppData', JSON.stringify(modelWithConnectedHistory));
 
         renderContext(<ClearHistoryConsumer packageKey="pkg-1" />);
 
         expect(screen.getByTestId('history-len')).toHaveTextContent('1');
         await userEvent.click(screen.getByText('Clear'));
-        // No mutation — history length remains 1
-        await new Promise(r => setTimeout(r, 50));
-        expect(screen.getByTestId('history-len')).toHaveTextContent('1');
+        await waitFor(() => {
+            expect(screen.getByTestId('history-len')).toHaveTextContent('0');
+        });
     });
 
     test('preserves other package fields (label, presets, conditions) when clearing', async () => {
@@ -277,65 +273,153 @@ describe('UseEditorStoreContext — clearPackageParamHistory', () => {
     });
 });
 
-describe('UseEditorStoreContext — locked (gistId) packages', () => {
-    const lockedPackage: SettingsPackage = {
+describe('UseEditorStoreContext — first-edit prompt for connected packages', () => {
+    const connectedPackage: SettingsPackage = {
         ...samplePackage,
-        gistId: 'gist-abc',
-        gistRevision: 'sha-1',
+        sourceUrl: 'https://example.com/pkgs.json',
     };
-    const lockedModel: EditorModel = {
+    const connectedModel: EditorModel = {
         modelVersion: 1,
-        packages: { 'pkg-1': lockedPackage },
+        packages: { 'pkg-1': connectedPackage },
     };
 
-    function MutationConsumer() {
+    function ConnectedConsumer() {
         const store = useContext(EditorStoreContext);
+        const pkg = store.state.packages['pkg-1'];
+        const keys = Object.keys(store.state.packages);
         return (
             <div>
-                <span data-testid="label">{store.state.packages['pkg-1']?.label ?? 'missing'}</span>
-                <span data-testid="presets">{JSON.stringify(store.state.packages['pkg-1']?.presets ?? {})}</span>
-                <span data-testid="pkg-count">{Object.keys(store.state.packages).length}</span>
+                <span data-testid="label">{pkg?.label ?? 'missing'}</span>
+                <span data-testid="presets">{JSON.stringify(pkg?.presets ?? {})}</span>
+                <span data-testid="is-override">{String(pkg?.isOverride ?? false)}</span>
+                <span data-testid="pkg-count">{keys.length}</span>
+                <span data-testid="pending">{store.pendingFirstEdit ? 'open' : 'closed'}</span>
                 <button onClick={() => store.updatePackageLabel('pkg-1', 'Renamed')}>Rename</button>
-                <button onClick={() => store.deletePackage('pkg-1')}>Delete</button>
+                <button onClick={() => store.updatePackageLabel('pkg-1', 'Renamed Twice')}>RenameAgain</button>
                 <button onClick={() => store.updatePackagePreset('pkg-1', { p1: { label: 'P1', entries: [] } })}>SetPreset</button>
-                <button onClick={() => store.updatePackageUrlPatterns('pkg-1', [{ id: 'x', value: 'https://foo/*' }])}>SetUrl</button>
+                <button onClick={() => store.confirmOverride()}>Confirm</button>
+                <button onClick={() => store.forkAsNewPackage()}>Fork</button>
+                <button onClick={() => store.cancelPendingEdit()}>DismissPending</button>
+                <button onClick={() => store.disconnectPackage('pkg-1')}>Disconnect</button>
             </div>
         );
     }
 
-    test('updatePackageLabel is a no-op for locked package', async () => {
-        localStorage.setItem('reparamsAppData', JSON.stringify(lockedModel));
-        renderContext(<MutationConsumer />);
-        expect(screen.getByTestId('label')).toHaveTextContent('Sample Package');
+    test('data edit on connected non-overridden package opens pending prompt without applying', async () => {
+        localStorage.setItem('reparamsAppData', JSON.stringify(connectedModel));
+        renderContext(<ConnectedConsumer />);
+
         await userEvent.click(screen.getByText('Rename'));
-        await new Promise(r => setTimeout(r, 50));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('pending')).toHaveTextContent('open');
+        });
         expect(screen.getByTestId('label')).toHaveTextContent('Sample Package');
     });
 
-    test('deletePackage is a no-op for locked package', async () => {
-        localStorage.setItem('reparamsAppData', JSON.stringify(lockedModel));
-        renderContext(<MutationConsumer />);
-        expect(screen.getByTestId('pkg-count')).toHaveTextContent('1');
-        await userEvent.click(screen.getByText('Delete'));
-        await new Promise(r => setTimeout(r, 50));
-        expect(screen.getByTestId('pkg-count')).toHaveTextContent('1');
+    test('confirmOverride applies the captured edit and sets isOverride=true', async () => {
+        localStorage.setItem('reparamsAppData', JSON.stringify(connectedModel));
+        renderContext(<ConnectedConsumer />);
+
+        await userEvent.click(screen.getByText('Rename'));
+        await waitFor(() => expect(screen.getByTestId('pending')).toHaveTextContent('open'));
+        await userEvent.click(screen.getByText('Confirm'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('label')).toHaveTextContent('Renamed');
+        });
+        expect(screen.getByTestId('is-override')).toHaveTextContent('true');
+        expect(screen.getByTestId('pending')).toHaveTextContent('closed');
     });
 
-    test('updatePackagePreset is a no-op for locked package', async () => {
-        localStorage.setItem('reparamsAppData', JSON.stringify(lockedModel));
-        renderContext(<MutationConsumer />);
-        expect(screen.getByTestId('presets')).toHaveTextContent('{}');
-        await userEvent.click(screen.getByText('SetPreset'));
-        await new Promise(r => setTimeout(r, 50));
-        expect(screen.getByTestId('presets')).toHaveTextContent('{}');
-    });
+    test('after override, subsequent edits go through without prompting', async () => {
+        localStorage.setItem('reparamsAppData', JSON.stringify({
+            modelVersion: 1,
+            packages: { 'pkg-1': { ...connectedPackage, isOverride: true } },
+        }));
+        renderContext(<ConnectedConsumer />);
 
-    test('unlocked package is still mutable (sanity check)', async () => {
-        localStorage.setItem('reparamsAppData', JSON.stringify(sampleModel));
-        renderContext(<MutationConsumer />);
         await userEvent.click(screen.getByText('Rename'));
         await waitFor(() => {
             expect(screen.getByTestId('label')).toHaveTextContent('Renamed');
         });
+        expect(screen.getByTestId('pending')).toHaveTextContent('closed');
+    });
+
+    test('forkAsNewPackage creates a "Copy of …" new package and discards the captured edit', async () => {
+        localStorage.setItem('reparamsAppData', JSON.stringify(connectedModel));
+        renderContext(<ConnectedConsumer />);
+
+        await userEvent.click(screen.getByText('Rename'));
+        await waitFor(() => expect(screen.getByTestId('pending')).toHaveTextContent('open'));
+        await userEvent.click(screen.getByText('Fork'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('pkg-count')).toHaveTextContent('2');
+        });
+        // Original is untouched
+        expect(screen.getByTestId('label')).toHaveTextContent('Sample Package');
+        expect(screen.getByTestId('is-override')).toHaveTextContent('false');
+        expect(screen.getByTestId('pending')).toHaveTextContent('closed');
+        // New package is named "Copy of <prevName>"
+        const stored = JSON.parse(localStorage.getItem('reparamsAppData')!);
+        const labels = Object.values(stored.packages).map((p: any) => p.label);
+        expect(labels).toContain('Copy of Sample Package');
+    });
+
+    test('cancelPendingEdit discards the captured edit without applying', async () => {
+        localStorage.setItem('reparamsAppData', JSON.stringify(connectedModel));
+        renderContext(<ConnectedConsumer />);
+
+        await userEvent.click(screen.getByText('Rename'));
+        await waitFor(() => expect(screen.getByTestId('pending')).toHaveTextContent('open'));
+        await userEvent.click(screen.getByText('DismissPending'));
+
+        await waitFor(() => expect(screen.getByTestId('pending')).toHaveTextContent('closed'));
+        expect(screen.getByTestId('label')).toHaveTextContent('Sample Package');
+        expect(screen.getByTestId('is-override')).toHaveTextContent('false');
+    });
+
+    test('latest captured edit wins when multiple data mutations fire before confirm', async () => {
+        localStorage.setItem('reparamsAppData', JSON.stringify(connectedModel));
+        renderContext(<ConnectedConsumer />);
+
+        await userEvent.click(screen.getByText('Rename'));
+        await waitFor(() => expect(screen.getByTestId('pending')).toHaveTextContent('open'));
+        await userEvent.click(screen.getByText('RenameAgain'));
+        await userEvent.click(screen.getByText('Confirm'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('label')).toHaveTextContent('Renamed Twice');
+        });
+    });
+
+    test('disconnectPackage strips sourceUrl and isOverride and bypasses the prompt', async () => {
+        localStorage.setItem('reparamsAppData', JSON.stringify({
+            modelVersion: 1,
+            packages: { 'pkg-1': { ...connectedPackage, isOverride: true } },
+        }));
+        renderContext(<ConnectedConsumer />);
+
+        await userEvent.click(screen.getByText('Disconnect'));
+
+        await waitFor(() => {
+            const stored = JSON.parse(localStorage.getItem('reparamsAppData')!) as EditorModel;
+            const pkg = stored.packages['pkg-1'];
+            expect(pkg.sourceUrl).toBeUndefined();
+            expect(pkg.isOverride).toBeUndefined();
+        });
+        expect(screen.getByTestId('pending')).toHaveTextContent('closed');
+    });
+
+    test('unconnected package edits go through without prompt', async () => {
+        localStorage.setItem('reparamsAppData', JSON.stringify(sampleModel));
+        renderContext(<ConnectedConsumer />);
+
+        await userEvent.click(screen.getByText('Rename'));
+        await waitFor(() => {
+            expect(screen.getByTestId('label')).toHaveTextContent('Renamed');
+        });
+        expect(screen.getByTestId('pending')).toHaveTextContent('closed');
     });
 });

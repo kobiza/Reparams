@@ -47,8 +47,14 @@ export type SettingsPackage = {
     presets: PresetsEntriesMap
     paramsWithDelimiter: ParamsWithDelimiter
     paramHistory?: ParamHistoryEntry[]
-    gistId?: string
-    gistRevision?: string
+    sourceUrl?: string
+    isOverride?: boolean
+}
+
+export type PendingFirstEdit = {
+    packageKey: string
+    packageLabel: string
+    transform: (pkg: SettingsPackage) => SettingsPackage
 }
 
 export type MergedAppData = {
@@ -85,7 +91,12 @@ export type EditorStore = {
     addPackages: (packagesToAdd: { [key: string]: SettingsPackage }, replace: boolean) => void
     deletePackage: (packageKey: string) => void
     clearPackageParamHistory: (packageKey: string) => void
-    unlinkPackage: (packageKey: string) => void
+    disconnectPackage: (packageKey: string) => void
+    pendingFirstEdit: PendingFirstEdit | null
+    confirmOverride: () => void
+    forkAsNewPackage: () => void
+    cancelPendingEdit: () => void
+    showNotification: (message: string) => void
 }
 
 export type ViewerModel = {

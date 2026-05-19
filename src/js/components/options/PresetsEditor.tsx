@@ -13,11 +13,10 @@ import SearchParams from '../common/SearchParams';
 interface PresetsEditorProps {
     packageKey: string
     presets: SettingsPackage['presets']
-    isLocked?: boolean
     updatePackagePreset: (packageKey: string, presets: SettingsPackage['presets']) => void
 }
 
-const PresetsEditor = ({ packageKey, presets, isLocked, updatePackagePreset }: PresetsEditorProps) => {
+const PresetsEditor = ({ packageKey, presets, updatePackagePreset }: PresetsEditorProps) => {
     const presetsItems = Object.entries(presets).map(([presetKey, presetData]) => {
         const presetRename = (newName: string) => {
             const newPresets: SettingsPackage['presets'] = {
@@ -57,11 +56,9 @@ const PresetsEditor = ({ packageKey, presets, isLocked, updatePackagePreset }: P
                     <TextField
                         label="Preset name"
                         size="small"
-                        disabled={isLocked}
                         value={presetData.label} onChange={e => presetRename(e.target.value)}
                     />
                     <IconButton aria-label="delete" color="primary" size="small"
-                        disabled={isLocked}
                         onClick={removePreset}>
                         <DeleteIcon fontSize="inherit" />
                     </IconButton>
@@ -74,7 +71,7 @@ const PresetsEditor = ({ packageKey, presets, isLocked, updatePackagePreset }: P
                             <Box sx={{ flex: '0 0 28px' }} />
                         </Box>
                     )}
-                    <SearchParams entries={presetData.entries} setEntries={updatePresetEntries} paramsWithDelimiter={{}} readOnly={isLocked} />
+                    <SearchParams entries={presetData.entries} setEntries={updatePresetEntries} paramsWithDelimiter={{}} />
                 </Box>
             </Paper>
         )
@@ -98,7 +95,6 @@ const PresetsEditor = ({ packageKey, presets, isLocked, updatePackagePreset }: P
             </Typography>
             {presetsItems}
             <Button sx={{ marginTop: '10px' }} onClick={addNewPreset}
-                disabled={isLocked}
                 variant="text">Add Preset</Button>
         </div>
     )

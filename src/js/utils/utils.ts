@@ -100,5 +100,3 @@ export const getEmptySettingsPackage = (label: string): SettingsPackage => {
     }
 }
 
-export const isPackageLocked = (pkg: SettingsPackage | undefined | null): boolean =>
-    !!pkg?.gistId;

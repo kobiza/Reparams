@@ -24,8 +24,7 @@ interface ParamsEditorProps {
     domSelectors: SettingsPackage['conditions']['domSelectors']
     label: SettingsPackage['label']
     paramHistoryCount: number
-    isLocked?: boolean
-    gistLinkActions?: React.ReactNode
+    connectedActions?: React.ReactNode
     addNewPackage: EditorStore['addNewPackage']
     updatePackageParamsWithDelimiter: EditorStore['updatePackageParamsWithDelimiter']
     updatePackageUrlPatterns: EditorStore['updatePackageUrlPatterns']
@@ -41,8 +40,7 @@ const PackageSettingsEditor = ({
     domSelectors,
     label,
     paramHistoryCount,
-    isLocked,
-    gistLinkActions,
+    connectedActions,
     addNewPackage,
     updatePackageParamsWithDelimiter,
     updatePackageUrlPatterns,
@@ -81,7 +79,6 @@ const PackageSettingsEditor = ({
                     hiddenLabel
                     placeholder="Parameter key"
                     size="small"
-                    disabled={isLocked}
                     value={label} onChange={e => updateParamLabel(e.target.value)}
                 />
                 <TextField
@@ -89,11 +86,9 @@ const PackageSettingsEditor = ({
                     hiddenLabel
                     placeholder="e.g. ,"
                     size="small"
-                    disabled={isLocked}
                     value={separator} onChange={e => updateParamSeparator(e.target.value)}
                 />
                 <IconButton aria-label="delete" color="primary" size="small"
-                    disabled={isLocked}
                     sx={{ padding: '0', marginLeft: '10px' }} onClick={removeParam}>
                     <ClearIcon fontSize="inherit" />
                 </IconButton>
@@ -129,11 +124,9 @@ const PackageSettingsEditor = ({
                     sx={{ flex: '1' }}
                     hiddenLabel
                     size="small"
-                    disabled={isLocked}
                     value={v.value} onChange={e => updateCurrentPattern(e.target.value)}
                 />
                 <IconButton aria-label="delete" color="primary" size="small"
-                    disabled={isLocked}
                     sx={{ padding: '0', marginLeft: '10px' }} onClick={removePattern}>
                     <ClearIcon fontSize="inherit" />
                 </IconButton>
@@ -146,7 +139,11 @@ const PackageSettingsEditor = ({
     }
 
     const addPackageWithSameSettings = () => {
-        addNewPackage({ paramsWithDelimiter, conditions: { urlPatterns, domSelectors } })
+        addNewPackage({
+            label: `Copy of ${label}`,
+            paramsWithDelimiter,
+            conditions: { urlPatterns, domSelectors },
+        })
     }
 
     const [deletePackageDialog, setDeletePackageDialog] = useState(false)
@@ -194,11 +191,9 @@ const PackageSettingsEditor = ({
                     sx={{ flex: '1' }}
                     hiddenLabel
                     size="small"
-                    disabled={isLocked}
                     value={v.value} onChange={e => updateCurrentDomSelectorValue(e.target.value)}
                 />
                 <IconButton aria-label="delete" color="primary" size="small"
-                    disabled={isLocked}
                     sx={{ padding: '0', marginLeft: '10px' }} onClick={removeDomSelector}>
                     <ClearIcon fontSize="inherit" />
                 </IconButton>
@@ -239,7 +234,6 @@ const PackageSettingsEditor = ({
                 <Box>
                     {patternsInput}
                     <Button sx={{ marginTop: '8px' }} onClick={addNewUrlPattern}
-                        disabled={isLocked}
                         variant="text" startIcon={<AddIcon />}>Add</Button>
                 </Box>
 
@@ -252,7 +246,6 @@ const PackageSettingsEditor = ({
                 <Box>
                     {domSelectorsInput}
                     <Button sx={{ marginTop: '8px' }} onClick={addNewDomSelector}
-                        disabled={isLocked}
                         variant="text" startIcon={<AddIcon />}>Add</Button>
                 </Box>
             </Box>
@@ -272,7 +265,6 @@ const PackageSettingsEditor = ({
                 )}
                 {paramsItems}
                 <Button sx={{ marginTop: '8px' }} onClick={addNewMultiParam}
-                    disabled={isLocked}
                     variant="text" startIcon={<AddIcon />}>Add</Button>
             </Box>
             <Divider sx={{ margin: '12px 0' }} />
@@ -284,7 +276,7 @@ const PackageSettingsEditor = ({
                 <Button
                     color="warning"
                     sx={{ marginTop: '8px' }}
-                    disabled={isLocked || paramHistoryCount === 0}
+                    disabled={paramHistoryCount === 0}
                     onClick={openClearHistoryDialog}
                     variant="text"
                 >
@@ -310,19 +302,17 @@ const PackageSettingsEditor = ({
             <Divider sx={{ margin: '12px 0' }} />
             <div>
                 <Button sx={{ marginTop: '10px' }} onClick={() => addPackageWithSameSettings()}
-                    disabled={isLocked}
                     variant="text">Add package with same settings</Button>
             </div>
-            {gistLinkActions && (
+            {connectedActions && (
                 <Box sx={{ marginTop: '12px' }}>
                     <Divider sx={{ margin: '12px 0' }} />
-                    <Typography fontWeight="bold" sx={{ paddingY: 0.5 }}>Gist link</Typography>
-                    {gistLinkActions}
+                    <Typography fontWeight="bold" sx={{ paddingY: 0.5 }}>Connected source</Typography>
+                    {connectedActions}
                 </Box>
             )}
             <div>
                 <Button color="warning" sx={{ marginTop: '10px' }} onClick={openDeleteDialog}
-                    disabled={isLocked}
                     variant="text">Delete Package</Button>
                 <Dialog
                     open={deletePackageDialog}
