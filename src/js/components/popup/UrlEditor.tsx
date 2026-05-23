@@ -34,12 +34,7 @@ import {
 } from "../../types/types";
 import { captureParamHistory } from "../../utils/paramHistoryCaptureService";
 import { dropEmptyEntries } from "../../utils/searchParamsUtils";
-import AppBar from '@mui/material/AppBar';
-import Fab from '@mui/material/Fab';
-import Typography from '@mui/material/Typography';
 import './UrlEditor.scss'
-import Container from "@mui/material/Container";
-import Toolbar from "@mui/material/Toolbar";
 import Paper from '@mui/material/Paper';
 
 type UrlEditorProps = {
@@ -146,41 +141,53 @@ function UrlEditor({
     }
 
     return (
-        <Paper className="url-editor" sx={{ p: 2, bgcolor: 'background.paper', boxShadow: 'none' }}>
-            <AppBar className="row1" position="relative" component="nav" elevation={0} sx={{ bgcolor: 'transparent', boxShadow: 'none' }}>
-                <Container maxWidth="xl">
-                    <Toolbar disableGutters sx={{ justifyContent: 'center', position: 'relative', minHeight: 56 }}>
-                        <Typography
-                            variant="h6"
-                            noWrap
-                            sx={{
-                                position: 'absolute',
-                                left: 0,
-                                right: 0,
-                                margin: 'auto',
-                                textAlign: 'center',
-                                width: 'fit-content',
-                                color: theme.palette.text.primary,
-                                fontFamily: ['Leckerli One', 'monospace'].join(','),
-                                fontWeight: 700,
-                                letterSpacing: '2px',
-                                textDecoration: 'none',
-                            }}
-                        >
-                            ReParams
-                        </Typography>
-                        <IconButton
-                            size="large"
-                            edge="end"
-                            aria-label="menu"
-                            onClick={handleDrawerOpen}
-                            sx={{ position: 'absolute', right: 0, color: theme.palette.text.primary }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                    </Toolbar>
-                </Container>
-            </AppBar>
+        <Paper elevation={0} className="url-editor" sx={{ p: 2, bgcolor: 'background.paper' }}>
+            <Box
+                className="row1"
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 10,
+                    bgcolor: 'background.paper',
+                    mb: 1,
+                }}
+            >
+                <IconButton
+                    size="medium"
+                    aria-label="menu"
+                    onClick={handleDrawerOpen}
+                    sx={{ color: theme.palette.text.primary, flexShrink: 0 }}
+                >
+                    <MenuIcon />
+                </IconButton>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                    {!isEmpty(presets) && (
+                        <PresetsPicker className="presets-picker" entries={searchParamsEntries}
+                            setEntries={setSearchParamsEntries} presets={presets}
+                            paramsWithDelimiter={paramsWithDelimiter}
+                            addEntriesAndNavigate={addEntriesAndNavigate} />
+                    )}
+                </Box>
+                <Tooltip
+                    title={
+                        <Box sx={{ display: 'grid', gridTemplateColumns: 'auto auto', columnGap: 1.5, rowGap: 0.75, alignItems: 'center' }}>
+                            <span>Apply</span>
+                            <ShortcutHint keys={['Mod', 'Enter']} />
+                            <span>New tab</span>
+                            <ShortcutHint keys={['Mod', 'Shift', 'Enter']} />
+                        </Box>
+                    }
+                    placement="bottom-end"
+                    componentsProps={{ tooltip: { sx: { fontSize: '0.85rem', p: 1.25 } } }}
+                >
+                    <IconButton aria-label="apply url" color="primary" onClick={applyUrl} sx={{ flexShrink: 0 }}>
+                        <RocketLaunchIcon />
+                    </IconButton>
+                </Tooltip>
+            </Box>
             <Drawer
                 anchor="right"
                 open={drawerOpen}
@@ -210,37 +217,9 @@ function UrlEditor({
                     </ListItem>
                 </List>
             </Drawer>
-            {!isEmpty(presets) && (
-                <div className="presets-picker-container row2">
-                    <PresetsPicker className="presets-picker" entries={searchParamsEntries}
-                        setEntries={setSearchParamsEntries} presets={presets}
-                        paramsWithDelimiter={paramsWithDelimiter}
-                        addEntriesAndNavigate={addEntriesAndNavigate} />
-                </div>
-            )}
-            <SearchParams className="search-params-container row3" entries={searchParamsEntries}
+            <SearchParams className="search-params-container row2" entries={searchParamsEntries}
                 setEntries={setSearchParamsEntries} paramsWithDelimiter={paramsWithDelimiter}
                 suggestions={suggestions} />
-            <Tooltip
-                title={
-                    <Box sx={{ display: 'grid', gridTemplateColumns: 'auto auto', columnGap: 1.5, rowGap: 0.75, alignItems: 'center' }}>
-                        <span>Apply</span>
-                        <ShortcutHint keys={['Mod', 'Enter']} />
-                        <span>New tab</span>
-                        <ShortcutHint keys={['Mod', 'Shift', 'Enter']} />
-                    </Box>
-                }
-                placement="left"
-                componentsProps={{ tooltip: { sx: { fontSize: '0.85rem', p: 1.25 } } }}
-            >
-                <Fab aria-label="apply url" color="primary" onClick={applyUrl} sx={{
-                    position: 'fixed',
-                    bottom: 20,
-                    right: 20,
-                }}>
-                    <RocketLaunchIcon />
-                </Fab>
-            </Tooltip>
         </Paper>
     );
 }
