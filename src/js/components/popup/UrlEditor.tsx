@@ -1,4 +1,3 @@
-import { isEmpty } from "lodash";
 import React, { MouseEventHandler, useState, useMemo, useLayoutEffect, useRef } from 'react';
 import { perfMark, perfMeasure } from '../../utils/perf';
 import SearchParams from "../common/SearchParams";
@@ -10,20 +9,8 @@ import Box from '@mui/material/Box';
 import ShortcutHint from "../common/ShortcutHint";
 
 import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import LightModeIcon from '@mui/icons-material/LightMode';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
-import Drawer from '@mui/material/Drawer';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { useTheme } from '@mui/material/styles';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemButton from '@mui/material/ListItemButton';
-import ContrastIcon from '@mui/icons-material/Contrast';
 import SettingsIcon from '@mui/icons-material/Settings';
+import Typography from '@mui/material/Typography';
 
 import {
     ParamsWithDelimiterViewModel,
@@ -46,8 +33,6 @@ type UrlEditorProps = {
     quickActions: QuickActionData
     suggestions: ParamSuggestions
     className?: string,
-    themeMode: 'light' | 'dark',
-    setThemeMode: (mode: 'light' | 'dark') => void,
 }
 
 const addEntries = (url: string, newEntries: Array<[string, string]>) => {
@@ -67,8 +52,6 @@ function UrlEditor({
     presets,
     paramsWithDelimiter,
     suggestions,
-    themeMode,
-    setThemeMode
 }: UrlEditorProps) {
     // const urlData = new URL(url)
     const [newUrl, setNewUrl] = useState(currentTabUrl)
@@ -111,11 +94,11 @@ function UrlEditor({
         navigateWith(newUrl, e.metaKey)
     }
 
-    const [drawerOpen, setDrawerOpen] = useState(false);
-    const handleDrawerOpen = () => setDrawerOpen(true);
-    const handleDrawerClose = () => setDrawerOpen(false);
-
-    const theme = useTheme();
+    const openOptionsPage = () => {
+        if (chrome.runtime) {
+            chrome.runtime.openOptionsPage();
+        }
+    }
 
     // Add keyboard shortcuts for Command + Enter and Command + Shift + Enter
     useCommandShortcuts({
@@ -134,12 +117,6 @@ function UrlEditor({
         enabled: true
     });
 
-    const openOptionsPage = () => {
-        if (chrome.runtime) {
-            chrome.runtime.openOptionsPage();
-        }
-    }
-
     return (
         <Paper elevation={0} className="url-editor" sx={{ p: 2, bgcolor: 'background.paper' }}>
             <Box
@@ -155,21 +132,11 @@ function UrlEditor({
                     mb: 1,
                 }}
             >
-                <IconButton
-                    size="medium"
-                    aria-label="menu"
-                    onClick={handleDrawerOpen}
-                    sx={{ color: theme.palette.text.primary, flexShrink: 0 }}
-                >
-                    <MenuIcon />
-                </IconButton>
                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                    {!isEmpty(presets) && (
-                        <PresetsPicker className="presets-picker" entries={searchParamsEntries}
-                            setEntries={setSearchParamsEntries} presets={presets}
-                            paramsWithDelimiter={paramsWithDelimiter}
-                            addEntriesAndNavigate={addEntriesAndNavigate} />
-                    )}
+                    <PresetsPicker className="presets-picker" entries={searchParamsEntries}
+                        setEntries={setSearchParamsEntries} presets={presets}
+                        paramsWithDelimiter={paramsWithDelimiter}
+                        addEntriesAndNavigate={addEntriesAndNavigate} />
                 </Box>
                 <Tooltip
                     title={
@@ -188,38 +155,27 @@ function UrlEditor({
                     </IconButton>
                 </Tooltip>
             </Box>
-            <Drawer
-                anchor="right"
-                open={drawerOpen}
-                onClose={handleDrawerClose}
-                PaperProps={{ sx: { width: 320, bgcolor: 'background.default', color: 'text.primary', p: 2 } }}
-            >
-                <List>
-                    <ListItem>
-                        <ListItemIcon><ContrastIcon /></ListItemIcon>
-                        <ListItemText primary="Theme" />
-                        <ToggleButtonGroup
-                            value={themeMode}
-                            exclusive
-                            onChange={(_e, value) => value && setThemeMode(value)}
-                            size="small"
-                            sx={{ ml: 2 }}
-                        >
-                            <ToggleButton value="light"><LightModeIcon /></ToggleButton>
-                            <ToggleButton value="dark"><DarkModeIcon /></ToggleButton>
-                        </ToggleButtonGroup>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton onClick={openOptionsPage}>
-                            <ListItemIcon><SettingsIcon /></ListItemIcon>
-                            <ListItemText primary="Settings" />
-                        </ListItemButton>
-                    </ListItem>
-                </List>
-            </Drawer>
             <SearchParams className="search-params-container row2" entries={searchParamsEntries}
                 setEntries={setSearchParamsEntries} paramsWithDelimiter={paramsWithDelimiter}
                 suggestions={suggestions} />
+            <Box className="row3" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 1, mt: 'auto' }}>
+                <Typography
+                    sx={{
+                        fontFamily: ['Leckerli One', 'monospace'].join(','),
+                        fontSize: '0.85rem',
+                        letterSpacing: '1px',
+                        opacity: 0.3,
+                        userSelect: 'none',
+                    }}
+                >
+                    ReParams
+                </Typography>
+                <Tooltip title="Settings" placement="top">
+                    <IconButton size="small" onClick={openOptionsPage} sx={{ opacity: 0.3, '&:hover': { opacity: 0.8 } }}>
+                        <SettingsIcon fontSize="small" />
+                    </IconButton>
+                </Tooltip>
+            </Box>
         </Paper>
     );
 }
