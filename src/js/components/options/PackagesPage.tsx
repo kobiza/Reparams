@@ -8,8 +8,8 @@ const PackagesPage = () => {
     const {
         state: appState,
         addNewPackage,
-        addPackages,
     } = editorStore
+
     const packagesList = Object.values(appState.packages).map((packageData) => {
         return (
             <PackagePanel key={packageData.key} packageData={packageData} packageKey={packageData.key}

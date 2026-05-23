@@ -24,6 +24,7 @@ interface ParamsEditorProps {
     domSelectors: SettingsPackage['conditions']['domSelectors']
     label: SettingsPackage['label']
     paramHistoryCount: number
+    connectedActions?: React.ReactNode
     addNewPackage: EditorStore['addNewPackage']
     updatePackageParamsWithDelimiter: EditorStore['updatePackageParamsWithDelimiter']
     updatePackageUrlPatterns: EditorStore['updatePackageUrlPatterns']
@@ -39,6 +40,7 @@ const PackageSettingsEditor = ({
     domSelectors,
     label,
     paramHistoryCount,
+    connectedActions,
     addNewPackage,
     updatePackageParamsWithDelimiter,
     updatePackageUrlPatterns,
@@ -137,7 +139,11 @@ const PackageSettingsEditor = ({
     }
 
     const addPackageWithSameSettings = () => {
-        addNewPackage({ paramsWithDelimiter, conditions: { urlPatterns, domSelectors } })
+        addNewPackage({
+            label: `Copy of ${label}`,
+            paramsWithDelimiter,
+            conditions: { urlPatterns, domSelectors },
+        })
     }
 
     const [deletePackageDialog, setDeletePackageDialog] = useState(false)
@@ -298,6 +304,13 @@ const PackageSettingsEditor = ({
                 <Button sx={{ marginTop: '10px' }} onClick={() => addPackageWithSameSettings()}
                     variant="text">Add package with same settings</Button>
             </div>
+            {connectedActions && (
+                <Box sx={{ marginTop: '12px' }}>
+                    <Divider sx={{ margin: '12px 0' }} />
+                    <Typography fontWeight="bold" sx={{ paddingY: 0.5 }}>Connected source</Typography>
+                    {connectedActions}
+                </Box>
+            )}
             <div>
                 <Button color="warning" sx={{ marginTop: '10px' }} onClick={openDeleteDialog}
                     variant="text">Delete Package</Button>

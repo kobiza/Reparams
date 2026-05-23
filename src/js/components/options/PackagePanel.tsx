@@ -7,14 +7,18 @@ import IconButton from '@mui/material/IconButton';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditIcon from '@mui/icons-material/Edit';
+import LinkIcon from '@mui/icons-material/Link';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
 import classNames from 'classnames';
 import { EditorStore, SettingsPackage } from '../../types/types';
 import { CustomTabPanel, a11yProps } from './CustomTabPanel';
 import PresetsEditor from './PresetsEditor';
 import PackageSettingsEditor from './PackageSettingsEditor';
+import ConnectedPackageActions from './ConnectedPackageActions';
 
 type PackagePanelProps = {
     packageData: SettingsPackage,
@@ -23,17 +27,21 @@ type PackagePanelProps = {
 }
 
 const PackagePanel = ({ packageData, packageKey, editorStore }: PackagePanelProps) => {
-    const { key, label, presets, paramsWithDelimiter, conditions, paramHistory } = packageData
+    const { key, label, presets, paramsWithDelimiter, conditions, paramHistory, sourceUrl, isOverride } = packageData
+    const isConnected = !!sourceUrl
     const [value, setValue] = useState(0);
     const {
         addNewPackage,
+        addPackages,
         updatePackagePreset,
         updatePackageParamsWithDelimiter,
         updatePackageLabel,
         updatePackageUrlPatterns,
         updatePackageDomSelectors,
         deletePackage,
-        clearPackageParamHistory
+        clearPackageParamHistory,
+        disconnectPackage,
+        showNotification
     } = editorStore
 
     const [accordionOpen, setAccordionOpen] = useState(false)
@@ -87,6 +95,24 @@ const PackagePanel = ({ packageData, packageKey, editorStore }: PackagePanelProp
         }
     }
 
+    const connectedIndicator = (() => {
+        if (!isConnected) return null
+        if (isOverride) {
+            return (
+                <Tooltip title={`Connected (overridden) — local edits won't be replaced by updates unless you choose Pull. Source: ${sourceUrl}`}>
+                    <LinkOffIcon aria-label="connected-overridden" color="warning" fontSize="small"
+                        sx={{ marginLeft: '8px' }} />
+                </Tooltip>
+            )
+        }
+        return (
+            <Tooltip title={`Connected to ${sourceUrl}`}>
+                <LinkIcon aria-label="connected" color="primary" fontSize="small"
+                    sx={{ marginLeft: '8px' }} />
+            </Tooltip>
+        )
+    })()
+
     return (
         <Accordion key={key} expanded={accordionOpen} onChange={handleAccordionChange}>
             <AccordionSummary
@@ -97,7 +123,8 @@ const PackagePanel = ({ packageData, packageKey, editorStore }: PackagePanelProp
                 <div className="package-name-wrapper">
                     <div className={classNames("package-name-view", { 'hidden-x': isRenameActive })}>
                         <Typography sx={{ paddingLeft: '6px' }}>{label}</Typography>
-                        <IconButton aria-label="delete" color="primary" size="small"
+                        {connectedIndicator}
+                        <IconButton aria-label="rename" color="primary" size="small"
                             sx={{ padding: '0', marginLeft: '10px' }} onClick={startRenameMode}>
                             <EditIcon fontSize="inherit" />
                         </IconButton>
@@ -139,7 +166,16 @@ const PackagePanel = ({ packageData, packageKey, editorStore }: PackagePanelProp
                                 updatePackageDomSelectors={updatePackageDomSelectors}
                                 updatePackageUrlPatterns={updatePackageUrlPatterns}
                                 deletePackage={deletePackage}
-                                clearPackageParamHistory={clearPackageParamHistory} />
+                                clearPackageParamHistory={clearPackageParamHistory}
+                                connectedActions={isConnected ? (
+                                    <ConnectedPackageActions
+                                        packageData={packageData}
+                                        addPackages={addPackages}
+                                        disconnectPackage={disconnectPackage}
+                                        showNotification={showNotification}
+                                    />
+                                ) : undefined}
+                            />
                         </CustomTabPanel>
                     </Box>
                 ) :

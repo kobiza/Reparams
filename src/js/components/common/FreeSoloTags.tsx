@@ -15,9 +15,10 @@ export type FreeSoloTagsProps = {
     sx?: SxProps<Theme>,
     options?: Array<string>,
     autoFocus?: boolean,
+    disabled?: boolean,
 }
 
-const FreeSoloTags = ({ values, onChange, sx, className, placeholderText, limitTags, onKeyUp, options = [], autoFocus = true }: FreeSoloTagsProps) => {
+const FreeSoloTags = ({ values, onChange, sx, className, placeholderText, limitTags, onKeyUp, options = [], autoFocus = true, disabled }: FreeSoloTagsProps) => {
     const highlightedRef = useRef<string | null>(null)
     const [inputValue, setInputValue] = useState('')
 
@@ -33,6 +34,7 @@ const FreeSoloTags = ({ values, onChange, sx, className, placeholderText, limitT
             limitTags={limitTags}
             disableCloseOnSelect
             filterSelectedOptions
+            disabled={disabled}
             id="multiple-limit-tags"
             options={options}
             freeSolo={true}

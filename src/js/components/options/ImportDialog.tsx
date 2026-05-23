@@ -20,10 +20,12 @@ import CircularProgress from '@mui/material/CircularProgress';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import LinkIcon from '@mui/icons-material/Link';
-import { replaceItem, toTrueObj } from "../../utils/arrayUtils";
+import { replaceItem } from "../../utils/arrayUtils";
 import { EditorStore, EditorModel, SettingsPackage } from "../../types/types";
 import { useEffect, useState } from "react";
-import { migrateModel } from "../../utils/dataFixer";
+import { migrateModel, MigrateFailureReason } from "../../utils/dataFixer";
+import { fetchModelFromUrl, FetchModelFailureReason } from "../../utils/urlImport";
+import { isGistUrl, resolveGistUrl } from "../../utils/sourceUrl";
 
 type PackageItem = { key: string, label: string, checked: boolean }
 
@@ -138,6 +140,17 @@ function AreYouSureModal({ message, replacePackages, isOpen, closeDialog }: AreY
     )
 }
 
+const migrateErrorByReason: Record<MigrateFailureReason, string> = {
+    'parse': 'Invalid JSON format',
+    'fixer-threw': "Import couldn't be upgraded to the current model version",
+    'future-version': 'Import is from a newer extension version — please update first',
+};
+
+const urlFetchErrorByReason: Record<FetchModelFailureReason, string> = {
+    'fetch-failed': "Couldn't reach the URL (network or 4xx/5xx).",
+    ...migrateErrorByReason,
+};
+
 export default function ImportDialog({
     isOpen,
     closeDialog,
@@ -148,6 +161,7 @@ export default function ImportDialog({
     const [tabValue, setTabValue] = useState(0);
     const [packagesToImport, setPackagesToImport] = useState<{ [key: string]: SettingsPackage } | null>(null);
     const [importUrl, setImportUrl] = useState('');
+    const [pendingSourceUrl, setPendingSourceUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [replaceRequiredModal, setReplaceRequiredModal] = useState(false);
@@ -167,17 +181,13 @@ export default function ImportDialog({
         setError(null);
         setPackagesToImport(null);
         setSelectedPackages([]);
+        setPendingSourceUrl(null);
     };
 
     const parseImportData = (jsonString: string): EditorModel | null => {
         const result = migrateModel(jsonString);
         if (!result.ok) {
-            const errorByReason = {
-                'parse': 'Invalid JSON format',
-                'fixer-threw': "Import couldn't be upgraded to the current model version",
-                'future-version': 'Import is from a newer extension version — please update first',
-            };
-            setError(errorByReason[result.reason]);
+            setError(migrateErrorByReason[result.reason]);
             return null;
         }
         if (!result.model.packages || Object.keys(result.model.packages).length === 0) {
@@ -225,28 +235,50 @@ export default function ImportDialog({
     };
 
     const importFromUrl = async () => {
-        if (!importUrl.trim()) {
+        const trimmed = importUrl.trim();
+        if (!trimmed) {
             setError('Please enter a URL');
             return;
         }
 
         setLoading(true);
         setError(null);
-        try {
-            const response = await fetch(importUrl);
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+
+        let urlToFetch = trimmed;
+        if (isGistUrl(trimmed)) {
+            const resolved = await resolveGistUrl(trimmed);
+            if (!resolved.ok) {
+                const messages: Record<typeof resolved.reason, string> = {
+                    'invalid-input': "Couldn't recognize that as a Gist URL.",
+                    'fetch-failed': "Couldn't reach the Gist (network or 4xx/5xx).",
+                    'no-json-file': "That Gist doesn't contain a .json file.",
+                };
+                setError(messages[resolved.reason]);
+                setLoading(false);
+                return;
             }
-            const text = await response.text();
-            const data = parseImportData(text);
-            if (data) {
-                setPackagesToImport(data.packages);
-            }
-        } catch (err) {
-            setError(`Failed to fetch from URL: ${err instanceof Error ? err.message : 'Unknown error'}`);
+            urlToFetch = resolved.rawUrl;
         }
+
+        const result = await fetchModelFromUrl(urlToFetch);
+        if (!result.ok) {
+            setError(urlFetchErrorByReason[result.reason]);
+            setLoading(false);
+            return;
+        }
+        if (!result.model.packages || Object.keys(result.model.packages).length === 0) {
+            setError('Nothing to import: no packages found');
+            setLoading(false);
+            return;
+        }
+
+        setPendingSourceUrl(urlToFetch);
+        setPackagesToImport(result.model.packages);
         setLoading(false);
     };
+
+    const stampWithSourceUrl = (pkg: SettingsPackage): SettingsPackage =>
+        pendingSourceUrl ? { ...pkg, sourceUrl: pendingSourceUrl } : pkg;
 
     const forceImportPackages = (replace: boolean) => () => {
         if (!packagesToImport) return;
@@ -254,7 +286,7 @@ export default function ImportDialog({
         const selectedPackagesToImport = Object.values(packagesToImport).filter((v, index) => {
             return selectedPackages[index]?.checked;
         });
-        const packagesObj = Object.fromEntries(selectedPackagesToImport.map(pkg => [pkg.key, pkg]));
+        const packagesObj = Object.fromEntries(selectedPackagesToImport.map(pkg => [pkg.key, stampWithSourceUrl(pkg)]));
         addPackages(packagesObj, replace);
         closeDialog();
         resetState();
@@ -265,6 +297,7 @@ export default function ImportDialog({
         setSelectedPackages([]);
         setError(null);
         setImportUrl('');
+        setPendingSourceUrl(null);
         setTabValue(0);
     };
 
@@ -280,7 +313,7 @@ export default function ImportDialog({
         });
 
         if (!isReplaceRequired) {
-            const packagesObj = Object.fromEntries(selectedPackagesToImport.map(pkg => [pkg.key, pkg]));
+            const packagesObj = Object.fromEntries(selectedPackagesToImport.map(pkg => [pkg.key, stampWithSourceUrl(pkg)]));
             addPackages(packagesObj, false);
             closeDialog();
             resetState();
@@ -362,14 +395,14 @@ export default function ImportDialog({
                         </TabPanel>
                         <TabPanel value={tabValue} index={2}>
                             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                Import packages from a URL that returns JSON data.
+                                Import packages from any URL that returns JSON data, or a GitHub Gist URL. Imported packages stay connected to the source URL so you can pull updates later.
                             </Typography>
                             <TextField
                                 fullWidth
-                                label="JSON URL"
+                                label="JSON or Gist URL"
                                 value={importUrl}
                                 onChange={(e) => setImportUrl(e.target.value)}
-                                placeholder="https://example.com/packages.json"
+                                placeholder="https://example.com/packages.json or https://gist.github.com/user/abc..."
                                 sx={{ mb: 2 }}
                                 size="small"
                             />
@@ -380,7 +413,7 @@ export default function ImportDialog({
                                 fullWidth
                                 sx={{ mb: 2 }}
                             >
-                                {loading ? <CircularProgress size={20} /> : 'Fetch from URL'}
+                                {loading ? <CircularProgress size={20} /> : 'Fetch'}
                             </Button>
                         </TabPanel>
 
