@@ -1,5 +1,6 @@
 import {ParamsWithDelimiter, ParamsWithDelimiterViewModel, SearchParamsEntries} from "../types/types";
 import {removeItem, replaceItem, toTrueObj} from "./arrayUtils";
+import { perfMark, perfMeasure } from "./perf";
 
 const mergeValues = (values1: Array<string>, values2: Array<string>): Array<string> => {
     const alreadyAdded: Record<string, true> = {}
@@ -101,24 +102,49 @@ const removeEntry = (entries: SearchParamsEntries, [entryKey, valueToRemove]: [s
 }
 
 export const mergeEntries = (entriesArr: Array<SearchParamsEntries>, paramsWithDelimiter: ParamsWithDelimiterViewModel): SearchParamsEntries => {
+    perfMark('rp:mergeEntriesStart');
     if (entriesArr.length === 0) {
+        perfMark('rp:mergeEntriesEnd');
+        perfMeasure('rp:mergeEntries', 'rp:mergeEntriesStart', 'rp:mergeEntriesEnd');
         return []
     }
     if(entriesArr.length === 1) {
+        perfMark('rp:mergeEntriesEnd');
+        perfMeasure('rp:mergeEntries', 'rp:mergeEntriesStart', 'rp:mergeEntriesEnd');
         return entriesArr[0]
     }
 
     const [first, ...rest] = entriesArr
+    const result: SearchParamsEntries = [...first]
+    const indexMap = new Map<string, number>()
+    for (let i = 0; i < result.length; i++) {
+        indexMap.set(result[i][0], i)
+    }
 
-    let lastEntries = [...first]
+    for (const arr of rest) {
+        for (const entry of arr) {
+            const [newKey, newValue] = entry
+            const idx = indexMap.get(newKey)
+            if (idx === undefined) {
+                indexMap.set(newKey, result.length)
+                result.push(entry)
+            } else {
+                const multipleValuesData = paramsWithDelimiter[newKey]
+                if (multipleValuesData) {
+                    const { separator } = multipleValuesData
+                    const currParts = result[idx][1].split(separator)
+                    const newParts = newValue.split(separator)
+                    result[idx] = [newKey, mergeValues(currParts, newParts).join(separator)]
+                } else {
+                    result[idx] = entry
+                }
+            }
+        }
+    }
 
-    rest.forEach(arr => {
-        arr.forEach((entry => {
-            lastEntries = addOrReplaceEntry(lastEntries, entry, paramsWithDelimiter)
-        }))
-    })
-
-    return lastEntries
+    perfMark('rp:mergeEntriesEnd');
+    perfMeasure('rp:mergeEntries', 'rp:mergeEntriesStart', 'rp:mergeEntriesEnd');
+    return result
 }
 
 export const removeEntries = (entries: SearchParamsEntries, entriesToRemove: SearchParamsEntries, paramsWithDelimiter: ParamsWithDelimiterViewModel): SearchParamsEntries => {

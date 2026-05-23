@@ -1,4 +1,4 @@
-import React, { createContext, PropsWithChildren, useEffect, useRef, useState } from "react";
+import React, { createContext, PropsWithChildren, useEffect, useRef, useState, useMemo } from "react";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import { EditorModel, EditorStore, PendingFirstEdit, SettingsPackage } from "../../types/types";
@@ -59,8 +59,15 @@ const UseEditorStoreContext = (props: PropsWithChildren) => {
         setNotification(null)
     }
 
+    const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     useEffect(() => {
-        localStorage.setItem(localStorageKey, JSON.stringify(appState))
+        if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = setTimeout(() => {
+            localStorage.setItem(localStorageKey, JSON.stringify(appState));
+        }, 250);
+        return () => {
+            if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+        };
     }, [appState])
 
     const applyTransform = (packageKey: string, transform: (pkg: SettingsPackage) => SettingsPackage) => {

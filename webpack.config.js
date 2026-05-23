@@ -100,16 +100,16 @@ module.exports = (env, argv) => {
     devtool: isDev ? 'source-map' : false,
     optimization: {
         minimize: !isDev,
-        // splitChunks: {
-        //     chunks: (chunk) => chunk.name !== 'content',
-        //     cacheGroups: {
-        //         vendor: {
-        //             test: /[\\/]node_modules[\\/]/,
-        //             name: 'vendors',
-        //             chunks: 'all',
-        //         },
-        //     },
-        // },
+        splitChunks: {
+            chunks: (chunk) => chunk.name !== 'content' && chunk.name !== 'background',
+            cacheGroups: {
+                vendors: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: 'vendors',
+                    chunks: (chunk) => chunk.name !== 'content' && chunk.name !== 'background',
+                },
+            },
+        },
     },
     }; // end config object
 }; // end module.exports function

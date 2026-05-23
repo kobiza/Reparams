@@ -219,9 +219,11 @@ describe('UseEditorStoreContext — clearPackageParamHistory', () => {
             expect(screen.getByTestId('history-len')).toHaveTextContent('0');
         });
 
-        const stored = JSON.parse(localStorage.getItem('reparamsAppData')!) as EditorModel;
-        expect(stored.packages['pkg-1'].paramHistory).toEqual([]);
-        expect(stored.packages['pkg-2'].paramHistory).toEqual([{ key: 'x', value: 'y' }]);
+        await waitFor(() => {
+            const stored = JSON.parse(localStorage.getItem('reparamsAppData')!) as EditorModel;
+            expect(stored.packages['pkg-1'].paramHistory).toEqual([]);
+            expect(stored.packages['pkg-2'].paramHistory).toEqual([{ key: 'x', value: 'y' }]);
+        });
     });
 
     test('clears paramHistory on a connected package without first-edit prompt (structural mutation bypasses guard)', async () => {
@@ -362,9 +364,11 @@ describe('UseEditorStoreContext — first-edit prompt for connected packages', (
         expect(screen.getByTestId('is-override')).toHaveTextContent('false');
         expect(screen.getByTestId('pending')).toHaveTextContent('closed');
         // New package is named "Copy of <prevName>"
-        const stored = JSON.parse(localStorage.getItem('reparamsAppData')!);
-        const labels = Object.values(stored.packages).map((p: any) => p.label);
-        expect(labels).toContain('Copy of Sample Package');
+        await waitFor(() => {
+            const stored = JSON.parse(localStorage.getItem('reparamsAppData')!);
+            const labels = Object.values(stored.packages).map((p: any) => p.label);
+            expect(labels).toContain('Copy of Sample Package');
+        });
     });
 
     test('cancelPendingEdit discards the captured edit without applying', async () => {

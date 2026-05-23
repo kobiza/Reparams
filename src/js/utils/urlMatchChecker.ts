@@ -3,10 +3,9 @@ const urlTlds = 'museum|travel|aero|arpa|coop|info|jobs|name|nvus|biz|com|edu|go
 const url2LevelTlds = "de.net|gb.net|uk.net|dk.org|eu.org|asn.au|com.au|conf.au|csiro.au|edu.au|gov.au|id.au|info.au|net.au|org.au|otc.au|oz.au|telememo.au|ac.cn|ah.cn|bj.cn|com.cn|cq.cn|edu.cn|gd.cn|gov.cn|gs.cn|gx.cn|gz.cn|hb.cn|he.cn|hi.cn|hk.cn|hl.cn|hn.cn|jl.cn|js.cn|ln.cn|mo.cn|net.cn|nm.cn|nx.cn|org.cn|qh.cn|sc.cn|sh.cn|sn.cn|sx.cn|tj.cn|tw.cn|xj.cn|xz.cn|yn.cn|zj.cn|ac.jp|ad.jp|aichi.jp|akita.jp|aomori.jp|chiba.jp|co.jp|ed.jp|ehime.jp|fukui.jp|fukuoka.jp|fukushima.jp|gifu.jp|go.jp|gov.jp|gr.jp|gunma.jp|hiroshima.jp|hokkaido.jp|hyogo.jp|ibaraki.jp|ishikawa.jp|iwate.jp|kagawa.jp|kagoshima.jp|kanagawa.jp|kanazawa.jp|kawasaki.jp|kitakyushu.jp|kobe.jp|kochi.jp|kumamoto.jp|kyoto.jp|lg.jp|matsuyama.jp|mie.jp|miyagi.jp|miyazaki.jp|nagano.jp|nagasaki.jp|nagoya.jp|nara.jp|ne.jp|net.jp|niigata.jp|oita.jp|okayama.jp|okinawa.jp|or.jp|org.jp|osaka.jp|saga.jp|saitama.jp|sapporo.jp|sendai.jp|shiga.jp|shimane.jp|shizuoka.jp|takamatsu.jp|tochigi.jp|tokushima.jp|tokyo.jp|tottori.jp|toyama.jp|utsunomiya.jp|wakayama.jp|yamagata.jp|yamaguchi.jp|yamanashi.jp|yokohama.jp|ac.uk|co.uk|edu.uk|gov.uk|ltd.uk|me.uk|mod.uk|net.uk|nhs.uk|nic.uk|org.uk|plc.uk|police.uk|sch.uk|co.tv";
 const urlAllTlds = ("(" + [urlTlds, url2LevelTlds].join("|") + ")").replace(/\./gi, "\\.");
 
-const escapeForRegExpURL = function(str: string) {
-    const re = new RegExp( '(\\' + [ '/', '.', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\' ].join('|\\') + ')', 'g');
-    return str.replace(re, '\\$1');
-};
+const ESCAPE_RE = /([\/\.\+\?\|\(\)\[\]\{\}\\])/g;
+
+const escapeForRegExpURL = (str: string) => str.replace(ESCAPE_RE, '\\$1');
 
 const getRegExpFromUrlPattern = function(urlPattern: string) {
     let u = urlPattern;
@@ -21,8 +20,14 @@ const getRegExpFromUrlPattern = function(urlPattern: string) {
     return '(' + u + ')';
 };
 
+const regExpCache = new Map<string, RegExp>();
+
 export const matchUrl = function(href: string, reg: string) {
-    const regExp = new RegExp(getRegExpFromUrlPattern(reg));
+    let regExp = regExpCache.get(reg);
+    if (!regExp) {
+        regExp = new RegExp(getRegExpFromUrlPattern(reg));
+        regExpCache.set(reg, regExp);
+    }
 
     return href.replace(regExp, '') == '';
 };

@@ -1,5 +1,6 @@
 import { isEmpty } from "lodash";
-import React, { MouseEventHandler, useState } from 'react';
+import React, { MouseEventHandler, useState, useMemo, useLayoutEffect, useRef } from 'react';
+import { perfMark, perfMeasure } from '../../utils/perf';
 import SearchParams from "../common/SearchParams";
 import PresetsPicker, { PresetsPickerProps } from "./PresetsPicker";
 import useCommandShortcuts from "../common/useCommandShortcuts";
@@ -76,8 +77,16 @@ function UrlEditor({
 }: UrlEditorProps) {
     // const urlData = new URL(url)
     const [newUrl, setNewUrl] = useState(currentTabUrl)
-    const newUrlData = new URL(newUrl)
-    const searchParamsEntries = [...newUrlData.searchParams.entries()]
+    const searchParamsEntries = useMemo(() => [...new URL(newUrl).searchParams.entries()], [newUrl])
+
+    const mountedRef = useRef(false);
+    useLayoutEffect(() => {
+        if (!mountedRef.current) {
+            mountedRef.current = true;
+            perfMark('rp:urlEditorReady');
+            perfMeasure('rp:timeToAutocompleteInteractive', 'rp:scriptStart', 'rp:urlEditorReady');
+        }
+    });
     const setSearchParamsEntries = (newSearchParamsEntries: Array<[string, string]>) => {
         setNewUrl((prevUrl) => {
             return addEntries(prevUrl, newSearchParamsEntries)
