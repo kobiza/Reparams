@@ -15,7 +15,9 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ContrastIcon from '@mui/icons-material/Contrast';
+import SyncIcon from '@mui/icons-material/Sync';
 import DevModeIndicator from '../common/DevModeIndicator';
+import CheckForUpdatesDialog from './CheckForUpdatesDialog';
 
 const Settings = ({ themeMode, onThemeChange }: { themeMode: 'light' | 'dark', onThemeChange: (mode: 'light' | 'dark') => void }) => {
     const editorStore = React.useContext(EditorStoreContext)
@@ -23,9 +25,11 @@ const Settings = ({ themeMode, onThemeChange }: { themeMode: 'light' | 'dark', o
         state,
         addPackages
     } = editorStore
+    const hasConnectedPackages = Object.values(state.packages).some(p => !!p.sourceUrl);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [importDialogOpen, setImportDialogOpen] = useState(false);
     const [exportDialog, setExportDialog] = useState(false);
+    const [updatesOpen, setUpdatesOpen] = useState(false);
 
     const openImportDialog = () => setImportDialogOpen(true);
     const closeImportDialog = () => setImportDialogOpen(false);
@@ -69,10 +73,20 @@ const Settings = ({ themeMode, onThemeChange }: { themeMode: 'light' | 'dark', o
                             <ListItemText primary="Export" />
                         </ListItemButton>
                     </ListItem>
+                    <ListItem disablePadding>
+                        <ListItemButton
+                            onClick={() => { setUpdatesOpen(true); setDrawerOpen(false); }}
+                            disabled={!hasConnectedPackages}
+                        >
+                            <ListItemIcon><SyncIcon /></ListItemIcon>
+                            <ListItemText primary="Update connected packages" />
+                        </ListItemButton>
+                    </ListItem>
                 </List>
                 <ImportDialog packages={state.packages} isOpen={importDialogOpen} closeDialog={closeImportDialog} addPackages={addPackages} />
                 <ExportDialog packages={state.packages} isOpen={exportDialog} closeDialog={closeExportDialog} />
             </Drawer>
+            <CheckForUpdatesDialog isOpen={updatesOpen} onClose={() => setUpdatesOpen(false)} packages={state.packages} addPackages={addPackages} />
             <div>
                 <PackagesPage />
             </div>

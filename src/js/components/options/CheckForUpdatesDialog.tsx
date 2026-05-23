@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -107,7 +109,7 @@ const CheckForUpdatesDialog = ({ isOpen, onClose, packages, addPackages }: Props
 
     return (
         <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>{applied ? 'Sync finished' : 'Check for updates'}</DialogTitle>
+            <DialogTitle>Check for updates</DialogTitle>
             <DialogContent>
                 {loading && (
                     <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
@@ -115,24 +117,23 @@ const CheckForUpdatesDialog = ({ isOpen, onClose, packages, addPackages }: Props
                     </Box>
                 )}
                 {applied && (
-                    <Box>
+                    <Alert severity="success" sx={{ mb: 1 }}>
+                        <AlertTitle>Sync finished</AlertTitle>
                         {applied.length === 0 ? (
-                            <Typography>No packages were updated.</Typography>
+                            'No packages were updated.'
                         ) : (
                             <>
-                                <Typography sx={{ mb: 1 }}>
-                                    Updated {applied.length} package{applied.length === 1 ? '' : 's'}:
-                                </Typography>
-                                <List dense>
+                                Updated {applied.length} package{applied.length === 1 ? '' : 's'}:
+                                <List dense sx={{ mt: 0.5 }}>
                                     {applied.map((pkg) => (
-                                        <ListItem key={pkg.key} disableGutters>
+                                        <ListItem key={pkg.key} disableGutters sx={{ py: 0 }}>
                                             <ListItemText primary={pkg.label} />
                                         </ListItem>
                                     ))}
                                 </List>
                             </>
                         )}
-                    </Box>
+                    </Alert>
                 )}
                 {!applied && !loading && result && !hasResults && (
                     <Typography>
