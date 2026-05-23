@@ -12,7 +12,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:fresh": "yarn build && playwright test",
-    "start": "concurrently \"webpack --mode development --watch\" \"webpack serve --mode development --static build --open\""
+    "start": "concurrently \"webpack --mode development --watch\" \"webpack serve --mode development --static build --open\"",
+    "analyze": "webpack --mode production --json > /tmp/reparams-stats.json && webpack-bundle-analyzer /tmp/reparams-stats.json build --mode static --report build/report.html --no-open"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",

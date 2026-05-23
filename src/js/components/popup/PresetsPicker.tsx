@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useLayoutEffect, useRef } from 'react'
 import type {
     AddEntriesAndNavigate,
     ParamsWithDelimiterViewModel,
@@ -11,6 +11,7 @@ import './PresetsPicker.scss'
 import {SearchParamsEntries, SetEntries} from "../../types/types";
 import {mergeEntries, removeEntries} from "../../utils/searchParamsUtils";
 import Tags, {TagsProps} from "../common/MuiTags";
+import { perfMark, perfMeasure } from '../../utils/perf';
 
 
 // const PresetsPicker = ({presetsNames, allPresetsNames}: PresetsPickerProps) => {
@@ -132,6 +133,15 @@ const getEntriesAfterRemovingPreset = (sourceEntries: SearchParamsEntries, prese
 const PresetsPicker = (props: PresetsPickerProps) => {
     const {className, presets, paramsWithDelimiter, entries, setEntries, addEntriesAndNavigate} = props
     const presetsKeys = Object.keys(presets)
+
+    const mountedRef = useRef(false);
+    useLayoutEffect(() => {
+        if (!mountedRef.current) {
+            mountedRef.current = true;
+            perfMark('rp:presetsPickerReady');
+            perfMeasure('rp:timeToPresetsInteractive', 'rp:scriptStart', 'rp:presetsPickerReady');
+        }
+    });
 
 
 

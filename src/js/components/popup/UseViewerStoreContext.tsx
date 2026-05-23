@@ -1,9 +1,10 @@
 /// <reference types="chrome"/>
-import React, { createContext, PropsWithChildren, useEffect, useState } from "react";
+import React, { createContext, PropsWithChildren, useEffect, useMemo, useLayoutEffect, useRef, useState } from "react";
 import { EditorModel, ViewerStore } from "../../types/types";
 import { getRelevantPackages, toViewerModel } from "../../utils/utils";
 import type { DomSelectorResultMessage, DomSelectorRequestMessage } from "../../types/types";
 import { CURRENT_MODEL_VERSION, loadAndMigrateAppData } from "../../utils/dataFixer";
+import { perfMark, perfMeasure } from "../../utils/perf";
 
 
 export const ViewerStoreContext = createContext<ViewerStore>({
@@ -25,39 +26,65 @@ const UseViewerStoreContext = (props: PropsWithChildren<{ currentTabUrl: string 
     const { currentTabUrl } = props
     const [filterCriteriaResult, setFilterCriteriaResult] = useState<Record<string, boolean>>({})
 
+    perfMark('rp:viewerStoreRender');
 
-    const settings = getSettings()
+    const settings = useMemo(() => {
+        perfMark('rp:loadSettingsStart');
+        const s = getSettings();
+        perfMark('rp:loadSettingsEnd');
+        perfMeasure('rp:loadSettings', 'rp:loadSettingsStart', 'rp:loadSettingsEnd');
+        return s;
+    }, []);
 
+    const domSelectors = useMemo(() => (
+        Object.keys(
+            Object.values(settings.packages)
+                .flatMap(pkg => pkg.conditions.domSelectors)
+                .reduce<Record<string, true>>((acc, curr) => { acc[curr.value] = true; return acc; }, {})
+        )
+    ), [settings]);
 
-    const domSelectors = Object.keys(Object.values(settings.packages).flatMap(packageSettings => packageSettings.conditions.domSelectors).reduce<Record<string, true>>((acc, curr) => {
-        acc[curr.value] = true
-        return acc
-    }, {}))
+    const viewerState = useMemo(() => {
+        perfMark('rp:toViewerModelStart');
+        const state = toViewerModel(getRelevantPackages(settings, currentTabUrl, filterCriteriaResult), currentTabUrl);
+        perfMark('rp:toViewerModelEnd');
+        perfMeasure('rp:toViewerModel', 'rp:toViewerModelStart', 'rp:toViewerModelEnd');
+        return state;
+    }, [settings, currentTabUrl, filterCriteriaResult]);
+
+    const contextValue = useMemo(() => ({ state: viewerState }), [viewerState]);
+
+    const providerMountedRef = useRef(false);
+    useLayoutEffect(() => {
+        if (!providerMountedRef.current) {
+            providerMountedRef.current = true;
+            perfMark('rp:viewerStoreReady');
+            perfMeasure('rp:viewerStoreInit', 'rp:scriptStart', 'rp:viewerStoreReady');
+        }
+    });
 
     useEffect(() => {
         const isRunInChromeExtension = chrome.tabs
         const messageListener = (message: DomSelectorResultMessage) => {
             if (message.type === 'DOM_SELECTOR_RESULT') {
+                perfMark('rp:domSelectorReply');
+                perfMeasure('rp:domSelectorRoundTrip', 'rp:domSelectorSent', 'rp:domSelectorReply');
                 setFilterCriteriaResult(message.domSelectorResult);
             }
         };
 
         if (isRunInChromeExtension) {
-            // Send message to content script to check for commonConfig
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs: chrome.tabs.Tab[]) => {
                 if (tabs[0]?.id) {
                     const message: DomSelectorRequestMessage = { type: 'DOM_SELECTOR_REQUEST', domSelectors };
-                    // No content script in tabs that predate the extension load, or on chrome:// URLs.
+                    perfMark('rp:domSelectorSent');
                     chrome.tabs.sendMessage(tabs[0].id, message).catch(() => { });
                 }
             });
 
-            // Listen for response from content script
             chrome.runtime.onMessage.addListener(messageListener);
         }
 
-
-        // Cleanup listener when component unmounts
         return () => {
             if (isRunInChromeExtension) {
                 chrome.runtime.onMessage.removeListener(messageListener);
@@ -66,9 +93,7 @@ const UseViewerStoreContext = (props: PropsWithChildren<{ currentTabUrl: string 
     }, []);
 
     return (
-        <ViewerStoreContext.Provider value={{
-            state: toViewerModel(getRelevantPackages(settings, currentTabUrl, filterCriteriaResult), currentTabUrl),
-        }}>
+        <ViewerStoreContext.Provider value={contextValue}>
             {props.children}
         </ViewerStoreContext.Provider>
     )
