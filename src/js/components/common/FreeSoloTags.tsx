@@ -4,6 +4,7 @@ import TextField from '@mui/material/TextField';
 import type { Theme } from '@mui/material/styles';
 import type { SxProps } from "@mui/system";
 import { autocompleteListboxSx } from "./autocompleteListboxSx";
+import { useRegisterDraftFlush } from "./DraftFlushContext";
 
 export type FreeSoloTagsProps = {
     values: Array<string>,
@@ -21,6 +22,21 @@ export type FreeSoloTagsProps = {
 const FreeSoloTags = ({ values, onChange, sx, className, placeholderText, limitTags, onKeyUp, options = [], autoFocus = true, disabled }: FreeSoloTagsProps) => {
     const highlightedRef = useRef<string | null>(null)
     const [inputValue, setInputValue] = useState('')
+
+    const inputValueRef = useRef(inputValue)
+    inputValueRef.current = inputValue
+    const valuesRef = useRef(values)
+    valuesRef.current = values
+    const onChangeRef = useRef(onChange)
+    onChangeRef.current = onChange
+
+    useRegisterDraftFlush(() => {
+        const typed = inputValueRef.current.trim()
+        if (typed && !valuesRef.current.includes(typed)) {
+            onChangeRef.current([...valuesRef.current, typed])
+            setInputValue('')
+        }
+    })
 
     const onChangeHandler = (e: any, newValues: any) => {
         onChange(newValues as Array<string>)
