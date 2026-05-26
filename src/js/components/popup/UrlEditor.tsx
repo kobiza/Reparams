@@ -10,6 +10,13 @@ import ShortcutHint from "../common/ShortcutHint";
 
 import IconButton from '@mui/material/IconButton';
 import SettingsIcon from '@mui/icons-material/Settings';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import ContrastIcon from '@mui/icons-material/Contrast';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 
 import {
@@ -33,6 +40,8 @@ type UrlEditorProps = {
     quickActions: QuickActionData
     suggestions: ParamSuggestions
     className?: string,
+    themeMode: 'light' | 'dark',
+    setThemeMode: (mode: 'light' | 'dark') => void,
 }
 
 const addEntries = (url: string, newEntries: Array<[string, string]>) => {
@@ -52,9 +61,11 @@ function UrlEditor({
     presets,
     paramsWithDelimiter,
     suggestions,
+    themeMode,
+    setThemeMode,
 }: UrlEditorProps) {
-    // const urlData = new URL(url)
     const [newUrl, setNewUrl] = useState(currentTabUrl)
+    const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
     const searchParamsEntries = useMemo(() => [...new URL(newUrl).searchParams.entries()], [newUrl])
 
     const mountedRef = useRef(false);
@@ -132,6 +143,11 @@ function UrlEditor({
                     mb: 1,
                 }}
             >
+                <Tooltip title="Menu" placement="bottom-start">
+                    <IconButton aria-label="menu" onClick={e => setMenuAnchor(e.currentTarget)} sx={{ flexShrink: 0 }}>
+                        <MoreVertIcon />
+                    </IconButton>
+                </Tooltip>
                 <Box sx={{ flex: 1, minWidth: 0 }}>
                     <PresetsPicker className="presets-picker" entries={searchParamsEntries}
                         setEntries={setSearchParamsEntries} presets={presets}
@@ -158,24 +174,30 @@ function UrlEditor({
             <SearchParams className="search-params-container row2" entries={searchParamsEntries}
                 setEntries={setSearchParamsEntries} paramsWithDelimiter={paramsWithDelimiter}
                 suggestions={suggestions} />
-            <Box className="row3" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 1, mt: 'auto' }}>
-                <Typography
-                    sx={{
-                        fontFamily: ['Leckerli One', 'monospace'].join(','),
-                        fontSize: '0.85rem',
-                        letterSpacing: '1px',
-                        opacity: 0.3,
-                        userSelect: 'none',
-                    }}
-                >
-                    ReParams
-                </Typography>
-                <Tooltip title="Settings" placement="top">
-                    <IconButton size="small" onClick={openOptionsPage} sx={{ opacity: 0.3, '&:hover': { opacity: 0.8 } }}>
+            <Menu
+                anchorEl={menuAnchor}
+                open={Boolean(menuAnchor)}
+                onClose={() => setMenuAnchor(null)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+            >
+                <MenuItem onClick={() => { setThemeMode(themeMode === 'light' ? 'dark' : 'light'); setMenuAnchor(null); }}>
+                    <ListItemIcon>
+                        <ContrastIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Theme</ListItemText>
+                    <Typography variant="body2" sx={{ ml: 3, opacity: 0.5, textTransform: 'capitalize' }}>
+                        {themeMode}
+                    </Typography>
+                </MenuItem>
+                <MenuItem onClick={() => { openOptionsPage(); setMenuAnchor(null); }}>
+                    <ListItemIcon>
                         <SettingsIcon fontSize="small" />
-                    </IconButton>
-                </Tooltip>
-            </Box>
+                    </ListItemIcon>
+                    <ListItemText>Settings</ListItemText>
+                    <OpenInNewIcon fontSize="small" sx={{ ml: 3, opacity: 0.5 }} />
+                </MenuItem>
+            </Menu>
         </Paper>
     );
 }

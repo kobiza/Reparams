@@ -2,9 +2,6 @@ import React, { useContext, useState } from 'react';
 import './popup.scss'
 import UrlEditor from "./UrlEditor";
 import { ViewerStoreContext } from "./UseViewerStoreContext";
-import Switch from '@mui/material/Switch';
-import LightModeIcon from '@mui/icons-material/LightMode';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
 import Box from '@mui/material/Box';
 import InputBase from '@mui/material/InputBase';
 import HttpsIcon from '@mui/icons-material/Https';
@@ -62,7 +59,6 @@ function Popup({ currentTabUrl, tabId, themeMode, setThemeMode }: {
                     />
                 </Box>
             )}
-            {/* Removed the theme toggle from here, only in Drawer now */}
             <UrlEditor
                 currentTabUrl={currentTabUrl}
                 updateCurrentTabUrl={updateCurrentTabUrl}
@@ -71,6 +67,8 @@ function Popup({ currentTabUrl, tabId, themeMode, setThemeMode }: {
                 paramsWithDelimiter={state.paramsWithDelimiter}
                 quickActions={state.quickActions}
                 suggestions={state.suggestions}
+                themeMode={themeMode}
+                setThemeMode={setThemeMode}
             />
             {/*<Settings/>*/}
             <DevModeIndicator />

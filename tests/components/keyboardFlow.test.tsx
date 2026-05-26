@@ -523,6 +523,8 @@ describe('Tooltips for keyboard shortcuts', () => {
                 paramsWithDelimiter={{}}
                 quickActions={[]}
                 suggestions={{ keys: [], valuesByKey: {} }}
+                themeMode="light"
+                setThemeMode={jest.fn()}
             />
         )
         const fab = screen.getByRole('button', { name: 'apply url' })
