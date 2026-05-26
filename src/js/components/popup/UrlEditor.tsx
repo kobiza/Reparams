@@ -1,4 +1,5 @@
-import React, { MouseEventHandler, useState, useMemo, useLayoutEffect, useRef } from 'react';
+import React, { MouseEventHandler, useState, useMemo, useLayoutEffect, useRef, useEffect } from 'react';
+import { flushSync } from 'react-dom';
 import { perfMark, perfMeasure } from '../../utils/perf';
 import SearchParams from "../common/SearchParams";
 import PresetsPicker, { PresetsPickerProps } from "./PresetsPicker";
@@ -28,6 +29,7 @@ import {
 } from "../../types/types";
 import { captureParamHistory } from "../../utils/paramHistoryCaptureService";
 import { dropEmptyEntries } from "../../utils/searchParamsUtils";
+import { DraftFlushContext, createDraftFlushRegistry } from "../common/DraftFlushContext";
 import './UrlEditor.scss'
 import Paper from '@mui/material/Paper';
 
@@ -68,6 +70,10 @@ function UrlEditor({
     const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
     const searchParamsEntries = useMemo(() => [...new URL(newUrl).searchParams.entries()], [newUrl])
 
+    const draftFlush = useMemo(() => createDraftFlushRegistry(), [])
+    const newUrlRef = useRef(newUrl)
+    useEffect(() => { newUrlRef.current = newUrl }, [newUrl])
+
     const mountedRef = useRef(false);
     useLayoutEffect(() => {
         if (!mountedRef.current) {
@@ -101,8 +107,13 @@ function UrlEditor({
         })
     }
 
+    const flushAndNavigate = (shouldOpenNewTab: boolean) => {
+        flushSync(() => draftFlush.flushAll())
+        navigateWith(newUrlRef.current, shouldOpenNewTab)
+    }
+
     const applyUrl: MouseEventHandler<HTMLButtonElement> = (e) => {
-        navigateWith(newUrl, e.metaKey)
+        flushAndNavigate(e.metaKey)
     }
 
     const openOptionsPage = () => {
@@ -116,12 +127,12 @@ function UrlEditor({
         shortcuts: [
             {
                 keys: ['Meta', 'Enter'],
-                callback: () => navigateWith(newUrl, false),
+                callback: () => flushAndNavigate(false),
                 description: 'Apply URL changes'
             },
             {
                 keys: ['Meta', 'Shift', 'Enter'],
-                callback: () => navigateWith(newUrl, true),
+                callback: () => flushAndNavigate(true),
                 description: 'Apply URL changes in new tab'
             }
         ],
@@ -129,6 +140,7 @@ function UrlEditor({
     });
 
     return (
+        <DraftFlushContext.Provider value={draftFlush}>
         <Paper elevation={0} className="url-editor" sx={{ p: 2, bgcolor: 'background.paper' }}>
             <Box
                 className="row1"
@@ -199,6 +211,7 @@ function UrlEditor({
                 </MenuItem>
             </Menu>
         </Paper>
+        </DraftFlushContext.Provider>
     );
 }
 
