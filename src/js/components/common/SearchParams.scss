@@ -29,6 +29,11 @@
 
 .query-param-input-value {
     flex: 2;
+    min-width: 0;
+
+    .MuiAutocomplete-tag {
+        max-width: 100%;
+    }
 }
 
 .query-param-input-delete-slot {
