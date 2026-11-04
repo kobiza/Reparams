@@ -1,6 +1,6 @@
 {
   "name": "Reparams",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "manifest_version": 3,
   "action": {
     "default_title": "ReParams",
@@ -24,7 +24,6 @@
     }
   ],
   "permissions": [
-    "storage",
     "clipboardWrite",
     "activeTab"
   ],
